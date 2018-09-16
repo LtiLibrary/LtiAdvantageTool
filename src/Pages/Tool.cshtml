@@ -1,8 +1,78 @@
 ﻿@page
-@model AdvantageTool.Pages.ToolModel
+@using LtiLibrary.NetCore.Extensions
+@using Microsoft.CodeAnalysis.Operations
+@model ToolModel
 @{
     ViewData["Title"] = "Tool";
 }
 
-<h1 class="mt-5">Tool</h1>
-
+<div class="row">
+    <div class="col">
+        @if (string.IsNullOrEmpty(Model.Error))
+        {
+            <div class="alert alert-success">Launch Successful!</div>
+        }
+        else
+        {
+            <div class="alert alert-danger">@Model.Error</div>
+        }
+    </div>
+</div>
+@if (string.IsNullOrEmpty(Model.Error))
+{
+    <div class="row">
+        <div class="col-6">
+            <div class="card">
+                <div class="card-header">
+                    JWT Payload
+                </div>
+                <pre class="card-body">@Model.LtiRequest.ToJsonString()</pre>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="card">
+                <div class="card-header">
+                    LTI Resource Link Request
+                </div>
+                <div class="card-body">
+                    <dl>
+                        <dt>Message Type</dt>
+                        <dd>@Model.LtiRequest.MessageType</dd>
+                        <dt>Version</dt>
+                        <dd>@Model.LtiRequest.Version</dd>
+                        <dt>Deployment ID</dt>
+                        <dd>@Model.LtiRequest.DeploymentId</dd>
+                        <dt>Resource Link</dt>
+                        <dd><pre>@Model.LtiRequest.ResourceLink.ToJsonString()</pre></dd>
+                        <dt>Context</dt>
+                        <dd><pre>@Model.LtiRequest.Context.ToJsonString()</pre></dd>
+                        <dt>Roles</dt>
+                        <dd><pre>@Model.LtiRequest.Roles.ToJsonString()</pre></dd>
+                        <dt>Iss</dt>
+                        <dd>@Model.LtiRequest.Iss</dd>
+                        <dt>Sub</dt>
+                        <dd>@Model.LtiRequest.Sub</dd>
+                        <dt>Aud</dt>
+                        <dd><pre>@Model.LtiRequest.Aud.ToJsonString()</pre></dd>
+                        <dt>Exp</dt>
+                        <dd>@Model.LtiRequest.Exp</dd>
+                        <dt>Iat</dt>
+                        <dd>@Model.LtiRequest.Iat</dd>
+                        <dt>Azp</dt>
+                        <dd>@Model.LtiRequest.Azp</dd>
+                        <dt>Nonce</dt>
+                        <dd>@Model.LtiRequest.Nonce</dd>
+                        <dt>Given Name</dt>
+                        <dd>@Model.LtiRequest.GivenName</dd>
+                        <dt>Middle Name</dt>
+                        <dd>@Model.LtiRequest.MiddleName</dd>
+                        <dt>Family Name</dt>
+                        <dd>@Model.LtiRequest.FamilyName</dd>
+                        <dt>Name</dt>
+                        <dd>@Model.LtiRequest.Name</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+}
