@@ -24,12 +24,26 @@
         <div class="col-6">
             <div class="card">
                 <div class="card-header">
+                    JWT Header
+                </div>
+                <pre class="card-body">@Model.Token.Header.ToJsonString()</pre>
+            </div>
+            <div class="card">
+                <div class="card-header">
                     JWT Payload
                 </div>
                 <pre class="card-body">@Model.LtiRequest.ToJsonString()</pre>
             </div>
         </div>
         <div class="col-6">
+            <div class="card">
+                <div class="card-header">
+                    Security Check
+                </div>
+                <div class="card-body">
+                    Signature correct for issuer [@Model.Token.Issuer]
+                </div>
+            </div>
             <div class="card">
                 <div class="card-header">
                     LTI Resource Link Request
@@ -44,10 +58,6 @@
                         <dd>@Model.LtiRequest.DeploymentId</dd>
                         <dt>Resource Link</dt>
                         <dd><pre>@Model.LtiRequest.ResourceLink.ToJsonString()</pre></dd>
-                        <dt>Context</dt>
-                        <dd><pre>@Model.LtiRequest.Context.ToJsonString()</pre></dd>
-                        <dt>Roles</dt>
-                        <dd><pre>@Model.LtiRequest.Roles.ToJsonString()</pre></dd>
                         <dt>Iss</dt>
                         <dd>@Model.LtiRequest.Iss</dd>
                         <dt>Sub</dt>
@@ -76,6 +86,21 @@
                         <dd>@Model.LtiRequest.Email</dd>
                         <dt>Locale</dt>
                         <dd>@Model.LtiRequest.Locale</dd>
+
+                        <dt>Context</dt>
+                        <dd><pre>@Model.LtiRequest.Context.ToJsonString()</pre></dd>
+                        <dt>Roles</dt>
+                        <dd><pre>@Model.LtiRequest.Roles.ToJsonString()</pre></dd>
+                        <dt>Launch Presentation</dt>
+                        <dd><pre>@Model.LtiRequest.LaunchPresentation.ToJsonString()</pre></dd>
+                        <dt>Role Scope Mentor</dt>
+                        <dd>@Model.LtiRequest.RoleScopeMentor.ToJsonString()</dd>
+                        <dt>Tool Platform</dt>
+                        <dd><pre>@Model.LtiRequest.ToolPlatform.ToJsonString()</pre></dd>
+                        
+                        <dt>Custom</dt>
+                        <dd><pre>@Model.LtiRequest.Custom.ToJsonString()</pre></dd>
+
                     </dl>
                 </div>
             </div>
