@@ -1,8 +1,7 @@
 ﻿using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
-using LtiLibrary.NetCore.Common;
-using LtiLibrary.NetCore.Lti.v1p3;
+using LtiAdvantageLibrary.NetCore.Lti;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -150,52 +149,9 @@ oQIDAQAB
                 return Page();
             }
 
-            try
-            {
-                LtiRequest = new LtiResourceLinkRequest(Token.Payload);
-            }
-            catch (LtiException e)
-            {
-                Error = e.Message;
-            }
+            LtiRequest = new LtiResourceLinkRequest(Token.Payload);
 
             return Page();
         }
-
-        //private LtiRequest GetLtiRequest(JwtSecurityToken token)
-        //{
-        //    var messageType = token.Claims
-        //        .SingleOrDefault(c => c.Type == "https://purl.imsglobal.org/spec/lti/claim/message_type")?.Value;
-        //    if (string.IsNullOrEmpty(messageType))
-        //    {
-        //        throw new LtiException("message_type is missing from token.");
-        //    }
-
-        //    var version = token.Claims
-        //        .SingleOrDefault(c => c.Type == "https://purl.imsglobal.org/spec/lti/claim/version")?.Value;
-        //    if (string.IsNullOrEmpty(version))
-        //    {
-        //        throw new LtiException("version is missing from token.");
-        //    }
-
-        //    var deploymentId = token.Claims
-        //        .SingleOrDefault(c => c.Type == "https://purl.imsglobal.org/spec/lti/claim/deployment_id")?.Value;
-        //    if (string.IsNullOrEmpty(version))
-        //    {
-        //        throw new LtiException("deployment_id is missing from token.");
-        //    }
-
-        //    var request = new LtiRequest(messageType)
-        //    {
-        //        DeploymentId = deploymentId,
-        //        LtiVersion = version
-        //    };
-
-        //    request.LisPersonNameFamily = token.GetClaimValueAsString("family_name");
-        //    request.LisPersonNameGiven = token.GetClaimValueAsString("given_name");
-        //    request.LisPersonNameMiddle = token.GetClaimValueAsString("middle_name");
-
-        //    return request;
-        //}
     }
 }
