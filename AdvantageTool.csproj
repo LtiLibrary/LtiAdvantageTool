@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\LtiAdvantageLibrary\src\LtiAdvantageLibrary.NetCore\LtiAdvantageLibrary.NetCore.csproj" />
+    <ProjectReference Include="..\..\LtiAdvantageLibrary\src\LtiAdvantageLibrary.NetCore\LtiAdvantageLibrary.NetCore.csproj" />
   </ItemGroup>
 
 </Project>

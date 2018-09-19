@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28010.2019
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AdvantageTool", "src\AdvantageTool.csproj", "{EE85544E-A9AB-4FB4-B1C7-DF43A119D993}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AdvantageTool", "AdvantageTool.csproj", "{EE85544E-A9AB-4FB4-B1C7-DF43A119D993}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LtiAdvantageLibrary.NetCore", "..\..\LtiAdvantageLibrary\src\LtiAdvantageLibrary.NetCore\LtiAdvantageLibrary.NetCore.csproj", "{926FA46D-4DD2-4F09-89D3-1E948747CFE2}"
 EndProject
