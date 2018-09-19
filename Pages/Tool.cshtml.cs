@@ -155,6 +155,8 @@ oQIDAQAB
                 return Page();
             }
 
+            // Wrap the JwtPayload in an LtiResourceLinkRequest.
+            
             LtiRequest = new LtiResourceLinkRequest(Token.Payload);
 
             return Page();
