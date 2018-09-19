@@ -25,6 +25,11 @@ namespace AdvantageTool.Pages
         [BindProperty(Name = "id_token")]
         public string IdToken { get; set; }
 
+        /// <summary>
+        /// This is a wrapper around the JwtPayload that makes it easy to examine the
+        /// claims. For example, LtiRequest.Roles gets the role claims as an Enum array
+        /// so you don't have to match string values.
+        /// </summary>
         public LtiResourceLinkRequest LtiRequest { get; set; }
 
         /// <summary>
