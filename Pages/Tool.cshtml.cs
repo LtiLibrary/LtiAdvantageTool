@@ -20,7 +20,8 @@ namespace AdvantageTool.Pages
         public string Error { get; set; }
 
         /// <summary>
-        /// Get or set the id_token in the request.
+        /// Get or set the id_token (JWT) in the request. Platforms will always send the
+        /// id_token of a launch request in the body of a form post.
         /// </summary>
         [BindProperty(Name = "id_token")]
         public string IdToken { get; set; }
