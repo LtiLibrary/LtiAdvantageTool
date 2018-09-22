@@ -20,11 +20,17 @@ namespace AdvantageTool.Pages
         public string Error { get; set; }
 
         /// <summary>
-        /// Get or set the id_token in the request.
+        /// Get or set the id_token (JWT) in the request. Platforms will always send the
+        /// id_token of a launch request in the body of a form post.
         /// </summary>
         [BindProperty(Name = "id_token")]
         public string IdToken { get; set; }
 
+        /// <summary>
+        /// This is a wrapper around the JwtPayload that makes it easy to examine the
+        /// claims. For example, LtiRequest.Roles gets the role claims as an Enum array
+        /// so you don't have to match string values.
+        /// </summary>
         public LtiResourceLinkRequest LtiRequest { get; set; }
 
         /// <summary>
@@ -149,6 +155,8 @@ oQIDAQAB
                 return Page();
             }
 
+            // Wrap the JwtPayload in an LtiResourceLinkRequest.
+            
             LtiRequest = new LtiResourceLinkRequest(Token.Payload);
 
             return Page();
