@@ -118,7 +118,7 @@ namespace AdvantageTool.Pages
             // Prepare the TokenValidationParameters using information
             // gathered during previous registration process
 
-            var publicKey =
+            const string publicKey = 
 @"-----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxwNk5GjdXmb4iFWOe/Lf
 kWYfuzUhU+rHef4FziWJq31RZUkdKjaul0MyUwPZ/u2Gpzpdr1hNSa3Kmtj4BQk8
