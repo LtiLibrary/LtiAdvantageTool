@@ -1,0 +1,25 @@
+﻿@page
+@model DetailsModel
+
+@{
+    ViewData["Title"] = "Clients";
+}
+
+<div class="container">
+    <h4>Client Details</h4>
+    <hr />
+    <dl>
+        <dt>@Html.DisplayNameFor(model => model.Client.Id)</dt>
+        <dd>@Html.DisplayFor(model => model.Client.Id)</dd>
+        <dt>@Html.DisplayNameFor(model => model.Client.Name)</dt>
+        <dd>@Html.DisplayFor(model => model.Client.Name)</dd>
+        <dt>@Html.DisplayNameFor(model => model.Client.PrivateKey)</dt>
+        <dd><pre>@Html.DisplayFor(model => model.Client.PrivateKey)</pre></dd>
+        <dt>@Html.DisplayNameFor(model => model.Client.PublicKey)</dt>
+        <dd><pre>@Html.DisplayFor(model => model.Client.PublicKey)</pre></dd>
+    </dl>
+    <div>
+        <a asp-page="./Edit" asp-route-id="@Model.Client.Id">Edit</a> |
+        <a asp-page="./Index">Back to List</a>
+    </div>
+</div>

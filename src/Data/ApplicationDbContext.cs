@@ -9,5 +9,8 @@ namespace AdvantageTool.Data
             : base(options)
         {
         }
+
+        public DbSet<Client> Clients { get; set; }
+        public DbSet<Platform> Platforms { get; set; }
     }
 }
