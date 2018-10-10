@@ -12,6 +12,7 @@ namespace AdvantageTool.Data
         public string Id { get; set; }
 
         [Required]
+        [PublicKey]
         [Display(Name = "Public Key")]
         public string PublicKey { get; set; }
 

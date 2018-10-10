@@ -1,0 +1,76 @@
+﻿@page
+@model EditModel
+
+@{
+    ViewData["Title"] = "Platforms";
+}
+
+<div class="container">
+    <h4>Edit Platform</h4>
+    <hr />
+    <div class="row">
+        <div class="col-md-7">
+            <form method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="Platform.UserId" />
+                <div class="form-group">
+                    <label asp-for="Platform.Id"></label>
+                    <input asp-for="Platform.Id" class="form-control col-md-6" />
+                    <span asp-validation-for="Platform.Id" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Platform.Name"></label>
+                    <input asp-for="Platform.Name" class="form-control col-md-6" />
+                    <span asp-validation-for="Platform.Name" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Platform.PublicKey"></label>
+                    <textarea asp-for="Platform.PublicKey" class="form-control text-monospace" rows="5"></textarea>
+                    <span asp-validation-for="Platform.PublicKey" class="text-danger"></span>
+                </div>
+                <p>The following fields can be overwritten by an LTI Resource Link Request.</p>
+                <div class="form-group">
+                    <label asp-for="Platform.ContactEmail"></label>
+                    <input asp-for="Platform.ContactEmail" class="form-control col-md-6" />
+                    <span asp-validation-for="Platform.ContactEmail" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Platform.Description"></label>
+                    <input asp-for="Platform.Description" class="form-control col-md-6" />
+                    <span asp-validation-for="Platform.Description" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Platform.Guid"></label>
+                    <input asp-for="Platform.Guid" class="form-control col-md-6" />
+                    <span asp-validation-for="Platform.Guid" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Platform.ProductFamilyCode"></label>
+                    <input asp-for="Platform.ProductFamilyCode" class="form-control col-md-6" />
+                    <span asp-validation-for="Platform.ProductFamilyCode" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Platform.Url"></label>
+                    <input asp-for="Platform.Url" class="form-control col-md-6" />
+                    <span asp-validation-for="Platform.Url" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Platform.Version"></label>
+                    <input asp-for="Platform.Version" class="form-control col-md-6" />
+                    <span asp-validation-for="Platform.Version" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="Save" class="btn btn-secondary" />
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div>
+        <a asp-page="./Index">Back to List</a>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

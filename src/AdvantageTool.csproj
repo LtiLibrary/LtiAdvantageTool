@@ -16,7 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Pages\Platforms\" />
     <Folder Include="wwwroot\lib\" />
   </ItemGroup>
 

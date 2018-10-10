@@ -1,0 +1,44 @@
+﻿@page
+@model CreateModel
+
+@{
+    ViewData["Title"] = "Platforms";
+}
+
+<div class="container">
+    <h4>Create Platform</h4>
+    <hr />
+    <div class="row">
+        <div class="col-md-7">
+            <form method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    <label asp-for="Platform.Id"></label>
+                    <input asp-for="Platform.Id" class="form-control col-md-5" />
+                    <span asp-validation-for="Platform.Id" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Platform.Name"></label>
+                    <input asp-for="Platform.Name" class="form-control col-md-5" />
+                    <span asp-validation-for="Platform.Name" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Platform.PublicKey"></label>
+                    <textarea asp-for="Platform.PublicKey" class="form-control text-monospace" Rows="5"></textarea>
+                    <span asp-validation-for="Platform.PublicKey" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="Create" class="btn btn-secondary" />
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div>
+        <a asp-page="Index">Back to List</a>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
