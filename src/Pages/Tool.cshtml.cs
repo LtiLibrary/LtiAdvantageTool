@@ -1,11 +1,13 @@
 ﻿using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Threading.Tasks;
+using AdvantageTool.Data;
 using LtiAdvantageLibrary.NetCore.Lti;
 using LtiAdvantageLibrary.NetCore.Utilities;
-using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 namespace AdvantageTool.Pages
@@ -15,6 +17,13 @@ namespace AdvantageTool.Pages
     [IgnoreAntiforgeryToken(Order = 1001)]
     public class ToolModel : PageModel
     {
+        private readonly ApplicationDbContext _context;
+
+        public ToolModel(ApplicationDbContext context)
+        {
+            _context = context;
+        }
+
         /// <summary>
         /// Get or set the error discovered while parsing the request.
         /// </summary>
@@ -44,7 +53,7 @@ namespace AdvantageTool.Pages
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        public IActionResult OnPost()
+        public async Task<IActionResult> OnPost()
         {
             // Authenticate the request starting at step 5 in the OpenId Implicit Flow
             // See https://www.imsglobal.org/spec/security/v1p0/#platform-originating-messages
@@ -72,28 +81,41 @@ namespace AdvantageTool.Pages
             // Authentication Response Validation
             // See https://www.imsglobal.org/spec/security/v1p0/#authentication-response-validation
 
-            // The Issuer Identifier for the Platform MUST exactly match the value of the iss (Issuer)
+            // The Issuer Identifier for the Platform MUST exactly match the value of the Issuer (iss)
             // Claim (therefore the Tool MUST previously have been made aware of this identifier). The
-            // Issuer Identifier was collected in an offline process.
+            // Issuer Identifier is collected in an offline process.
             // See https://www.imsglobal.org/spec/security/v1p0/#dfn-issuer-identifier
-            
             if (string.IsNullOrEmpty(Token.Issuer))
             {
                 Error = "Issuer is missing from id_token";
                 return Page();
             }
-
-            // Look for the local record of this issuer
-            
-            var issuer = Token.Issuer; // Normally this would actually look up the issuer
-            if (string.IsNullOrEmpty(issuer))
+            var platform = await _context.Platforms.FindAsync(Token.Issuer);
+            if (platform == null)
             {
-                Error = $"Issuer '{issuer}' is not recognized.";
+                Error = $"Issuer '{Token.Issuer}' is not recognized.";
+                return Page();
+            }
+
+            // The Audience Claim must match a Client ID exactly.
+            if (!Token.Audiences.Any())
+            {
+                Error = "Audiences are missing from id_token";
+            }
+
+            Client client = null;
+            foreach (var audience in Token.Audiences)
+            {
+                client = await _context.Clients.FindAsync(audience);
+                if (client != null) break;
+            }
+            if (client == null)
+            {
+                Error = $"Audiences '{string.Join(", ", Token.Audiences)}' are not recogized.";
                 return Page();
             }
 
             // The ID Token MUST contain a nonce Claim.
-
             var nonce = Token.Claims.SingleOrDefault(c => c.Type == "nonce")?.Value;
             if (string.IsNullOrEmpty(nonce))
             {
@@ -115,32 +137,14 @@ namespace AdvantageTool.Pages
             //    contains additional audiences not trusted by the Tool.
             // 4. The current time MUST be before the time represented by the exp Claim;
 
-            // Prepare the TokenValidationParameters using information
-            // gathered during previous registration process
-
-            const string publicKey = 
-@"-----BEGIN PUBLIC KEY-----
-MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxwNk5GjdXmb4iFWOe/Lf
-kWYfuzUhU+rHef4FziWJq31RZUkdKjaul0MyUwPZ/u2Gpzpdr1hNSa3Kmtj4BQk8
-IUgveVAyvNxTMinsEm6hSjihQHnM5LLWGM804uZ8ylS0Rt4ne31hIQSOnxBp6LXj
-Uvxdavl5Zp+tt5aF+5zxE0Viu7s4oqwEdr25kCdo/H4zBadLGCmx1IFFYqd8voEM
-AILwP02jbuOSeSxK86b2uxLl4BZb9qL1Itd2+Febtt8PW4vVkcl7jWXQUBhQRn1L
-GNRmKF4nXZVVAYu1grC4jXqIYX0rY9BuQAgR3W1B+aBWfPCxkOFyCH5re6lNA+OH
-oQIDAQAB
------END PUBLIC KEY-----";
-            var audiences = new [] {Request.GetDisplayUrl()};
-
             var validationParameters = new TokenValidationParameters
             {
+                ValidateAudience = false, // Done manually above
                 ValidateIssuer = true,
-                ValidIssuer = issuer,
-
-                ValidateAudience = true,
-                ValidAudiences = audiences,
-                
+                ValidIssuer = platform.Id,
                 RequireSignedTokens = true,
                 ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new RsaSecurityKey(RsaHelper.PublicKeyFromPemString(publicKey)),
+                IssuerSigningKey = new RsaSecurityKey(RsaHelper.PublicKeyFromPemString(platform.PublicKey)),
 
                 ValidateLifetime = true,
                 ClockSkew = TimeSpan.FromMinutes(5.0)
@@ -157,9 +161,21 @@ oQIDAQAB
             }
 
             // Wrap the JwtPayload in an LtiResourceLinkRequest.
-            
             LtiRequest = new LtiResourceLinkRequest(Token.Payload);
 
+            // Save the updated current platform information
+            platform.ContactEmail = LtiRequest.Platform.ContactEmail;
+            platform.Description = LtiRequest.Platform.Description;
+            platform.Guid = LtiRequest.Platform.Guid;
+            platform.Name = LtiRequest.Platform.Name;
+            platform.ProductFamilyCode = LtiRequest.Platform.ProductFamilyCode;
+            platform.Url = LtiRequest.Platform.Url;
+            platform.Version = LtiRequest.Platform.Version;
+            _context.Attach(platform).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+
+
+            // Show something interesting to the platform user
             return Page();
         }
     }

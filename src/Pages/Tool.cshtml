@@ -1,109 +1,156 @@
 ﻿@page
 @model ToolModel
 @{
-    ViewData["Title"] = "Tool";
+    Layout = null;
 }
-
-<div class="row">
-    <div class="col">
-        @if (string.IsNullOrEmpty(Model.Error))
-        {
-            <div class="alert alert-success">Launch Successful!</div>
-        }
-        else
-        {
-            <div class="alert alert-danger">@Model.Error</div>
-        }
-    </div>
-</div>
-@if (string.IsNullOrEmpty(Model.Error))
-{
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
+    <title></title>
+    <environment include="Development">
+        <link rel="stylesheet" href="~/lib/bootstrap/css/bootstrap.css" />
+        <link rel="stylesheet" href="~/css/site.css" />
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" 
+              integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" 
+              crossorigin="anonymous"
+              asp-fallback-href="~/lib/bootstrap/css/bootstrap.min.css"
+              asp-fallback-test-class="sr-only" 
+              asp-fallback-test-property="position"
+              asp-fallback-test-value="absolute" />
+        <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
+    </environment>
+</head>
+<body>
     <div class="row">
-        <div class="col-6">
-            <div class="card">
-                <div class="card-header">
-                    JWT Header
-                </div>
-                <pre class="card-body">@Model.Token.Header.ToJsonString()</pre>
-            </div>
-            <div class="card">
-                <div class="card-header">
-                    JWT Payload
-                </div>
-                <pre class="card-body">@Model.LtiRequest.ToJsonString()</pre>
-            </div>
-        </div>
-        <div class="col-6">
-            <div class="card">
-                <div class="card-header">
-                    Security Check
-                </div>
-                <div class="card-body">
-                    Signature correct for issuer: @Model.Token.Issuer
-                </div>
-            </div>
-            <div class="card">
-                <div class="card-header">
-                    LTI Resource Link Request
-                </div>
-                <div class="card-body">
-                    <dl>
-                        <dt>Message Type</dt>
-                        <dd>@Model.LtiRequest.MessageType</dd>
-                        <dt>Version</dt>
-                        <dd>@Model.LtiRequest.Version</dd>
-                        <dt>Deployment ID</dt>
-                        <dd>@Model.LtiRequest.DeploymentId</dd>
-                        <dt>Resource Link</dt>
-                        <dd><pre>@Model.LtiRequest.ResourceLink.ToJsonString()</pre></dd>
-                        <dt>Iss</dt>
-                        <dd>@Model.LtiRequest.Iss</dd>
-                        <dt>User ID ('sub')</dt>
-                        <dd>@Model.LtiRequest.UserId</dd>
-                        <dt>Aud</dt>
-                        <dd><pre>@Model.LtiRequest.Aud.ToJsonString()</pre></dd>
-                        <dt>Exp</dt>
-                        <dd>@Model.LtiRequest.Exp</dd>
-                        <dt>Iat</dt>
-                        <dd>@Model.LtiRequest.Iat</dd>
-                        <dt>Azp</dt>
-                        <dd>@Model.LtiRequest.Azp</dd>
-                        <dt>Nonce</dt>
-                        <dd>@Model.LtiRequest.Nonce</dd>
-                        <dt>Given Name</dt>
-                        <dd>@Model.LtiRequest.GivenName</dd>
-                        <dt>Middle Name</dt>
-                        <dd>@Model.LtiRequest.MiddleName</dd>
-                        <dt>Family Name</dt>
-                        <dd>@Model.LtiRequest.FamilyName</dd>
-                        <dt>Name</dt>
-                        <dd>@Model.LtiRequest.Name</dd>
-                        <dt>Picture</dt>
-                        <dd>@Model.LtiRequest.Picture</dd>
-                        <dt>Email</dt>
-                        <dd>@Model.LtiRequest.Email</dd>
-                        <dt>Locale</dt>
-                        <dd>@Model.LtiRequest.Locale</dd>
-
-                        <dt>Context</dt>
-                        <dd><pre>@Model.LtiRequest.Context.ToJsonString()</pre></dd>
-                        <dt>Roles</dt>
-                        <dd><pre>@Model.LtiRequest.Roles.ToJsonString()</pre></dd>
-                        <dt>Launch Presentation</dt>
-                        <dd><pre>@Model.LtiRequest.LaunchPresentation.ToJsonString()</pre></dd>
-                        <dt>Role Scope Mentor</dt>
-                        <dd>@Model.LtiRequest.RoleScopeMentor.ToJsonString()</dd>
-                        <dt>Tool Platform</dt>
-                        <dd><pre>@Model.LtiRequest.Platform.ToJsonString()</pre></dd>
-                        <dt>LIS</dt>
-                        <dd><pre>@Model.LtiRequest.Lis.ToJsonString()</pre></dd>
-                        
-                        <dt>Custom</dt>
-                        <dd><pre>@Model.LtiRequest.Custom.ToJsonString()</pre></dd>
-
-                    </dl>
-                </div>
-            </div>
+        <div class="col">
+            @if (string.IsNullOrEmpty(Model.Error))
+            {
+                <div class="alert alert-success">Launch Successful!</div>
+            }
+            else
+            {
+                <div class="alert alert-danger">@Model.Error</div>
+            }
         </div>
     </div>
-}
+    @if (string.IsNullOrEmpty(Model.Error))
+    {
+        <div class="row">
+            <div class="col-6">
+                <div class="card mb-3">
+                    <div class="card-header">
+                        JWT Header
+                    </div>
+                    <pre class="card-body">@Model.Token.Header.ToJsonString()</pre>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        JWT Payload
+                    </div>
+                    <pre class="card-body">@Model.LtiRequest.ToJsonString()</pre>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="card mb-3">
+                    <div class="card-header">
+                        Security Check
+                    </div>
+                    <div class="card-body">
+                        Signature correct for issuer: @Model.Token.Issuer
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        LTI Resource Link Request
+                    </div>
+                    <div class="card-body">
+                        <dl>
+                            <dt>Message Type</dt>
+                            <dd>@Model.LtiRequest.MessageType</dd>
+                            <dt>Version</dt>
+                            <dd>@Model.LtiRequest.Version</dd>
+                            <dt>Deployment ID</dt>
+                            <dd>@Model.LtiRequest.DeploymentId</dd>
+                            <dt>Resource Link</dt>
+                            <dd><pre>@Model.LtiRequest.ResourceLink.ToJsonString()</pre></dd>
+                            <dt>Iss</dt>
+                            <dd>@Model.LtiRequest.Iss</dd>
+                            <dt>User ID ('sub')</dt>
+                            <dd>@Model.LtiRequest.UserId</dd>
+                            <dt>Aud</dt>
+                            <dd><pre>@Model.LtiRequest.Aud.ToJsonString()</pre></dd>
+                            <dt>Exp</dt>
+                            <dd>@Model.LtiRequest.Exp</dd>
+                            <dt>Iat</dt>
+                            <dd>@Model.LtiRequest.Iat</dd>
+                            <dt>Azp</dt>
+                            <dd>@Model.LtiRequest.Azp</dd>
+                            <dt>Nonce</dt>
+                            <dd>@Model.LtiRequest.Nonce</dd>
+                            <dt>Given Name</dt>
+                            <dd>@Model.LtiRequest.GivenName</dd>
+                            <dt>Middle Name</dt>
+                            <dd>@Model.LtiRequest.MiddleName</dd>
+                            <dt>Family Name</dt>
+                            <dd>@Model.LtiRequest.FamilyName</dd>
+                            <dt>Name</dt>
+                            <dd>@Model.LtiRequest.Name</dd>
+                            <dt>Picture</dt>
+                            <dd>@Model.LtiRequest.Picture</dd>
+                            <dt>Email</dt>
+                            <dd>@Model.LtiRequest.Email</dd>
+                            <dt>Locale</dt>
+                            <dd>@Model.LtiRequest.Locale</dd>
+
+                            <dt>Context</dt>
+                            <dd><pre>@Model.LtiRequest.Context.ToJsonString()</pre></dd>
+                            <dt>Roles</dt>
+                            <dd><pre>@Model.LtiRequest.Roles.ToJsonString()</pre></dd>
+                            <dt>Launch Presentation</dt>
+                            <dd><pre>@Model.LtiRequest.LaunchPresentation.ToJsonString()</pre></dd>
+                            <dt>Role Scope Mentor</dt>
+                            <dd>@Model.LtiRequest.RoleScopeMentor.ToJsonString()</dd>
+                            <dt>Tool Platform</dt>
+                            <dd><pre>@Model.LtiRequest.Platform.ToJsonString()</pre></dd>
+                            <dt>LIS</dt>
+                            <dd><pre>@Model.LtiRequest.Lis.ToJsonString()</pre></dd>
+
+                            <dt>Custom</dt>
+                            <dd><pre>@Model.LtiRequest.Custom.ToJsonString()</pre></dd>
+
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+<environment include="Development">
+    <script src="~/lib/jquery/jquery.js"></script>
+    <script src="~/lib/bootstrap/js/bootstrap.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+</environment>
+<environment exclude="Development">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+            asp-fallback-src="~/lib/jquery/jquery.min.js"
+            asp-fallback-test="window.jQuery"
+            integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" 
+            crossorigin="anonymous">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" 
+            integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" 
+            crossorigin="anonymous">
+    </script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" 
+            integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" 
+            crossorigin="anonymous">
+    </script>
+
+    <script src="~/js/site.min.js" asp-append-version="true"></script>
+</environment>
+
+</body>
+</html>
