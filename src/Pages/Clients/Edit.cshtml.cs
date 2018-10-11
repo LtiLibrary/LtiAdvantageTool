@@ -63,10 +63,8 @@ namespace AdvantageTool.Pages.Clients
                 {
                     return NotFound();
                 }
-                else
-                {
-                    throw;
-                }
+
+                throw;
             }
 
             return RedirectToPage("./Index");

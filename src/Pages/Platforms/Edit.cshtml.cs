@@ -63,10 +63,8 @@ namespace AdvantageTool.Pages.Platforms
                 {
                     return NotFound();
                 }
-                else
-                {
-                    throw;
-                }
+
+                throw;
             }
 
             return RedirectToPage("./Index");
