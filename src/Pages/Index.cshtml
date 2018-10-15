@@ -3,3 +3,107 @@
 @{
     ViewData["Title"] = "Home page";
 }
+
+<div class="container">
+    <div class="row">
+        @if (!User.Identity.IsAuthenticated)
+        {
+            <div class="col">
+                <h4>Welcome Stranger!</h4>
+                <p>
+                    Please <a asp-area="Identity" asp-page="/Account/Register">Register</a>
+                    or <a asp-area="Identity" asp-page="/Account/Login">Sign In</a> to configure
+                    test Tools.
+                </p>
+            </div>
+        }
+        else
+        {
+            <div class="col-4">
+                <h4>Welcome!</h4>
+                <p>
+                    This is a sample LTI Advantage Tool which you can use to test your Platform
+                    or as a <a href="https://github.com/andyfmiller/LtiAdvantageTool">reference
+                        implementation</a> of an LTI 1.3 Tool. This tool currently supports:
+                    <ul>
+                        <li>LtiResourceLinkRequest</li>
+                    </ul>
+                </p>
+                <h4>Getting Started</h4>
+                <p>
+                    To use this Tool to test your Platform:
+                    <ol>
+                        <li>
+                            <a asp-page="./Platforms/Index">Create a Platform</a> to record the 
+                            <code>id</code> and <code>public key</code> of your platform.
+                        </li>
+                        <li>
+                            <a asp-page="./Clients/Index">Create a Client</a> to record the
+                            <code>client_id</code>, <code>public key</code>, and
+                            <code>private key</code> that were issued by your platform.
+                        </li>
+                        <li>
+                            Configure your platform to launch this Tool with the
+                            platform <code>id</code> in the Issuer (iss) claim, the 
+                            <code>client_id</code> in the Audience (aud) claim,
+                            and this URL:
+                            <div class="mt-2">@Url.Page("./Tool", null, null, "https")</div>
+                        </li>
+                    </ol>
+                </p>
+            </div>
+            <div class="col-8">
+                <h4>Platforms</h4>
+                @if (!Model.Platforms.Any())
+                {
+                    <p>No Platforms have been registered.</p>
+                }
+                else
+                {
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>@Html.DisplayNameFor(m => m.Platforms[0].Id)</th>
+                                <th>@Html.DisplayNameFor(m => m.Platforms[0].Name)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var platform in Model.Platforms)
+                            {
+                                <tr>
+                                    <td>@Html.DisplayFor(m => platform.Id)</td>
+                                    <td>@Html.DisplayFor(m => platform.Name)</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                <h4>Clients</h4>
+                @if (!Model.Clients.Any())
+                {
+                    <p>No Clients have been registered.</p>
+                }
+                else
+                {
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>@Html.DisplayNameFor(m => m.Clients[0].Id)</th>
+                                <th>@Html.DisplayNameFor(m => m.Clients[0].Name)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var client in Model.Clients)
+                            {
+                                <tr>
+                                    <td>@Html.DisplayFor(m => client.Id)</td>
+                                    <td>@Html.DisplayFor(m => client.Name)</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            </div>
+        }
+    </div>
+</div>
