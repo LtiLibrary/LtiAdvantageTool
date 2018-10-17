@@ -30,11 +30,12 @@ namespace AdvantageTool
             });
 
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(
-                    Configuration.GetConnectionString("DefaultConnection")));
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+
             services.AddDefaultIdentity<IdentityUser>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
+            services.ConfigureApplicationCookie(options => { options.Cookie.Name = "AdvantageTool"; });
 
             services.AddMvc()
                 .AddRazorPagesOptions(options => { options.Conventions.AuthorizeFolder("/Clients"); })
