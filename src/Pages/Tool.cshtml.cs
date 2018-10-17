@@ -1,14 +1,18 @@
 ﻿using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Net.Http;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using AdvantageTool.Data;
+using IdentityModel.Client;
 using LtiAdvantageLibrary.NetCore.Lti;
-using LtiAdvantageLibrary.NetCore.Utilities;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using JsonWebKey = IdentityModel.Jwk.JsonWebKey;
 
 namespace AdvantageTool.Pages
 {
@@ -81,40 +85,6 @@ namespace AdvantageTool.Pages
             // Authentication Response Validation
             // See https://www.imsglobal.org/spec/security/v1p0/#authentication-response-validation
 
-            // The Issuer Identifier for the Platform MUST exactly match the value of the Issuer (iss)
-            // Claim (therefore the Tool MUST previously have been made aware of this identifier). The
-            // Issuer Identifier is collected in an offline process.
-            // See https://www.imsglobal.org/spec/security/v1p0/#dfn-issuer-identifier
-            if (string.IsNullOrEmpty(Token.Issuer))
-            {
-                Error = "Issuer is missing from id_token";
-                return Page();
-            }
-            var platform = await _context.Platforms.FindAsync(Token.Issuer);
-            if (platform == null)
-            {
-                Error = $"Issuer '{Token.Issuer}' is not recognized.";
-                return Page();
-            }
-
-            // The Audience Claim must match a Client ID exactly.
-            if (!Token.Audiences.Any())
-            {
-                Error = "Audiences are missing from id_token";
-            }
-
-            Client client = null;
-            foreach (var audience in Token.Audiences)
-            {
-                client = await _context.Clients.FindAsync(audience);
-                if (client != null) break;
-            }
-            if (client == null)
-            {
-                Error = $"Audiences '{string.Join(", ", Token.Audiences)}' are not recogized.";
-                return Page();
-            }
-
             // The ID Token MUST contain a nonce Claim.
             var nonce = Token.Claims.SingleOrDefault(c => c.Type == "nonce")?.Value;
             if (string.IsNullOrEmpty(nonce))
@@ -137,14 +107,40 @@ namespace AdvantageTool.Pages
             //    contains additional audiences not trusted by the Tool.
             // 4. The current time MUST be before the time represented by the exp Claim;
 
+            JsonWebKey key;
+            using (var httpClient = new HttpClient())
+            {
+                var disco = await httpClient.GetDiscoveryDocumentAsync(Token.Issuer);
+                if (disco.IsError)
+                {
+                    Error = disco.Error;
+                    return Page();
+                }
+
+                key = disco.KeySet.Keys.SingleOrDefault(k => k.Kid == Token.Header.Kid);
+                if (key == null)
+                {
+                    Error = "No matching key found.";
+                    return Page();
+                }
+            }
+
+            var rsaParameters = new RSAParameters
+            {
+                Modulus = Base64UrlEncoder.DecodeBytes(key.N),
+                Exponent = Base64UrlEncoder.DecodeBytes(key.E)
+            };
+
             var validationParameters = new TokenValidationParameters
             {
-                ValidateAudience = false, // Done manually above
+                ValidateTokenReplay = true,
+                ValidateAudience = true,
+                ValidAudiences = await _context.Clients.Select(c => c.Id).ToListAsync(),
                 ValidateIssuer = true,
-                ValidIssuer = platform.Id,
+                ValidIssuers = await _context.Platforms.Select(p => p.Id).ToListAsync(),
                 RequireSignedTokens = true,
                 ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new RsaSecurityKey(RsaHelper.PublicKeyFromPemString(platform.PublicKey)),
+                IssuerSigningKey = new RsaSecurityKey(rsaParameters),
 
                 ValidateLifetime = true,
                 ClockSkew = TimeSpan.FromMinutes(5.0)
@@ -164,6 +160,7 @@ namespace AdvantageTool.Pages
             LtiRequest = new LtiResourceLinkRequest(Token.Payload);
 
             // Save the updated current platform information
+            var platform = await _context.Platforms.FindAsync(Token.Issuer);
             platform.ContactEmail = LtiRequest.Platform.ContactEmail;
             platform.Description = LtiRequest.Platform.Description;
             platform.Guid = LtiRequest.Platform.Guid;
@@ -173,7 +170,6 @@ namespace AdvantageTool.Pages
             platform.Version = LtiRequest.Platform.Version;
             _context.Attach(platform).State = EntityState.Modified;
             await _context.SaveChangesAsync();
-
 
             // Show something interesting to the platform user
             return Page();
