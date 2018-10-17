@@ -18,16 +18,6 @@
                     <input asp-for="Platform.Id" class="form-control col-md-6" />
                     <span asp-validation-for="Platform.Id" class="text-danger"></span>
                 </div>
-                <div class="form-group">
-                    <label asp-for="Platform.Name"></label>
-                    <input asp-for="Platform.Name" class="form-control col-md-6" />
-                    <span asp-validation-for="Platform.Name" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="Platform.PublicKey"></label>
-                    <textarea asp-for="Platform.PublicKey" class="form-control text-monospace" rows="5"></textarea>
-                    <span asp-validation-for="Platform.PublicKey" class="text-danger"></span>
-                </div>
                 <p>The following fields can be overwritten by an LTI Resource Link Request.</p>
                 <div class="form-group">
                     <label asp-for="Platform.ContactEmail"></label>
@@ -43,6 +33,11 @@
                     <label asp-for="Platform.Guid"></label>
                     <input asp-for="Platform.Guid" class="form-control col-md-6" />
                     <span asp-validation-for="Platform.Guid" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Platform.Name"></label>
+                    <input asp-for="Platform.Name" class="form-control col-md-6" />
+                    <span asp-validation-for="Platform.Name" class="text-danger"></span>
                 </div>
                 <div class="form-group">
                     <label asp-for="Platform.ProductFamilyCode"></label>

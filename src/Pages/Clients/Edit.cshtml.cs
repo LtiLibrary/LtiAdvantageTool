@@ -47,10 +47,6 @@ namespace AdvantageTool.Pages.Clients
                 return Page();
             }
 
-            // Cleanup the keys
-            Client.PrivateKey = Client.PrivateKey.Replace("\r\n\r\n", "\r\n");
-            Client.PublicKey = Client.PublicKey.Replace("\r\n\r\n", "\r\n");
-
             _context.Attach(Client).State = EntityState.Modified;
 
             try

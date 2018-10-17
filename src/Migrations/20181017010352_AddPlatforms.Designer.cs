@@ -4,14 +4,16 @@ using AdvantageTool.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace AdvantageTool.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20181017010352_AddPlatforms")]
+    partial class AddPlatforms
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -25,6 +27,12 @@ namespace AdvantageTool.Data.Migrations
                         .ValueGeneratedOnAdd();
 
                     b.Property<string>("Name")
+                        .IsRequired();
+
+                    b.Property<string>("PrivateKey")
+                        .IsRequired();
+
+                    b.Property<string>("PublicKey")
                         .IsRequired();
 
                     b.Property<string>("UserId");
@@ -45,9 +53,13 @@ namespace AdvantageTool.Data.Migrations
 
                     b.Property<string>("Guid");
 
-                    b.Property<string>("Name");
+                    b.Property<string>("Name")
+                        .IsRequired();
 
                     b.Property<string>("ProductFamilyCode");
+
+                    b.Property<string>("PublicKey")
+                        .IsRequired();
 
                     b.Property<string>("Url");
 

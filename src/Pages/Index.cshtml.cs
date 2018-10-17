@@ -25,13 +25,19 @@ namespace AdvantageTool.Pages
 
         public async Task OnGetAsync()
         {
-            var user = await _userManager.GetUserAsync(User);
-            Clients = await _context.Clients
-                .Where(c => c.UserId == user.Id)
-                .ToListAsync();
-            Platforms = await _context.Platforms
-                .Where(p => p.UserId == user.Id)
-                .ToListAsync();
+            if (User.Identity.IsAuthenticated)
+            {
+                var user = await _userManager.GetUserAsync(User);
+                if (user != null)
+                {
+                    Clients = await _context.Clients
+                        .Where(c => c.UserId == user.Id)
+                        .ToListAsync();
+                    Platforms = await _context.Platforms
+                        .Where(p => p.UserId == user.Id)
+                        .ToListAsync();
+                }
+            }
         }
     }
 }

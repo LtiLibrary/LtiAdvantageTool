@@ -32,9 +32,6 @@ namespace AdvantageTool.Pages.Platforms
                 return Page();
             }
 
-            // Cleanup the public key
-            Platform.PublicKey = Platform.PublicKey.Replace("\r\n\r\n", "\r\n");
-
             // Add the user ID
             var user = await _userManager.GetUserAsync(User);
             Platform.UserId = user.Id;

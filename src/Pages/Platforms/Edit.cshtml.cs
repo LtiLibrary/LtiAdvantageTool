@@ -47,10 +47,6 @@ namespace AdvantageTool.Pages.Platforms
                 return Page();
             }
 
-            
-            // Cleanup the public key
-            Platform.PublicKey = Platform.PublicKey.Replace("\r\n\r\n", "\r\n");
-
             _context.Attach(Platform).State = EntityState.Modified;
 
             try

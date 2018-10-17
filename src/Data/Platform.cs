@@ -11,11 +11,6 @@ namespace AdvantageTool.Data
         [Display(Name = "ID")]
         public string Id { get; set; }
 
-        [Required]
-        [PublicKey]
-        [Display(Name = "Public Key")]
-        public string PublicKey { get; set; }
-
         [EmailAddress]
         [Display(Name = "Contact Email")]
         public string ContactEmail { get; set; }
@@ -26,7 +21,6 @@ namespace AdvantageTool.Data
         [Display(Name = "GUID")]
         public string Guid { get; set; }
 
-        [Required]
         [Display(Name = "Name")]
         public string Name { get; set; }
 

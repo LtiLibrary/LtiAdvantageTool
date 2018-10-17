@@ -13,10 +13,6 @@
             <dl>
                 <dt>@Html.DisplayNameFor(model => model.Platform.Id)</dt>
                 <dd>@Html.DisplayFor(model => model.Platform.Id)</dd>
-                <dt>@Html.DisplayNameFor(model => model.Platform.Name)</dt>
-                <dd>@Html.DisplayFor(model => model.Platform.Name)</dd>
-                <dt>@Html.DisplayNameFor(model => model.Platform.PublicKey)</dt>
-                <dd><pre>@Html.DisplayFor(model => model.Platform.PublicKey)</pre></dd>
             </dl>
             <div>
                 <a asp-page="./Edit" asp-route-id="@Model.Platform.Id">Edit</a> |
@@ -32,6 +28,8 @@
                 <dd>@Html.DisplayFor(model => model.Platform.Description)</dd>
                 <dt>@Html.DisplayNameFor(model => model.Platform.Guid)</dt>
                 <dd>@Html.DisplayFor(model => model.Platform.Guid)</dd>
+                <dt>@Html.DisplayNameFor(model => model.Platform.Name)</dt>
+                <dd>@Html.DisplayFor(model => model.Platform.Name)</dd>
                 <dt>@Html.DisplayNameFor(model => model.Platform.ProductFamilyCode)</dt>
                 <dd>@Html.DisplayFor(model => model.Platform.ProductFamilyCode)</dd>
                 <dt>@Html.DisplayNameFor(model => model.Platform.Url)</dt>

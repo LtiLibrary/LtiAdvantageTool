@@ -4,14 +4,16 @@ using AdvantageTool.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace AdvantageTool.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20181017005057_RemovePlatforms")]
+    partial class RemovePlatforms
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -27,37 +29,17 @@ namespace AdvantageTool.Data.Migrations
                     b.Property<string>("Name")
                         .IsRequired();
 
+                    b.Property<string>("PrivateKey")
+                        .IsRequired();
+
+                    b.Property<string>("PublicKey")
+                        .IsRequired();
+
                     b.Property<string>("UserId");
 
                     b.HasKey("Id");
 
                     b.ToTable("Clients");
-                });
-
-            modelBuilder.Entity("AdvantageTool.Data.Platform", b =>
-                {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("ContactEmail");
-
-                    b.Property<string>("Description");
-
-                    b.Property<string>("Guid");
-
-                    b.Property<string>("Name");
-
-                    b.Property<string>("ProductFamilyCode");
-
-                    b.Property<string>("Url");
-
-                    b.Property<string>("UserId");
-
-                    b.Property<string>("Version");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Platforms");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
