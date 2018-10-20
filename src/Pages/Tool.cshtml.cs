@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using AdvantageTool.Data;
 using IdentityModel.Client;
 using LtiAdvantageLibrary.NetCore.Lti;
-using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;

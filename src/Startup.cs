@@ -1,3 +1,5 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Net.Http;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
@@ -5,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using AdvantageTool.Data;
+using IdentityModel.Client;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -15,6 +18,8 @@ namespace AdvantageTool
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+
+            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
         }
 
         public IConfiguration Configuration { get; }
@@ -41,6 +46,14 @@ namespace AdvantageTool
                 .AddRazorPagesOptions(options => { options.Conventions.AuthorizeFolder("/Clients"); })
                 .AddRazorPagesOptions(options => { options.Conventions.AuthorizeFolder("/Platforms"); })
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            services.AddHttpClient();
+            
+            services.AddSingleton<IDiscoveryCache>(r =>
+            {
+                var factory = r.GetRequiredService<IHttpClientFactory>();
+                return new DiscoveryCache(Configuration["Authority"], () => factory.CreateClient());
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

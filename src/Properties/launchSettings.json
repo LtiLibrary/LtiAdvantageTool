@@ -18,6 +18,7 @@
     "AdvantageTool": {
       "commandName": "Project",
       "environmentVariables": {
+        "Authority": "https://localhost:5001",
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "applicationUrl": "https://localhost:8001;http://localhost:8000"

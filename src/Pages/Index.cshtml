@@ -62,19 +62,19 @@
                 {
                     <table class="table">
                         <thead>
-                            <tr>
-                                <th>@Html.DisplayNameFor(m => m.Platforms[0].Id)</th>
-                                <th>@Html.DisplayNameFor(m => m.Platforms[0].Name)</th>
-                            </tr>
+                        <tr>
+                            <th>@Html.DisplayNameFor(m => m.Platforms[0].Id)</th>
+                            <th>@Html.DisplayNameFor(m => m.Platforms[0].Name)</th>
+                        </tr>
                         </thead>
                         <tbody>
-                            @foreach (var platform in Model.Platforms)
-                            {
-                                <tr>
-                                    <td>@Html.DisplayFor(m => platform.Id)</td>
-                                    <td>@Html.DisplayFor(m => platform.Name)</td>
-                                </tr>
-                            }
+                        @foreach (var platform in Model.Platforms)
+                        {
+                            <tr>
+                                <td>@Html.DisplayFor(m => platform.Id)</td>
+                                <td>@Html.DisplayFor(m => platform.Name)</td>
+                            </tr>
+                        }
                         </tbody>
                     </table>
                 }
@@ -87,23 +87,29 @@
                 {
                     <table class="table">
                         <thead>
-                            <tr>
-                                <th>@Html.DisplayNameFor(m => m.Clients[0].Id)</th>
-                                <th>@Html.DisplayNameFor(m => m.Clients[0].Name)</th>
-                            </tr>
+                        <tr>
+                            <th>@Html.DisplayNameFor(m => m.Clients[0].Id)</th>
+                            <th>@Html.DisplayNameFor(m => m.Clients[0].Name)</th>
+                        </tr>
                         </thead>
                         <tbody>
-                            @foreach (var client in Model.Clients)
-                            {
-                                <tr>
-                                    <td>@Html.DisplayFor(m => client.Id)</td>
-                                    <td>@Html.DisplayFor(m => client.Name)</td>
-                                </tr>
-                            }
+                        @foreach (var client in Model.Clients)
+                        {
+                            <tr>
+                                <td>@Html.DisplayFor(m => client.Id)</td>
+                                <td>@Html.DisplayFor(m => client.Name)</td>
+                            </tr>
+                        }
                         </tbody>
                     </table>
                 }
             </div>
         }
+    </div>
+    <div class="row">
+        <div class="col">
+            <a class="btn btn-primary" asp-page="./CallApi">Call API</a>
+            <a class="btn btn-primary" asp-page="./RenewTokens">Renew Tokens</a>
+        </div>
     </div>
 </div>
