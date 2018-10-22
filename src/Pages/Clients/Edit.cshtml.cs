@@ -22,7 +22,7 @@ namespace AdvantageTool.Pages.Clients
         [BindProperty]
         public Client Client { get; set; }
 
-        public async Task<IActionResult> OnGetAsync(string id)
+        public async Task<IActionResult> OnGetAsync(int? id)
         {
             if (id == null)
             {
@@ -66,7 +66,7 @@ namespace AdvantageTool.Pages.Clients
             return RedirectToPage("./Index");
         }
 
-        private bool ClientExists(string id)
+        private bool ClientExists(int id)
         {
             return _context.Clients.Any(e => e.Id == id);
         }

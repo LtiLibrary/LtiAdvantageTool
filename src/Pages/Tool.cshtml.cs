@@ -134,7 +134,7 @@ namespace AdvantageTool.Pages
             {
                 ValidateTokenReplay = true,
                 ValidateAudience = true,
-                ValidAudiences = await _context.Clients.Select(c => c.Id).ToListAsync(),
+                ValidAudiences = await _context.Clients.Select(c => c.ClientId).ToListAsync(),
                 ValidateIssuer = true,
                 ValidIssuers = await _context.Platforms.Select(p => p.Id).ToListAsync(),
                 RequireSignedTokens = true,

@@ -31,7 +31,7 @@ namespace AdvantageTool.Pages
                 return Page();
             }
 
-            var tokenClient = new TokenClient(disco.TokenEndpoint, "tool", "secret");
+            var tokenClient = new TokenClient(disco.TokenEndpoint, "5a69e6484db14f8b91536eed969c24ea", "kjYPV8rkQwCh8zrJetVoVF4V5U_z6wn8");
             var tokenResponse = await tokenClient.RequestClientCredentialsAsync("api1");
             if (tokenResponse.IsError)
             {

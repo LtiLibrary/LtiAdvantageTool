@@ -4,13 +4,19 @@ namespace AdvantageTool.Data
 {
     public class Client
     {
+        public int Id { get; set; }
+
         [Required]
-        [Display(Name = "ID")]
-        public string Id { get; set; }
+        [Display(Name = "Client ID")]
+        public string ClientId { get; set; }
 
         [Required]
         [Display(Name = "Name")]
-        public string Name { get; set; }
+        public string ClientName { get; set; }
+
+        [Required]
+        [Display(Name = "Client Secret")]
+        public string ClientSecret { get; set; }
 
         /// <summary>
         /// The ID of the AdvantagePlatformUser that owns this Client.
