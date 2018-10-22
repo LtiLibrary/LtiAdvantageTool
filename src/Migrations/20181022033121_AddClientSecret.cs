@@ -67,7 +67,7 @@ namespace AdvantageTool.Data.Migrations
                 name: "Id", 
                 table: "Clients");
 
-            migrationBuilder.AddColumn<int>(
+            migrationBuilder.AddColumn<string>(
                 name: "Id",
                 table: "Clients",
                 nullable: false)
