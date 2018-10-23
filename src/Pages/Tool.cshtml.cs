@@ -136,7 +136,7 @@ namespace AdvantageTool.Pages
                 ValidateAudience = true,
                 ValidAudiences = await _context.Clients.Select(c => c.ClientId).ToListAsync(),
                 ValidateIssuer = true,
-                ValidIssuers = await _context.Platforms.Select(p => p.Id).ToListAsync(),
+                ValidIssuers = await _context.Clients.Select(c => c.Issuer).ToListAsync(),
                 RequireSignedTokens = true,
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new RsaSecurityKey(rsaParameters),
@@ -158,19 +158,7 @@ namespace AdvantageTool.Pages
             // Wrap the JwtPayload in an LtiResourceLinkRequest.
             LtiRequest = new LtiResourceLinkRequest(Token.Payload);
 
-            // Save the updated current platform information
-            var platform = await _context.Platforms.FindAsync(Token.Issuer);
-            platform.ContactEmail = LtiRequest.Platform.ContactEmail;
-            platform.Description = LtiRequest.Platform.Description;
-            platform.Guid = LtiRequest.Platform.Guid;
-            platform.Name = LtiRequest.Platform.Name;
-            platform.ProductFamilyCode = LtiRequest.Platform.ProductFamilyCode;
-            platform.Url = LtiRequest.Platform.Url;
-            platform.Version = LtiRequest.Platform.Version;
-            _context.Attach(platform).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
-
-            // Show something interesting to the platform user
+            // Show something interesting
             return Page();
         }
     }

@@ -18,6 +18,18 @@ namespace AdvantageTool.Data
         [Display(Name = "Client Secret")]
         public string ClientSecret { get; set; }
 
+        [Required]
+        [Display(Name = "Issuer")]
+        public string Issuer { get; set; }
+
+        [Url]
+        [Display(Name = "Access Token URL")]
+        public string AccessTokenUrl { get; set; }
+
+        [Url]
+        [Display(Name = "JSON Web Keys URL")]
+        public string JsonWebKeysUrl { get; set; }
+
         /// <summary>
         /// The ID of the AdvantagePlatformUser that owns this Client.
         /// </summary>

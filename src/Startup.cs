@@ -48,12 +48,6 @@ namespace AdvantageTool
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             services.AddHttpClient();
-            
-            services.AddSingleton<IDiscoveryCache>(r =>
-            {
-                var factory = r.GetRequiredService<IHttpClientFactory>();
-                return new DiscoveryCache(Configuration["Authority"], () => factory.CreateClient());
-            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

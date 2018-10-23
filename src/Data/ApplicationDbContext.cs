@@ -11,6 +11,5 @@ namespace AdvantageTool.Data
         }
 
         public DbSet<Client> Clients { get; set; }
-        public DbSet<Platform> Platforms { get; set; }
     }
 }

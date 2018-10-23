@@ -34,50 +34,18 @@
                     To use this Tool to test your Platform:
                     <ol>
                         <li>
-                            <a asp-page="./Platforms/Index">Create a Platform</a> to record the 
-                            <code>id</code> and <code>public key</code> of your platform.
-                        </li>
-                        <li>
                             <a asp-page="./Clients/Index">Create a Client</a> to record the
-                            <code>client_id</code>, <code>public key</code>, and
-                            <code>private key</code> that were issued by your platform.
+                            <code>Client ID</code>, <code>Client Secret</code>, and
+                            <code>Issuer</code> that were issued by your Platform.
                         </li>
                         <li>
-                            Configure your platform to launch this Tool with the
-                            platform <code>id</code> in the Issuer (iss) claim, the 
-                            <code>client_id</code> in the Audience (aud) claim,
-                            and this URL:
+                            Configure your Platform to launch this Tool:
                             <div class="mt-2">@Url.Page("./Tool", null, null, "https")</div>
                         </li>
                     </ol>
                 </p>
             </div>
             <div class="col-8">
-                <h4>Platforms</h4>
-                @if (!Model.Platforms.Any())
-                {
-                    <p>No Platforms have been registered.</p>
-                }
-                else
-                {
-                    <table class="table">
-                        <thead>
-                        <tr>
-                            <th>@Html.DisplayNameFor(m => m.Platforms[0].Id)</th>
-                            <th>@Html.DisplayNameFor(m => m.Platforms[0].Name)</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        @foreach (var platform in Model.Platforms)
-                        {
-                            <tr>
-                                <td>@Html.DisplayFor(m => platform.Id)</td>
-                                <td>@Html.DisplayFor(m => platform.Name)</td>
-                            </tr>
-                        }
-                        </tbody>
-                    </table>
-                }
                 <h4>Clients</h4>
                 @if (!Model.Clients.Any())
                 {
@@ -105,11 +73,5 @@
                 }
             </div>
         }
-    </div>
-    <div class="row">
-        <div class="col">
-            <a class="btn btn-primary" asp-page="./CallApi">Call API</a>
-            <a class="btn btn-primary" asp-page="./RenewTokens">Renew Tokens</a>
-        </div>
     </div>
 </div>

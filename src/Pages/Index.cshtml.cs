@@ -15,7 +15,6 @@ namespace AdvantageTool.Pages
         private readonly UserManager<IdentityUser> _userManager;
 
         public IList<Client> Clients { get; set; }
-        public IList<Platform> Platforms { get; set; }
 
         public IndexModel(ApplicationDbContext context, UserManager<IdentityUser> userManager)
         {
@@ -32,9 +31,6 @@ namespace AdvantageTool.Pages
                 {
                     Clients = await _context.Clients
                         .Where(c => c.UserId == user.Id)
-                        .ToListAsync();
-                    Platforms = await _context.Platforms
-                        .Where(p => p.UserId == user.Id)
                         .ToListAsync();
                 }
             }

@@ -13,6 +13,7 @@
     <table class="table">
         <thead>
         <tr>
+            <th>@Html.DisplayNameFor(m => m.Clients[0].Issuer)</th>
             <th>@Html.DisplayNameFor(m => m.Clients[0].ClientName)</th>
             <th></th>
         </tr>
@@ -21,6 +22,7 @@
             @foreach (var item in Model.Clients)
             {
                 <tr>
+                    <td>@Html.DisplayFor(m => item.Issuer)</td>
                     <td>@Html.DisplayFor(m => item.ClientName)</td>
                     <td>
                         <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
