@@ -8,55 +8,52 @@
 <div class="container">
     <h4>Edit Client</h4>
     <hr />
-    <div class="row">
-        <div class="col-md-7">
-            <form method="post">
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                <input type="hidden" asp-for="Client.Id" />
-                <input type="hidden" asp-for="Client.UserId" />
-                <div class="form-group">
-                    <label asp-for="Client.ClientId"></label>
-                    <input asp-for="Client.ClientId" class="form-control col-md-6" />
-                    <span asp-validation-for="Client.ClientId" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="Client.ClientSecret"></label>
-                    <input asp-for="Client.ClientSecret" class="form-control col-md-6" />
-                    <span asp-validation-for="Client.ClientSecret" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="Client.ClientName"></label>
-                    <input asp-for="Client.ClientName" class="form-control col-md-6" />
-                    <span asp-validation-for="Client.ClientName" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="Client.Issuer"></label>
-                    <input asp-for="Client.Issuer" class="form-control col-md-6" />
-                    <span asp-validation-for="Client.Issuer" class="text-danger"></span>
-                </div>
-                <hr />
-                <p>
-                    If the Issuer supports OpenID Connect Discover, you can leave the
-                    next two fields blank.
-                </p>
-                <div class="form-group">
-                    <label asp-for="Client.AccessTokenUrl"></label>
-                    <input asp-for="Client.AccessTokenUrl" class="form-control col-md-6" />
-                    <span asp-validation-for="Client.AccessTokenUrl" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="Client.JsonWebKeysUrl"></label>
-                    <input asp-for="Client.JsonWebKeysUrl" class="form-control col-md-6" />
-                    <span asp-validation-for="Client.JsonWebKeysUrl" class="text-danger"></span>
-                </div>
-                <hr />
-                <div class="form-group">
-                    <input type="submit" value="Save" class="btn btn-secondary" />
-                </div>
-            </form>
+        <div class="row">
+            <div class="col">
+                <form method="post" class="container">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input type="hidden" asp-for="Client.Id" />
+                    <input type="hidden" asp-for="Client.UserId" />
+                    <div class="form-group">
+                        <label asp-for="Client.ClientId"></label>
+                        <input asp-for="Client.ClientId" class="form-control col-md-6" />
+                        <span asp-validation-for="Client.ClientId" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Client.ClientSecret"></label>
+                        <input asp-for="Client.ClientSecret" class="form-control col-md-6" />
+                        <span asp-validation-for="Client.ClientSecret" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Client.ClientName"></label>
+                        <input asp-for="Client.ClientName" class="form-control col-md-6" />
+                        <span asp-validation-for="Client.ClientName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Client.Issuer"></label>
+                        <input asp-for="Client.Issuer" class="form-control col-md-6" />
+                        <span asp-validation-for="Client.Issuer" class="text-danger"></span>
+                    </div>
+                    <p>
+                        If the Issuer supports OpenID Connect Discover, you can leave the
+                        next two fields blank.
+                    </p>
+                    <div class="form-group">
+                        <label asp-for="Client.JsonWebKeysUrl"></label>
+                        <input asp-for="Client.JsonWebKeysUrl" class="form-control col-md-6" />
+                        <span asp-validation-for="Client.JsonWebKeysUrl" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Client.AccessTokenUrl"></label>
+                        <input asp-for="Client.AccessTokenUrl" class="form-control col-md-6" />
+                        <span asp-validation-for="Client.AccessTokenUrl" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <input type="submit" value="Save" class="btn btn-secondary" />
+                    </div>
+                </form>
+            </div>
         </div>
-    </div>
-
     <div>
         <a asp-page="./Index">Back to List</a>
     </div>

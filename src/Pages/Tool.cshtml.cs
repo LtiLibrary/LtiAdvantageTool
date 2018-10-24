@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using JsonWebKey = IdentityModel.Jwk.JsonWebKey;
 
 namespace AdvantageTool.Pages
@@ -21,10 +22,12 @@ namespace AdvantageTool.Pages
     public class ToolModel : PageModel
     {
         private readonly ApplicationDbContext _context;
+        private readonly IHttpClientFactory _clientFactory;
 
-        public ToolModel(ApplicationDbContext context)
+        public ToolModel(ApplicationDbContext context, IHttpClientFactory clientFactory)
         {
             _context = context;
+            _clientFactory = clientFactory;
         }
 
         /// <summary>
@@ -92,6 +95,24 @@ namespace AdvantageTool.Pages
                 return Page();
             }
 
+            // The Token must include a Payload
+            if (Token.Payload == null)
+            {
+                Error = "The token payload is unrecognized";
+                return Page();
+            }
+
+            // The Audience must match a Client ID exactly.
+            var client = await _context.Clients
+                .Where(c => Token.Payload.Aud.Contains(c.ClientId))
+                .FirstOrDefaultAsync();
+
+            if (client == null)
+            {
+                Error = "Unknown audience";
+                return Page();
+            }
+
             // Using the JwtSecurityTokenHandler.ValidateToken method, validate four things:
             //
             // 1. The Issuer Identifier for the Platform MUST exactly match the value of the iss
@@ -106,29 +127,57 @@ namespace AdvantageTool.Pages
             //    contains additional audiences not trusted by the Tool.
             // 4. The current time MUST be before the time represented by the exp Claim;
 
-            JsonWebKey key;
-            using (var httpClient = new HttpClient())
-            {
-                var disco = await httpClient.GetDiscoveryDocumentAsync(Token.Issuer);
-                if (disco.IsError)
-                {
-                    Error = disco.Error;
-                    return Page();
-                }
+            RSAParameters rsaParameters;
 
-                key = disco.KeySet.Keys.SingleOrDefault(k => k.Kid == Token.Header.Kid);
-                if (key == null)
+            try
+            {
+                if (!string.IsNullOrEmpty(client.JsonWebKeysUrl))
                 {
-                    Error = "No matching key found.";
-                    return Page();
+                    var httpClient = _clientFactory.CreateClient();
+                    var keySetJson = await httpClient.GetStringAsync(client.JsonWebKeysUrl);
+                    var keySet = JsonConvert.DeserializeObject<JsonWebKeySet>(keySetJson);
+                    var key = keySet.Keys.SingleOrDefault(k => k.Kid == Token.Header.Kid);
+                    if (key == null)
+                    {
+                        Error = "No matching key found.";
+                        return Page();
+                    }
+
+                    rsaParameters = new RSAParameters
+                    {
+                        Modulus = Base64UrlEncoder.DecodeBytes(key.N),
+                        Exponent = Base64UrlEncoder.DecodeBytes(key.E)
+                    };
+                }
+                else
+                {
+                    var httpClient = _clientFactory.CreateClient();
+                    var disco = await httpClient.GetDiscoveryDocumentAsync(Token.Issuer);
+                    if (disco.IsError)
+                    {
+                        Error = disco.Error;
+                        return Page();
+                    }
+
+                    var key = disco.KeySet.Keys.SingleOrDefault(k => k.Kid == Token.Header.Kid);
+                    if (key == null)
+                    {
+                        Error = "No matching key found.";
+                        return Page();
+                    }
+
+                    rsaParameters = new RSAParameters
+                    {
+                        Modulus = Base64UrlEncoder.DecodeBytes(key.N),
+                        Exponent = Base64UrlEncoder.DecodeBytes(key.E)
+                    };
                 }
             }
-
-            var rsaParameters = new RSAParameters
+            catch (Exception e)
             {
-                Modulus = Base64UrlEncoder.DecodeBytes(key.N),
-                Exponent = Base64UrlEncoder.DecodeBytes(key.E)
-            };
+                Error = e.Message;
+                return Page();
+            }
 
             var validationParameters = new TokenValidationParameters
             {
