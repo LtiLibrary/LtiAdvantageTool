@@ -26,6 +26,7 @@ namespace AdvantageTool.Pages.Clients
             var user = await _userManager.GetUserAsync(User);
             Clients = await _context.Clients
                 .Where(c => c.UserId == user.Id)
+                .OrderBy(c => c.Name)
                 .Select(c => new ClientModel
                 {
                     PlatformAccessTokenUrl = c.PlatformAccessTokenUrl,
