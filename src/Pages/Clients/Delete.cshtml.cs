@@ -42,12 +42,12 @@ namespace AdvantageTool.Pages.Clients
 
             Client = new ClientModel
             {
-                AccessTokenUrl = client.AccessTokenUrl,
+                PlatformAccessTokenUrl = client.PlatformAccessTokenUrl,
                 ClientId = client.ClientId,
                 Name = client.Name,
                 Id = client.Id,
-                Issuer = client.Issuer,
-                JsonWebKeysUrl = client.JsonWebKeysUrl
+                PlatformIssuer = client.PlatformIssuer,
+                PlatformJsonWebKeysUrl = client.PlatformJsonWebKeysUrl
             };
 
             return Page();

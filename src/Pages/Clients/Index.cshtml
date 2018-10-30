@@ -15,7 +15,7 @@
             <tr>
                 <th>@Html.DisplayNameFor(m => m.Clients[0].Name)</th>
                 <th>@Html.DisplayNameFor(m => m.Clients[0].ClientId)</th>
-                <th>@Html.DisplayNameFor(m => m.Clients[0].Issuer)</th>
+                <th>@Html.DisplayNameFor(m => m.Clients[0].PlatformIssuer)</th>
                 <th></th>
             </tr>
         </thead>
@@ -25,7 +25,7 @@
             <tr>
                 <td>@Html.DisplayFor(m => item.Name)</td>
                 <td>@Html.DisplayFor(m => item.ClientId)</td>
-                <td>@Html.DisplayFor(m => item.Issuer)</td>
+                <td>@Html.DisplayFor(m => item.PlatformIssuer)</td>
                 <td>
                     <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
                     <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |

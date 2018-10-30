@@ -131,10 +131,10 @@ namespace AdvantageTool.Pages
 
             try
             {
-                if (!string.IsNullOrEmpty(client.JsonWebKeysUrl))
+                if (!string.IsNullOrEmpty(client.PlatformJsonWebKeysUrl))
                 {
                     var httpClient = _clientFactory.CreateClient();
-                    var keySetJson = await httpClient.GetStringAsync(client.JsonWebKeysUrl);
+                    var keySetJson = await httpClient.GetStringAsync(client.PlatformJsonWebKeysUrl);
                     var keySet = JsonConvert.DeserializeObject<JsonWebKeySet>(keySetJson);
                     var key = keySet.Keys.SingleOrDefault(k => k.Kid == Token.Header.Kid);
                     if (key == null)
@@ -185,7 +185,7 @@ namespace AdvantageTool.Pages
                 ValidateAudience = true,
                 ValidAudiences = await _context.Clients.Select(c => c.ClientId).ToListAsync(),
                 ValidateIssuer = true,
-                ValidIssuers = await _context.Clients.Select(c => c.Issuer).ToListAsync(),
+                ValidIssuers = await _context.Clients.Select(c => c.PlatformIssuer).ToListAsync(),
                 RequireSignedTokens = true,
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new RsaSecurityKey(rsaParameters),

@@ -35,11 +35,11 @@ namespace AdvantageTool.Pages.Clients
             var user = await _userManager.GetUserAsync(User);
             var client = new Client
             {
-                AccessTokenUrl = Client.AccessTokenUrl,
+                PlatformAccessTokenUrl = Client.PlatformAccessTokenUrl,
                 ClientId = Client.ClientId,
                 Name = Client.Name,
-                Issuer = Client.Issuer,
-                JsonWebKeysUrl = Client.JsonWebKeysUrl,
+                PlatformIssuer = Client.PlatformIssuer,
+                PlatformJsonWebKeysUrl = Client.PlatformJsonWebKeysUrl,
                 UserId = user.Id
             };
 

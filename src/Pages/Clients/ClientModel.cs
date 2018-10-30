@@ -9,7 +9,7 @@ namespace AdvantageTool.Pages.Clients
 
         [NullableUrl]
         [Display(Name = "Platform Access Token URL")]
-        public string AccessTokenUrl { get; set; }
+        public string PlatformAccessTokenUrl { get; set; }
 
         [Required]
         [Display(Name = "Client ID")]
@@ -17,11 +17,11 @@ namespace AdvantageTool.Pages.Clients
 
         [Required]
         [Display(Name = "Platform Issuer")]
-        public string Issuer { get; set; }
+        public string PlatformIssuer { get; set; }
 
         [NullableUrl]
         [Display(Name = "Platform JSON Web Keys URL")]
-        public string JsonWebKeysUrl { get; set; }
+        public string PlatformJsonWebKeysUrl { get; set; }
 
         [Required]
         [Display(Name = "Name")]

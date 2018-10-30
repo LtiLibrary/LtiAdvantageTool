@@ -43,12 +43,12 @@ namespace AdvantageTool.Pages.Clients
             
             Client = new ClientModel
             {
-                AccessTokenUrl = client.AccessTokenUrl,
+                PlatformAccessTokenUrl = client.PlatformAccessTokenUrl,
                 ClientId = client.ClientId,
                 Name = client.Name,
                 Id = client.Id,
-                Issuer = client.Issuer,
-                JsonWebKeysUrl = client.JsonWebKeysUrl
+                PlatformIssuer = client.PlatformIssuer,
+                PlatformJsonWebKeysUrl = client.PlatformJsonWebKeysUrl
             };
 
             return Page();
@@ -64,12 +64,12 @@ namespace AdvantageTool.Pages.Clients
             var user = await _userManager.GetUserAsync(User);
             var client = new Client
             {
-                AccessTokenUrl = Client.AccessTokenUrl,
+                PlatformAccessTokenUrl = Client.PlatformAccessTokenUrl,
                 ClientId = Client.ClientId,
                 Name = Client.Name,
                 Id = Client.Id,
-                Issuer = Client.Issuer,
-                JsonWebKeysUrl = Client.JsonWebKeysUrl,
+                PlatformIssuer = Client.PlatformIssuer,
+                PlatformJsonWebKeysUrl = Client.PlatformJsonWebKeysUrl,
                 UserId = user.Id
             };
 

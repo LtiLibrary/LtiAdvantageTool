@@ -11,16 +11,16 @@
         <h4>Delete Client</h4>
         <hr />
         <dl>
-            <dt>@Html.DisplayNameFor(model => model.Client.ClientId)</dt>
-            <dd>@Html.DisplayFor(model => model.Client.ClientId)</dd>
             <dt>@Html.DisplayNameFor(model => model.Client.Name)</dt>
             <dd>@Html.DisplayFor(model => model.Client.Name)</dd>
-            <dt>@Html.DisplayNameFor(model => model.Client.Issuer)</dt>
-            <dd>@Html.DisplayFor(model => model.Client.Issuer)</dd>
-            <dt>@Html.DisplayNameFor(model => model.Client.JsonWebKeysUrl)</dt>
-            <dd>@Html.DisplayFor(model => model.Client.JsonWebKeysUrl)</dd>
-            <dt>@Html.DisplayNameFor(model => model.Client.AccessTokenUrl)</dt>
-            <dd>@Html.DisplayFor(model => model.Client.AccessTokenUrl)</dd>
+            <dt>@Html.DisplayNameFor(model => model.Client.ClientId)</dt>
+            <dd>@Html.DisplayFor(model => model.Client.ClientId)</dd>
+            <dt>@Html.DisplayNameFor(model => model.Client.PlatformIssuer)</dt>
+            <dd>@Html.DisplayFor(model => model.Client.PlatformIssuer)</dd>
+            <dt>@Html.DisplayNameFor(model => model.Client.PlatformJsonWebKeysUrl)</dt>
+            <dd>@Html.DisplayFor(model => model.Client.PlatformJsonWebKeysUrl)</dd>
+            <dt>@Html.DisplayNameFor(model => model.Client.PlatformAccessTokenUrl)</dt>
+            <dd>@Html.DisplayFor(model => model.Client.PlatformAccessTokenUrl)</dd>
         </dl>
 
         <form method="post">

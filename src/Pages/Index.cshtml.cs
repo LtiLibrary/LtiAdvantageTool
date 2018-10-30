@@ -33,12 +33,12 @@ namespace AdvantageTool.Pages
                         .Where(c => c.UserId == user.Id)
                         .Select(c => new ClientModel
                         {
-                            AccessTokenUrl = c.AccessTokenUrl,
+                            PlatformAccessTokenUrl = c.PlatformAccessTokenUrl,
                             ClientId = c.ClientId,
                             Name = c.Name,
                             Id = c.Id,
-                            Issuer = c.Issuer,
-                            JsonWebKeysUrl = c.JsonWebKeysUrl
+                            PlatformIssuer = c.PlatformIssuer,
+                            PlatformJsonWebKeysUrl = c.PlatformJsonWebKeysUrl
                         })
                         .ToListAsync();
                 }
