@@ -35,12 +35,12 @@
                     <ol>
                         <li>
                             <a asp-page="./Clients/Index">Create a Client</a> to record the
-                            <code>Client ID</code>, <code>Client Secret</code>, and
-                            <code>Issuer</code> that were issued by your Platform.
+                            <code>Client ID</code> that was issued by the Platform, and the
+                            Platform's <code>Issuer</code>.
                         </li>
                         <li>
                             Configure your Platform to launch this Tool:
-                            <div class="mt-2">@Url.Page("./Tool", null, null, "https")</div>
+                            <pre class="mt-2">@Url.Page("./Tool", null, null, "https")</pre>
                         </li>
                     </ol>
                 </p>
@@ -55,17 +55,17 @@
                 {
                     <table class="table">
                         <thead>
-                        <tr>
-                            <th>@Html.DisplayNameFor(m => m.Clients[0].ClientId)</th>
-                            <th>@Html.DisplayNameFor(m => m.Clients[0].ClientName)</th>
-                        </tr>
+                            <tr>
+                                <th>@Html.DisplayNameFor(m => m.Clients[0].Name)</th>
+                                <th>@Html.DisplayNameFor(m => m.Clients[0].ClientId)</th>
+                            </tr>
                         </thead>
                         <tbody>
                         @foreach (var client in Model.Clients)
                         {
                             <tr>
+                                <td>@Html.DisplayFor(m => client.Name)</td>
                                 <td>@Html.DisplayFor(m => client.ClientId)</td>
-                                <td>@Html.DisplayFor(m => client.ClientName)</td>
                             </tr>
                         }
                         </tbody>

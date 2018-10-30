@@ -44,7 +44,7 @@ namespace AdvantageTool.Pages.Clients
             {
                 AccessTokenUrl = client.AccessTokenUrl,
                 ClientId = client.ClientId,
-                ClientName = client.ClientName,
+                Name = client.Name,
                 Id = client.Id,
                 Issuer = client.Issuer,
                 JsonWebKeysUrl = client.JsonWebKeysUrl

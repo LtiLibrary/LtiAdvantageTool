@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using AdvantageTool.Data;
+using AdvantageTool.Pages.Clients;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -13,7 +14,7 @@ namespace AdvantageTool.Pages
         private readonly ApplicationDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
 
-        public IList<Client> Clients { get; set; }
+        public IList<ClientModel> Clients { get; set; }
 
         public IndexModel(ApplicationDbContext context, UserManager<IdentityUser> userManager)
         {
@@ -30,6 +31,15 @@ namespace AdvantageTool.Pages
                 {
                     Clients = await _context.Clients
                         .Where(c => c.UserId == user.Id)
+                        .Select(c => new ClientModel
+                        {
+                            AccessTokenUrl = c.AccessTokenUrl,
+                            ClientId = c.ClientId,
+                            Name = c.Name,
+                            Id = c.Id,
+                            Issuer = c.Issuer,
+                            JsonWebKeysUrl = c.JsonWebKeysUrl
+                        })
                         .ToListAsync();
                 }
             }
