@@ -19,13 +19,22 @@ namespace AdvantageTool.Pages.Clients
             _userManager = userManager;
         }
 
-        public IList<Client> Clients { get; set; }
+        public IList<ClientModel> Clients { get; set; }
 
         public async Task OnGetAsync()
         {
             var user = await _userManager.GetUserAsync(User);
             Clients = await _context.Clients
                 .Where(c => c.UserId == user.Id)
+                .Select(c => new ClientModel
+                {
+                    AccessTokenUrl = c.AccessTokenUrl,
+                    ClientId = c.ClientId,
+                    ClientName = c.ClientName,
+                    Id = c.Id,
+                    Issuer = c.Issuer,
+                    JsonWebKeysUrl = c.JsonWebKeysUrl
+                })
                 .ToListAsync();
         }
     }

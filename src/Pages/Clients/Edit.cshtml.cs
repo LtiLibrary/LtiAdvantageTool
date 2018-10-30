@@ -20,7 +20,7 @@ namespace AdvantageTool.Pages.Clients
         }
 
         [BindProperty]
-        public Client Client { get; set; }
+        public ClientModel Client { get; set; }
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -29,14 +29,28 @@ namespace AdvantageTool.Pages.Clients
                 return NotFound();
             }
 
-            var user = await _userManager.GetUserAsync(User);
-            Client = await _context.Clients
-                .FirstOrDefaultAsync(m => m.Id == id && m.UserId == user.Id);
-
-            if (Client == null)
+            var client = await _context.Clients.FindAsync(id);
+            if (client == null)
             {
                 return NotFound();
             }
+
+            var user = await _userManager.GetUserAsync(User);
+            if (client.UserId != user.Id)
+            {
+                return NotFound();
+            }
+            
+            Client = new ClientModel
+            {
+                AccessTokenUrl = client.AccessTokenUrl,
+                ClientId = client.ClientId,
+                ClientName = client.ClientName,
+                Id = client.Id,
+                Issuer = client.Issuer,
+                JsonWebKeysUrl = client.JsonWebKeysUrl
+            };
+
             return Page();
         }
 
@@ -47,7 +61,19 @@ namespace AdvantageTool.Pages.Clients
                 return Page();
             }
 
-            _context.Attach(Client).State = EntityState.Modified;
+            var user = await _userManager.GetUserAsync(User);
+            var client = new Client
+            {
+                AccessTokenUrl = Client.AccessTokenUrl,
+                ClientId = Client.ClientId,
+                ClientName = Client.ClientName,
+                Id = Client.Id,
+                Issuer = Client.Issuer,
+                JsonWebKeysUrl = Client.JsonWebKeysUrl,
+                UserId = user.Id
+            };
+
+            _context.Attach(client).State = EntityState.Modified;
 
             try
             {
@@ -55,7 +81,7 @@ namespace AdvantageTool.Pages.Clients
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!ClientExists(Client.Id))
+                if (!ClientExists(client.Id))
                 {
                     return NotFound();
                 }

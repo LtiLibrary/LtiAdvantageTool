@@ -18,7 +18,7 @@ namespace AdvantageTool.Pages.Clients
         }
 
         [BindProperty]
-        public Client Client { get; set; }
+        public ClientModel Client { get; set; }
 
         public IActionResult OnGet()
         {
@@ -32,11 +32,18 @@ namespace AdvantageTool.Pages.Clients
                 return Page();
             }
 
-            // Add the user ID
             var user = await _userManager.GetUserAsync(User);
-            Client.UserId = user.Id;
+            var client = new Client
+            {
+                AccessTokenUrl = Client.AccessTokenUrl,
+                ClientId = Client.ClientId,
+                ClientName = Client.ClientName,
+                Issuer = Client.Issuer,
+                JsonWebKeysUrl = Client.JsonWebKeysUrl,
+                UserId = user.Id
+            };
 
-            _context.Clients.Add(Client);
+            _context.Clients.Add(client);
             await _context.SaveChangesAsync();
 
             return RedirectToPage("./Index");

@@ -6,7 +6,7 @@ namespace AdvantageTool.Data
     /// <summary>
     /// Validates a URL.
     /// </summary>
-    public class UrlAttribute : ValidationAttribute
+    public class NullableUrlAttribute : ValidationAttribute
     {
         public override bool IsValid(object value)
         {

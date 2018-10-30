@@ -18,7 +18,7 @@ namespace AdvantageTool.Pages.Clients
             _userManager = userManager;
         }
 
-        public Client Client { get; set; }
+        public ClientModel Client { get; set; }
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -27,14 +27,28 @@ namespace AdvantageTool.Pages.Clients
                 return NotFound();
             }
 
-            var user = await _userManager.GetUserAsync(User);
-            Client = await _context.Clients
-                .FirstOrDefaultAsync(m => m.Id == id && m.UserId == user.Id);
-
-            if (Client == null)
+            var client = await _context.Clients.FindAsync(id);
+            if (client == null)
             {
                 return NotFound();
             }
+
+            var user = await _userManager.GetUserAsync(User);
+            if (client.UserId != user.Id)
+            {
+                return NotFound();
+            }
+            
+            Client = new ClientModel
+            {
+                AccessTokenUrl = client.AccessTokenUrl,
+                ClientId = client.ClientId,
+                ClientName = client.ClientName,
+                Id = client.Id,
+                Issuer = client.Issuer,
+                JsonWebKeysUrl = client.JsonWebKeysUrl
+            };
+
             return Page();
         }
     }
