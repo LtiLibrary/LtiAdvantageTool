@@ -5,11 +5,11 @@ namespace AdvantageTool.Data
 {
     public class ApplicationDbContext : IdentityDbContext
     {
-        public ApplicationDbContext(DbContextOptions options)
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
         }
 
-        public DbSet<Client> Clients { get; set; }
+        public DbSet<Platform> Platforms { get; set; }
     }
 }

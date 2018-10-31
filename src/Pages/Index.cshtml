@@ -46,8 +46,8 @@
                 </p>
             </div>
             <div class="col-8">
-                <h4>Clients</h4>
-                @if (!Model.Clients.Any())
+                <h4>Platforms</h4>
+                @if (!Model.Platforms.Any())
                 {
                     <p>No Clients have been registered.</p>
                 }
@@ -56,16 +56,16 @@
                     <table class="table">
                         <thead>
                             <tr>
-                                <th>@Html.DisplayNameFor(m => m.Clients[0].Name)</th>
-                                <th>@Html.DisplayNameFor(m => m.Clients[0].ClientId)</th>
+                                <th>@Html.DisplayNameFor(m => m.Platforms[0].PlatformName)</th>
+                                <th>@Html.DisplayNameFor(m => m.Platforms[0].ToolClientId)</th>
                             </tr>
                         </thead>
                         <tbody>
-                        @foreach (var client in Model.Clients)
+                        @foreach (var client in Model.Platforms)
                         {
                             <tr>
-                                <td>@Html.DisplayFor(m => client.Name)</td>
-                                <td>@Html.DisplayFor(m => client.ClientId)</td>
+                                <td>@Html.DisplayFor(m => client.PlatformName)</td>
+                                <td>@Html.DisplayFor(m => client.ToolClientId)</td>
                             </tr>
                         }
                         </tbody>

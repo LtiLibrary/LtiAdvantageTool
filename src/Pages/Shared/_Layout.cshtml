@@ -7,16 +7,16 @@
 
     <environment include="Development">
         <link rel="stylesheet" href="~/lib/bootstrap/css/bootstrap.css" />
+        <link rel="stylesheet" href="~/lib/fontawesome/css/all.css" />
         <link rel="stylesheet" href="~/css/site.css" />
     </environment>
     <environment exclude="Development">
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" 
-		integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" 
-		crossorigin="anonymous"
-              	asp-fallback-href="~/lib/bootstrap/css/bootstrap.min.css"
-              	asp-fallback-test-class="sr-only" 
-		        asp-fallback-test-property="position"
-		        asp-fallback-test-value="absolute" />
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+              integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+              crossorigin="anonymous">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css"
+              integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU"
+              crossorigin="anonymous">
         <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
     </environment>
 </head>
@@ -34,7 +34,7 @@
                     <li class="nav-item @MainNavPages.IndexNavClass(ViewContext)"><a class="nav-link" asp-page="/Index">Home</a></li>
                     @if (User.Identity.IsAuthenticated)
                     {
-                        <li class="nav-item @MainNavPages.ClientsNavClass(ViewContext)"><a class="nav-link" asp-page="/Clients/Index">Clients</a></li>
+                        <li class="nav-item @MainNavPages.PlatformsNavClass(ViewContext)"><a class="nav-link" asp-page="/Platforms/Index">Platforms</a></li>
                     }
                     <li class="nav-item @MainNavPages.AboutNavClass(ViewContext)"><a class="nav-link" asp-page="/About">About</a></li>
                     <li class="nav-item @MainNavPages.ContactNavClass(ViewContext)"><a class="nav-link" asp-page="/Contact">Contact</a></li>
@@ -54,11 +54,12 @@
     </div>
 </footer>
 
-    <environment include="Development">
-        <script src="~/lib/jquery/jquery.js"></script>
-        <script src="~/lib/bootstrap/js/bootstrap.js"></script>
-        <script src="~/js/site.js" asp-append-version="true"></script>
-    </environment>
+<environment include="Development">
+    <script src="~/lib/jquery/jquery.js"></script>
+    <script src="~/lib/popper.js/umd/popper.js"></script>
+    <script src="~/lib/bootstrap/js/bootstrap.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+</environment>
     <environment exclude="Development">
 	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
                 asp-fallback-src="~/lib/jquery/jquery.min.js"

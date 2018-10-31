@@ -1,0 +1,78 @@
+﻿@page
+@model EditModel
+
+@{
+    ViewData["Title"] = "Platforms";
+}
+
+<div class="container">
+    <h4>Edit Platform</h4>
+    <hr />
+    <form method="post">
+        <input type="hidden" asp-for="Platform.Id" />
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="row">
+            <div class="col-lg-6 mb-3">
+                <div class="card">
+                    <h5 class="card-header">
+                        Platform LTI Settings
+                    </h5>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label asp-for="Platform.PlatformName"></label>
+                            <input asp-for="Platform.PlatformName" class="form-control" />
+                            <span asp-validation-for="Platform.PlatformName" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Platform.PlatformIssuer"></label>
+                            <input asp-for="Platform.PlatformIssuer" class="form-control" />
+                            <span asp-validation-for="Platform.PlatformIssuer" class="text-danger"></span>
+                        </div>
+                        <div class="alert alert-info">
+                            If the @Html.DisplayNameFor(m => m.Platform.PlatformIssuer) supports OpenID Connect Discover,
+                            you can leave the next two fields blank.
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Platform.PlatformJsonWebKeysUrl"></label>
+                            <input asp-for="Platform.PlatformJsonWebKeysUrl" class="form-control" />
+                            <span asp-validation-for="Platform.PlatformJsonWebKeysUrl" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Platform.PlatformAccessTokenUrl"></label>
+                            <input asp-for="Platform.PlatformAccessTokenUrl" class="form-control" />
+                            <span asp-validation-for="Platform.PlatformAccessTokenUrl" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 mb-3">
+                <div class="card">
+                    <h5 class="card-header">
+                        Tool LTI Settings
+                    </h5>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            The @Html.DisplayNameFor(m => m.Platform.ToolClientId) here must match the
+                            @Html.DisplayNameFor(m => m.Platform.ToolClientId) in the Platform.
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Platform.ToolClientId"></label>
+                            <input asp-for="Platform.ToolClientId" class="form-control" />
+                            <span asp-validation-for="Platform.ToolClientId" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <input type="submit" value="Save" class="btn btn-secondary" />
+        </div>
+    </form>
+    <div>
+        <a asp-page="./Index">Back to List</a>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

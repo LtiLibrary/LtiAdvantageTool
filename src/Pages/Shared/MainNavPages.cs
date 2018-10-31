@@ -12,7 +12,6 @@ namespace AdvantageTool.Pages.Shared
         public static string Contact => "/Pages/Contact";
 
         public static string IndexNavClass(ViewContext viewContext) => PageNavClass(viewContext, Index);
-        public static string ClientsNavClass(ViewContext viewContext) => PageNavClass(viewContext, Clients);
         public static string PlatformsNavClass(ViewContext viewContext) => PageNavClass(viewContext, Platforms);
         public static string AboutNavClass(ViewContext viewContext) => PageNavClass(viewContext, About);
         public static string ContactNavClass(ViewContext viewContext) => PageNavClass(viewContext, Contact);

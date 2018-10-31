@@ -2,30 +2,30 @@
 @model IndexModel
 
 @{
-    ViewData["Title"] = "Clients";
+    ViewData["Title"] = "Platforms";
 }
 
 <div class="container">
     <h4>@ViewData["Title"]</h4>
     <p>
-        <a asp-page="Create">Create New</a>
+        <a asp-page="Create">Register New</a>
     </p>
     <table class="table">
         <thead>
             <tr>
-                <th>@Html.DisplayNameFor(m => m.Clients[0].Name)</th>
-                <th>@Html.DisplayNameFor(m => m.Clients[0].ClientId)</th>
-                <th>@Html.DisplayNameFor(m => m.Clients[0].PlatformIssuer)</th>
+                <th>@Html.DisplayNameFor(m => m.Platforms[0].PlatformName)</th>
+                <th>@Html.DisplayNameFor(m => m.Platforms[0].PlatformIssuer)</th>
+                <th>@Html.DisplayNameFor(m => m.Platforms[0].ToolClientId)</th>
                 <th></th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in Model.Clients)
+            @foreach (var item in Model.Platforms)
             {
             <tr>
-                <td>@Html.DisplayFor(m => item.Name)</td>
-                <td>@Html.DisplayFor(m => item.ClientId)</td>
+                <td>@Html.DisplayFor(m => item.PlatformName)</td>
                 <td>@Html.DisplayFor(m => item.PlatformIssuer)</td>
+                <td>@Html.DisplayFor(m => item.ToolClientId)</td>
                 <td>
                     <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
                     <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |

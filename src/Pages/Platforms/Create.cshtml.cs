@@ -1,10 +1,10 @@
 ﻿using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using AdvantageTool.Data;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace AdvantageTool.Pages.Clients
+namespace AdvantageTool.Pages.Platforms
 {
     public class CreateModel : PageModel
     {
@@ -18,7 +18,7 @@ namespace AdvantageTool.Pages.Clients
         }
 
         [BindProperty]
-        public ClientModel Client { get; set; }
+        public PlatformModel Platform { get; set; }
 
         public IActionResult OnGet()
         {
@@ -33,17 +33,17 @@ namespace AdvantageTool.Pages.Clients
             }
 
             var user = await _userManager.GetUserAsync(User);
-            var client = new Client
+            var client = new Platform
             {
-                PlatformAccessTokenUrl = Client.PlatformAccessTokenUrl,
-                ClientId = Client.ClientId,
-                Name = Client.Name,
-                PlatformIssuer = Client.PlatformIssuer,
-                PlatformJsonWebKeysUrl = Client.PlatformJsonWebKeysUrl,
+                PlatformAccessTokenUrl = Platform.PlatformAccessTokenUrl,
+                ClientId = Platform.ToolClientId,
+                Name = Platform.PlatformName,
+                PlatformIssuer = Platform.PlatformIssuer,
+                PlatformJsonWebKeysUrl = Platform.PlatformJsonWebKeysUrl,
                 UserId = user.Id
             };
 
-            _context.Clients.Add(client);
+            _context.Platforms.Add(client);
             await _context.SaveChangesAsync();
 
             return RedirectToPage("./Index");

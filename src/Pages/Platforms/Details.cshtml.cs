@@ -1,11 +1,12 @@
-﻿using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
+using AdvantageTool.Data;
+using IdentityServer4.Extensions;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
-using AdvantageTool.Data;
-using Microsoft.AspNetCore.Identity;
 
-namespace AdvantageTool.Pages.Clients
+namespace AdvantageTool.Pages.Platforms
 {
     public class DetailsModel : PageModel
     {
@@ -18,7 +19,10 @@ namespace AdvantageTool.Pages.Clients
             _userManager = userManager;
         }
 
-        public ClientModel Client { get; set; }
+        public PlatformModel Platform { get; set; }
+
+        [Display(Name = "Tool Issuer", Description = "This is the Issuer for all messages that originate from this Tool.")]
+        public string ToolIssuer { get; set; }
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -27,7 +31,7 @@ namespace AdvantageTool.Pages.Clients
                 return NotFound();
             }
 
-            var client = await _context.Clients.FindAsync(id);
+            var client = await _context.Platforms.FindAsync(id);
             if (client == null)
             {
                 return NotFound();
@@ -39,15 +43,17 @@ namespace AdvantageTool.Pages.Clients
                 return NotFound();
             }
             
-            Client = new ClientModel
+            Platform = new PlatformModel
             {
                 PlatformAccessTokenUrl = client.PlatformAccessTokenUrl,
-                ClientId = client.ClientId,
-                Name = client.Name,
+                ToolClientId = client.ClientId,
+                PlatformName = client.Name,
                 Id = client.Id,
                 PlatformIssuer = client.PlatformIssuer,
                 PlatformJsonWebKeysUrl = client.PlatformJsonWebKeysUrl
             };
+
+            ToolIssuer = HttpContext.GetIdentityServerIssuerUri();
 
             return Page();
         }

@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
 using AdvantageTool.Data;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 
-namespace AdvantageTool.Pages.Clients
+namespace AdvantageTool.Pages.Platforms
 {
     public class IndexModel : PageModel
     {
@@ -19,19 +19,19 @@ namespace AdvantageTool.Pages.Clients
             _userManager = userManager;
         }
 
-        public IList<ClientModel> Clients { get; set; }
+        public IList<PlatformModel> Platforms { get; set; }
 
         public async Task OnGetAsync()
         {
             var user = await _userManager.GetUserAsync(User);
-            Clients = await _context.Clients
+            Platforms = await _context.Platforms
                 .Where(c => c.UserId == user.Id)
                 .OrderBy(c => c.Name)
-                .Select(c => new ClientModel
+                .Select(c => new PlatformModel
                 {
                     PlatformAccessTokenUrl = c.PlatformAccessTokenUrl,
-                    ClientId = c.ClientId,
-                    Name = c.Name,
+                    ToolClientId = c.ClientId,
+                    PlatformName = c.Name,
                     Id = c.Id,
                     PlatformIssuer = c.PlatformIssuer,
                     PlatformJsonWebKeysUrl = c.PlatformJsonWebKeysUrl

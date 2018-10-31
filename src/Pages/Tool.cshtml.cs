@@ -103,7 +103,7 @@ namespace AdvantageTool.Pages
             }
 
             // The Audience must match a Client ID exactly.
-            var client = await _context.Clients
+            var client = await _context.Platforms
                 .Where(c => Token.Payload.Aud.Contains(c.ClientId))
                 .FirstOrDefaultAsync();
 
@@ -183,9 +183,9 @@ namespace AdvantageTool.Pages
             {
                 ValidateTokenReplay = true,
                 ValidateAudience = true,
-                ValidAudiences = await _context.Clients.Select(c => c.ClientId).ToListAsync(),
+                ValidAudiences = await _context.Platforms.Select(c => c.ClientId).ToListAsync(),
                 ValidateIssuer = true,
-                ValidIssuers = await _context.Clients.Select(c => c.PlatformIssuer).ToListAsync(),
+                ValidIssuers = await _context.Platforms.Select(c => c.PlatformIssuer).ToListAsync(),
                 RequireSignedTokens = true,
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new RsaSecurityKey(rsaParameters),

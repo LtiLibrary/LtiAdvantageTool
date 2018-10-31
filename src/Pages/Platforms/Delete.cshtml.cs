@@ -1,11 +1,10 @@
 ﻿using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
 using AdvantageTool.Data;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace AdvantageTool.Pages.Clients
+namespace AdvantageTool.Pages.Platforms
 {
     public class DeleteModel : PageModel
     {
@@ -19,7 +18,7 @@ namespace AdvantageTool.Pages.Clients
         }
 
         [BindProperty]
-        public ClientModel Client { get; set; }
+        public PlatformModel Platform { get; set; }
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -28,7 +27,7 @@ namespace AdvantageTool.Pages.Clients
                 return NotFound();
             }
 
-            var client = await _context.Clients.FindAsync(id);
+            var client = await _context.Platforms.FindAsync(id);
             if (client == null)
             {
                 return NotFound();
@@ -40,11 +39,11 @@ namespace AdvantageTool.Pages.Clients
                 return NotFound();
             }
 
-            Client = new ClientModel
+            Platform = new PlatformModel
             {
                 PlatformAccessTokenUrl = client.PlatformAccessTokenUrl,
-                ClientId = client.ClientId,
-                Name = client.Name,
+                ToolClientId = client.ClientId,
+                PlatformName = client.Name,
                 Id = client.Id,
                 PlatformIssuer = client.PlatformIssuer,
                 PlatformJsonWebKeysUrl = client.PlatformJsonWebKeysUrl
@@ -60,10 +59,10 @@ namespace AdvantageTool.Pages.Clients
                 return NotFound();
             }
 
-            var client = await _context.Clients.FindAsync(id);
+            var client = await _context.Platforms.FindAsync(id);
             if (client != null)
             {
-                _context.Clients.Remove(client);
+                _context.Platforms.Remove(client);
                 await _context.SaveChangesAsync();
             }
 

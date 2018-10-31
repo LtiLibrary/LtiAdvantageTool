@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using AdvantageTool.Data;
 
-namespace AdvantageTool.Pages.Clients
+namespace AdvantageTool.Pages.Platforms
 {
-    public class ClientModel
+    public class PlatformModel
     {
         public int Id { get; set; }
 
@@ -12,11 +12,11 @@ namespace AdvantageTool.Pages.Clients
         public string PlatformAccessTokenUrl { get; set; }
 
         [Required]
-        [Display(Name = "Client ID")]
-        public string ClientId { get; set; }
+        [Display(Name = "Tool Client ID")]
+        public string ToolClientId { get; set; }
 
         [Required]
-        [Display(Name = "Platform Issuer")]
+        [Display(Name = "Platform Issuer", Description = "This is the Issuer for all messages that originate from the Platform.")]
         public string PlatformIssuer { get; set; }
 
         [NullableUrl]
@@ -24,7 +24,7 @@ namespace AdvantageTool.Pages.Clients
         public string PlatformJsonWebKeysUrl { get; set; }
 
         [Required]
-        [Display(Name = "Name")]
-        public string Name { get; set; }
+        [Display(Name = "Platform Name")]
+        public string PlatformName { get; set; }
     }
 }

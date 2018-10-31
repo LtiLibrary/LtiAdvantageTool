@@ -1,12 +1,12 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using AdvantageTool.Data;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using AdvantageTool.Data;
-using Microsoft.AspNetCore.Identity;
 
-namespace AdvantageTool.Pages.Clients
+namespace AdvantageTool.Pages.Platforms
 {
     public class EditModel : PageModel
     {
@@ -20,7 +20,7 @@ namespace AdvantageTool.Pages.Clients
         }
 
         [BindProperty]
-        public ClientModel Client { get; set; }
+        public PlatformModel Platform { get; set; }
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -29,7 +29,7 @@ namespace AdvantageTool.Pages.Clients
                 return NotFound();
             }
 
-            var client = await _context.Clients.FindAsync(id);
+            var client = await _context.Platforms.FindAsync(id);
             if (client == null)
             {
                 return NotFound();
@@ -41,11 +41,11 @@ namespace AdvantageTool.Pages.Clients
                 return NotFound();
             }
             
-            Client = new ClientModel
+            Platform = new PlatformModel
             {
                 PlatformAccessTokenUrl = client.PlatformAccessTokenUrl,
-                ClientId = client.ClientId,
-                Name = client.Name,
+                ToolClientId = client.ClientId,
+                PlatformName = client.Name,
                 Id = client.Id,
                 PlatformIssuer = client.PlatformIssuer,
                 PlatformJsonWebKeysUrl = client.PlatformJsonWebKeysUrl
@@ -62,14 +62,14 @@ namespace AdvantageTool.Pages.Clients
             }
 
             var user = await _userManager.GetUserAsync(User);
-            var client = new Client
+            var client = new Platform
             {
-                PlatformAccessTokenUrl = Client.PlatformAccessTokenUrl,
-                ClientId = Client.ClientId,
-                Name = Client.Name,
-                Id = Client.Id,
-                PlatformIssuer = Client.PlatformIssuer,
-                PlatformJsonWebKeysUrl = Client.PlatformJsonWebKeysUrl,
+                PlatformAccessTokenUrl = Platform.PlatformAccessTokenUrl,
+                ClientId = Platform.ToolClientId,
+                Name = Platform.PlatformName,
+                Id = Platform.Id,
+                PlatformIssuer = Platform.PlatformIssuer,
+                PlatformJsonWebKeysUrl = Platform.PlatformJsonWebKeysUrl,
                 UserId = user.Id
             };
 
@@ -94,7 +94,7 @@ namespace AdvantageTool.Pages.Clients
 
         private bool ClientExists(int id)
         {
-            return _context.Clients.Any(e => e.Id == id);
+            return _context.Platforms.Any(e => e.Id == id);
         }
     }
 }

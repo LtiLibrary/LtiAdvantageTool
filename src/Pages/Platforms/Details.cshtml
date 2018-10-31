@@ -1,0 +1,90 @@
+﻿@page
+@model DetailsModel
+
+@{
+    ViewData["Title"] = "Platforms";
+}
+
+<div class="container">
+    <h4>Platform Details</h4>
+    <hr />
+    <div class="row">
+        <div class="col-lg-6 mb-3">
+            <div class="card">
+                <h5 class="card-header">
+                    Platform LTI Settings
+                </h5>
+                <div class="card-body">
+                    <dl>
+                        <dt>@Html.DisplayNameFor(model => model.Platform.PlatformName)</dt>
+                        <dd>@Model.Platform.PlatformName</dd>
+                        <dt>
+                            @Html.DisplayNameFor(model => model.Platform.PlatformIssuer)
+                            <tooltip asp-for="Platform.PlatformIssuer"></tooltip>
+                        </dt>
+                        <dd>
+                            @Html.DisplayFor(model => model.Platform.PlatformIssuer)
+                            <a target="_blank" href='@($"{Model.Platform.PlatformIssuer}/.well-known/openid-configuration")'>
+                                Test OIDC Discover
+                            </a>
+                        </dd>
+                    </dl>
+                    <div class="alert alert-info">
+                        If the Platform Issuer supports OpenID Connect Discover, the next two fields
+                        are not used by this Tool.
+                    </div>
+                    <dl>
+                        <dt>@Html.DisplayNameFor(model => model.Platform.PlatformJsonWebKeysUrl)</dt>
+                        <dd>
+                            @if (Model.Platform.PlatformJsonWebKeysUrl == null)
+                            {
+                                <text>[not set]</text>
+                            }
+                            else
+                            {
+                                @Model.Platform.PlatformJsonWebKeysUrl
+                            }
+                        </dd>
+                        <dt>@Html.DisplayNameFor(model => model.Platform.PlatformAccessTokenUrl)</dt>
+                        <dd>
+                            @if (Model.Platform.PlatformAccessTokenUrl == null)
+                            {
+                                <text>[not set]</text>
+                            }
+                            else
+                            {
+                                @Model.Platform.PlatformAccessTokenUrl
+                            }
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 mb-3">
+            <div class="card">
+                <h5 class="card-header">
+                    Tool LTI Settings
+                </h5>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        The @Html.DisplayNameFor(m => m.Platform.ToolClientId) here must match the
+                        @Html.DisplayNameFor(m => m.Platform.ToolClientId) in the Platform.
+                    </div>
+                    <dl>
+                        <dt>@Html.DisplayNameFor(model => model.Platform.ToolClientId)</dt>
+                        <dd>@Html.DisplayFor(model => model.Platform.ToolClientId)</dd>
+                        <dt>
+                            @Html.DisplayNameFor(model => model.ToolIssuer)
+                            <tooltip asp-for="ToolIssuer"></tooltip>
+                        </dt>
+                        <dd>@Html.DisplayFor(model => model.ToolIssuer)</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div>
+        <a asp-page="./Edit" asp-route-id="@Model.Platform.Id">Edit</a> |
+        <a asp-page="./Index">Back to List</a>
+    </div>
+</div>
