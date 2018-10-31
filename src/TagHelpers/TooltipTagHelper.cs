@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
@@ -8,7 +7,8 @@ namespace AdvantageTool.TagHelpers
 {
     /// <inheritdoc />
     /// <summary>
-    /// Displays the Description from the <see cref="T:System.ComponentModel.DataAnnotations.DisplayAttribute" /> as a tooltip.
+    /// Displays the Description from the <see cref="T:System.ComponentModel.DataAnnotations.DisplayAttribute" />
+    /// for the model as a tooltip.
     /// </summary>
     [HtmlTargetElement("tooltip", Attributes = ForAttributeName)]
     public class TooltipTagHelper : TagHelper
