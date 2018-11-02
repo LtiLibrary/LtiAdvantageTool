@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace AdvantageTool.Data
+namespace AdvantageTool.Utility
 {
     /// <summary>
     /// Validates a URL.

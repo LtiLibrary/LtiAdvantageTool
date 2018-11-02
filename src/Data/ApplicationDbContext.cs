@@ -5,6 +5,7 @@ namespace AdvantageTool.Data
 {
     public class ApplicationDbContext : IdentityDbContext
     {
+        // ReSharper disable once SuggestBaseTypeForParameter
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {

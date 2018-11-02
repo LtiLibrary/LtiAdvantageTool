@@ -12,7 +12,6 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
-using JsonWebKey = IdentityModel.Jwk.JsonWebKey;
 
 namespace AdvantageTool.Pages
 {

@@ -6,66 +6,45 @@
 }
 
 <div class="container">
-    <h3>Are you sure you want to delete this?</h3>
-    <div>
-        <h4>Delete Platform</h4>
-        <hr />
-        <div class="row">
-            <div class="col-lg-6 mb-3">
-                <div class="card">
-                    <h5 class="card-header">
-                        Platform LTI Settings
-                    </h5>
-                    <div class="card-body">
-                        <dl>
-                            <dt>@Html.DisplayNameFor(model => model.Platform.PlatformName)</dt>
-                            <dd>@Html.DisplayFor(model => model.Platform.PlatformName)</dd>
-                            <dt>@Html.DisplayNameFor(model => model.Platform.PlatformIssuer)</dt>
-                            <dd>@Html.DisplayFor(model => model.Platform.PlatformIssuer)</dd>
-                            <dt>@Html.DisplayNameFor(model => model.Platform.PlatformJsonWebKeysUrl)</dt>
-                            <dd>
-                                @if (Model.Platform.PlatformJsonWebKeysUrl == null)
-                                {
-                                    <text>[not set]</text>
-                                }
-                                else
-                                {
-                                    @Model.Platform.PlatformJsonWebKeysUrl
-                                }
-                            </dd>
-                            <dt>@Html.DisplayNameFor(model => model.Platform.PlatformAccessTokenUrl)</dt>
-                            <dd>
-                                @if (Model.Platform.PlatformAccessTokenUrl == null)
-                                {
-                                    <text>[not set]</text>
-                                }
-                                else
-                                {
-                                    @Model.Platform.PlatformAccessTokenUrl
-                                }
-                            </dd>
-                        </dl>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-6 mb-3">
-                <div class="card">
-                    <h5 class="card-header">
-                        Tool LTI Settings
-                    </h5>
-                    <div class="card-body">
-                        <dl>
-                            <dt>@Html.DisplayNameFor(model => model.Platform.ToolClientId)</dt>
-                            <dd>@Html.DisplayFor(model => model.Platform.ToolClientId)</dd>
-                        </dl>
-                    </div>
+    <h4>Delete Platform</h4>
+    <hr />
+    <div class="row">
+        <div class="col-lg-6 mb-3">
+            <div class="card">
+                <h5 class="card-header">
+                    Platform Settings
+                </h5>
+                <div class="card-body">
+                    <dl>
+                        <dt>@Html.DisplayNameFor(model => model.Platform.PlatformName)</dt>
+                        <dd>@Html.DisplayFor(model => model.Platform.PlatformName)</dd>
+                        <dt>@Html.DisplayNameFor(model => model.Platform.PlatformIssuer)</dt>
+                        <dd>@Html.DisplayFor(model => model.Platform.PlatformIssuer)</dd>
+                        <dt>@Html.DisplayNameFor(model => model.Platform.PlatformJsonWebKeysUrl)</dt>
+                        <dd>@(Model.Platform.PlatformJsonWebKeysUrl??"[Not Set]")</dd>
+                        <dt>@Html.DisplayNameFor(model => model.Platform.PlatformAccessTokenUrl)</dt>
+                        <dd>@(Model.Platform.PlatformAccessTokenUrl??"[Not SEt]")</dd>
+                    </dl>
                 </div>
             </div>
         </div>
-        <form method="post">
-            <input type="hidden" asp-for="Platform.Id" />
-            <input type="submit" value="Delete" class="btn btn-secondary" /> |
-            <a asp-page="./Index">Back to List</a>
-        </form>
+        <div class="col-lg-6 mb-3">
+            <div class="card">
+                <h5 class="card-header">
+                    Tool Settings
+                </h5>
+                <div class="card-body">
+                    <dl>
+                        <dt>@Html.DisplayNameFor(model => model.Platform.ToolClientId)</dt>
+                        <dd>@Html.DisplayFor(model => model.Platform.ToolClientId)</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
     </div>
+    <form method="post">
+        <input type="hidden" asp-for="Platform.Id" />
+        <input type="submit" value="Delete" class="btn btn-secondary" /> |
+        <a asp-page="./Index">Back to List</a>
+    </form>
 </div>

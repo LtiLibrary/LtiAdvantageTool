@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using AdvantageTool.Data;
+using AdvantageTool.Utility;
 
 namespace AdvantageTool.Pages.Platforms
 {

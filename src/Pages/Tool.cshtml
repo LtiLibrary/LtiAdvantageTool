@@ -39,7 +39,7 @@
     @if (string.IsNullOrEmpty(Model.Error))
     {
         <div class="row">
-            <div class="col-6">
+            <div class="col-md-6">
                 <div class="card mb-3">
                     <div class="card-header">
                         JWT Header
@@ -53,18 +53,25 @@
                     <pre class="card-body">@Model.LtiRequest.ToJsonString()</pre>
                 </div>
             </div>
-            <div class="col-6">
+            <div class="col-md-6">
                 <div class="card mb-3">
-                    <div class="card-header">
-                        Security Check
-                    </div>
+                    <div class="card-header">OpenID Claims</div>
                     <div class="card-body">
-                        Signature correct for issuer: @Model.Token.Issuer
+                        <dl>
+                            @foreach (var claim in Model.LtiRequest.Claims)
+                            {
+                                if (!claim.Type.Contains("imsglobal"))
+                                {
+                                    <dt>@claim.Type</dt>
+                                    <dd>@claim.Value</dd>  
+                                }
+                            }
+                        </dl>
                     </div>
                 </div>
-                <div class="card">
+                <div class="card mb-3">
                     <div class="card-header">
-                        LTI Resource Link Request
+                        LTI Claims
                     </div>
                     <div class="card-body">
                         <dl>
@@ -74,49 +81,88 @@
                             <dd>@Model.LtiRequest.Version</dd>
                             <dt>Deployment ID</dt>
                             <dd>@Model.LtiRequest.DeploymentId</dd>
-                            <dt>Resource Link</dt>
-                            <dd><pre>@Model.LtiRequest.ResourceLink.ToJsonString()</pre></dd>
-                            <dt>Iss</dt>
-                            <dd>@Model.LtiRequest.Iss</dd>
-                            <dt>Sub (User ID)</dt>
-                            <dd>@Model.LtiRequest.UserId</dd>
-                            <dt>Aud</dt>
-                            <dd><pre>@Model.LtiRequest.Aud.ToJsonString()</pre></dd>
-                            <dt>Exp</dt>
-                            <dd>@Model.LtiRequest.Exp</dd>
-                            <dt>Iat</dt>
-                            <dd>@Model.LtiRequest.Iat</dd>
-                            <dt>Azp</dt>
-                            <dd>@Model.LtiRequest.Azp</dd>
-                            <dt>Nonce</dt>
-                            <dd>@Model.LtiRequest.Nonce</dd>
-                            <dt>Given Name</dt>
-                            <dd>@Model.LtiRequest.GivenName</dd>
-                            <dt>Middle Name</dt>
-                            <dd>@Model.LtiRequest.MiddleName</dd>
-                            <dt>Family Name</dt>
-                            <dd>@Model.LtiRequest.FamilyName</dd>
-                            <dt>Name</dt>
-                            <dd>@Model.LtiRequest.Name</dd>
-                            <dt>Picture</dt>
-                            <dd>@Model.LtiRequest.Picture</dd>
-                            <dt>Email</dt>
-                            <dd>@Model.LtiRequest.Email</dd>
-                            <dt>Locale</dt>
-                            <dd>@Model.LtiRequest.Locale</dd>
-
+                            <dt>Resource Link:</dt>
+                            <dd>
+                                <div class="offset-1 mt-3">
+                                    <dl>
+                                        <dt>Id</dt>
+                                        <dd>@Model.LtiRequest.ResourceLink.Id</dd>
+                                        <dt>Title</dt>
+                                        <dd>@Model.LtiRequest.ResourceLink.Title</dd>
+                                        <dt>Description</dt>
+                                        <dd>@(Model.LtiRequest.ResourceLink.Description ?? "[Not Set]")</dd>
+                                    </dl>
+                                </div>
+                            </dd>
                             <dt>Context</dt>
-                            <dd><pre>@Model.LtiRequest.Context.ToJsonString()</pre></dd>
+                            <dd>
+                                <div class="offset-1 mt-3">
+                                    <dl>
+                                        <dt>Id</dt>
+                                        <dd>@Model.LtiRequest.Context.Id</dd>
+                                        <dt>Label</dt>
+                                        <dd>@(Model.LtiRequest.Context.Label ?? "[Not Set]")</dd>
+                                        <dt>Title</dt>
+                                        <dd>@Model.LtiRequest.Context.Title</dd>
+                                        <dt>Type</dt>
+                                        <dd>@string.Join(", ", Model.LtiRequest.Context.Type)</dd>
+                                    </dl>
+                                </div>
+                            </dd>
                             <dt>Roles</dt>
-                            <dd><pre>@Model.LtiRequest.Roles.ToJsonString()</pre></dd>
+                            <dd>@string.Join(", ", Model.LtiRequest.Roles)</dd>
                             <dt>Launch Presentation</dt>
-                            <dd><pre>@Model.LtiRequest.LaunchPresentation.ToJsonString()</pre></dd>
-                            <dt>Role Scope Mentor</dt>
-                            <dd>@Model.LtiRequest.RoleScopeMentor.ToJsonString()</dd>
+                            <dd>
+                                <div class="offset-1 mt-3">
+                                    <dl>
+                                        <dt>Document Target</dt>
+                                        <dd>@Model.LtiRequest.LaunchPresentation.DocumentTarget</dd>
+                                        <dt>Height</dt>
+                                        <dd>@Model.LtiRequest.LaunchPresentation.Height</dd>
+                                        <dt>Width</dt>
+                                        <dd>@Model.LtiRequest.LaunchPresentation.Width</dd>
+                                        <dt>Return URL</dt>
+                                        <dd>@Model.LtiRequest.LaunchPresentation.ReturnUrl</dd>
+                                    </dl>
+                                </div>
+                            </dd>
+                            @if (Model.LtiRequest.RoleScopeMentor.Any(i => !string.IsNullOrEmpty(i)))
+                            {
+                                <dt>Role Scope Mentor</dt>
+                                <dd>@string.Join(", ", Model.LtiRequest.RoleScopeMentor)</dd>
+                            }
                             <dt>Tool Platform</dt>
-                            <dd><pre>@Model.LtiRequest.Platform.ToJsonString()</pre></dd>
+                            <dd>
+                                <div class="offset-1 mt-3">
+                                    <dl>
+                                        <dt>Contact Email</dt>
+                                        <dd>@Model.LtiRequest.Platform.ContactEmail</dd>
+                                        <dt>Description</dt>
+                                        <dd>@Model.LtiRequest.Platform.Description</dd>
+                                        <dt>GUID</dt>
+                                        <dd>@Model.LtiRequest.Platform.Guid</dd>
+                                        <dt>Name</dt>
+                                        <dd>@Model.LtiRequest.Platform.Name</dd>
+                                        <dt>Product Family Code</dt>
+                                        <dd>@Model.LtiRequest.Platform.ProductFamilyCode</dd>
+                                        <dt>URL</dt>
+                                        <dd>@Model.LtiRequest.Platform.Url</dd>
+                                        <dt>Version</dt>
+                                        <dd>@Model.LtiRequest.Platform.Version</dd>
+                                    </dl>
+                                </div>
+                            </dd>
                             <dt>LIS</dt>
-                            <dd><pre>@Model.LtiRequest.Lis.ToJsonString()</pre></dd>
+                            <dd>
+                                <div class="offset-1 mt-3">
+                                    <dl>
+                                        <dt>Course Section Sourced ID</dt>
+                                        <dd>@Model.LtiRequest.Lis.CourseSectionSourcedId</dd>
+                                        <dt>Person Sourced ID</dt>
+                                        <dd>@Model.LtiRequest.Lis.PersonSourcedId</dd>
+                                    </dl>
+                                </div>
+                            </dd>
 
                             <dt>Custom</dt>
                             <dd><pre>@Model.LtiRequest.Custom.ToJsonString()</pre></dd>

@@ -12,7 +12,7 @@
         <div class="col-lg-6 mb-3">
             <div class="card">
                 <h5 class="card-header">
-                    Platform LTI Settings
+                    Platform Settings
                 </h5>
                 <div class="card-body">
                     <dl>
@@ -35,27 +35,9 @@
                     </div>
                     <dl>
                         <dt>@Html.DisplayNameFor(model => model.Platform.PlatformJsonWebKeysUrl)</dt>
-                        <dd>
-                            @if (Model.Platform.PlatformJsonWebKeysUrl == null)
-                            {
-                                <text>[not set]</text>
-                            }
-                            else
-                            {
-                                @Model.Platform.PlatformJsonWebKeysUrl
-                            }
-                        </dd>
+                        <dd>@(Model.Platform.PlatformJsonWebKeysUrl??"[Not Set]")</dd>
                         <dt>@Html.DisplayNameFor(model => model.Platform.PlatformAccessTokenUrl)</dt>
-                        <dd>
-                            @if (Model.Platform.PlatformAccessTokenUrl == null)
-                            {
-                                <text>[not set]</text>
-                            }
-                            else
-                            {
-                                @Model.Platform.PlatformAccessTokenUrl
-                            }
-                        </dd>
+                        <dd>@(Model.Platform.PlatformAccessTokenUrl??"[Not Set]")</dd>
                     </dl>
                 </div>
             </div>
@@ -63,7 +45,7 @@
         <div class="col-lg-6 mb-3">
             <div class="card">
                 <h5 class="card-header">
-                    Tool LTI Settings
+                    Tool Settings
                 </h5>
                 <div class="card-body">
                     <div class="alert alert-info">
