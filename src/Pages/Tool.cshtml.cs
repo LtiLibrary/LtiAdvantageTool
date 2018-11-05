@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using AdvantageTool.Data;
 using IdentityModel.Client;
 using LtiAdvantageLibrary.NetCore.Lti;
+using LtiAdvantageLibrary.NetCore.Membership;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -41,6 +42,8 @@ namespace AdvantageTool.Pages
         [BindProperty(Name = "id_token")]
         public string IdToken { get; set; }
 
+        public string Membership { get; set; }
+
         /// <summary>
         /// This is a wrapper around the JwtPayload that makes it easy to examine the
         /// claims. For example, LtiRequest.Roles gets the role claims as an Enum array
@@ -58,7 +61,7 @@ namespace AdvantageTool.Pages
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        public async Task<IActionResult> OnPost()
+        public async Task<IActionResult> OnPostAsync()
         {
             // Authenticate the request starting at step 5 in the OpenId Implicit Flow
             // See https://www.imsglobal.org/spec/security/v1p0/#platform-originating-messages
@@ -208,6 +211,36 @@ namespace AdvantageTool.Pages
 
             // Show something interesting
             return Page();
+        }
+
+        public async Task<IActionResult> OnPostMembership(string id)
+        {
+            var client = _clientFactory.CreateClient();
+            try
+            {
+                using (var response = await client.GetAsync($"https://localhost:5001/context/{id}/membership")
+                    .ConfigureAwait(false))
+                {
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var json = await response.Content.ReadAsStringAsync();
+                        var membership = JsonConvert.DeserializeObject<MembershipContainer>(json);
+                        Membership = JsonConvert.SerializeObject(membership, Formatting.Indented,
+                            new JsonSerializerSettings {NullValueHandling = NullValueHandling.Ignore});
+                    }
+                    else
+                    {
+                        Membership = response.ReasonPhrase;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+
+            return await OnPostAsync();
         }
     }
 }
