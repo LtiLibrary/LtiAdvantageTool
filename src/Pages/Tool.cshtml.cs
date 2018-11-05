@@ -221,16 +221,17 @@ namespace AdvantageTool.Pages
                 using (var response = await client.GetAsync($"https://localhost:5001/context/{id}/membership")
                     .ConfigureAwait(false))
                 {
+                    var content = await response.Content.ReadAsStringAsync();
+
                     if (response.IsSuccessStatusCode)
                     {
-                        var json = await response.Content.ReadAsStringAsync();
-                        var membership = JsonConvert.DeserializeObject<MembershipContainer>(json);
+                        var membership = JsonConvert.DeserializeObject<MembershipContainer>(content);
                         Membership = JsonConvert.SerializeObject(membership, Formatting.Indented,
                             new JsonSerializerSettings {NullValueHandling = NullValueHandling.Ignore});
                     }
                     else
                     {
-                        Membership = response.ReasonPhrase;
+                        Membership = content ?? response.ReasonPhrase;
                     }
                 }
             }
