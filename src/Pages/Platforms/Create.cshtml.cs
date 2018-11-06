@@ -32,11 +32,18 @@ namespace AdvantageTool.Pages.Platforms
                 return Page();
             }
 
+            if (string.IsNullOrEmpty(Platform.ToolClientSecret))
+            {
+                ModelState.AddModelError("Platform.ToolClientSecret", "The Client Secret field is required.");
+                return Page();
+            }
+
             var user = await _userManager.GetUserAsync(User);
             var client = new Platform
             {
                 PlatformAccessTokenUrl = Platform.PlatformAccessTokenUrl,
                 ClientId = Platform.ToolClientId,
+                ClientSecret = Platform.ToolClientSecret,
                 Name = Platform.PlatformName,
                 PlatformIssuer = Platform.PlatformIssuer,
                 PlatformJsonWebKeysUrl = Platform.PlatformJsonWebKeysUrl,

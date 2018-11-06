@@ -61,19 +61,18 @@ namespace AdvantageTool.Pages.Platforms
                 return Page();
             }
 
-            var user = await _userManager.GetUserAsync(User);
-            var client = new Platform
+            var platform = await _context.Platforms.FindAsync(Platform.Id);
+            platform.ClientId = Platform.ToolClientId;
+            platform.Name = Platform.PlatformName;
+            platform.PlatformAccessTokenUrl = Platform.PlatformAccessTokenUrl;
+            platform.PlatformIssuer = Platform.PlatformIssuer;
+            platform.PlatformJsonWebKeysUrl = Platform.PlatformJsonWebKeysUrl;
+            if (!string.IsNullOrEmpty(Platform.ToolClientSecret))
             {
-                PlatformAccessTokenUrl = Platform.PlatformAccessTokenUrl,
-                ClientId = Platform.ToolClientId,
-                Name = Platform.PlatformName,
-                Id = Platform.Id,
-                PlatformIssuer = Platform.PlatformIssuer,
-                PlatformJsonWebKeysUrl = Platform.PlatformJsonWebKeysUrl,
-                UserId = user.Id
-            };
+                platform.ClientSecret = Platform.ToolClientSecret;
+            }
 
-            _context.Attach(client).State = EntityState.Modified;
+            _context.Platforms.Update(platform);
 
             try
             {
@@ -81,7 +80,7 @@ namespace AdvantageTool.Pages.Platforms
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!ClientExists(client.Id))
+                if (!PlatformExists(platform.Id))
                 {
                     return NotFound();
                 }
@@ -92,7 +91,7 @@ namespace AdvantageTool.Pages.Platforms
             return RedirectToPage("./Index");
         }
 
-        private bool ClientExists(int id)
+        private bool PlatformExists(int id)
         {
             return _context.Platforms.Any(e => e.Id == id);
         }

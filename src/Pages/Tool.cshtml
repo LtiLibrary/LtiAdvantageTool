@@ -44,9 +44,10 @@
                     <div class="card-header">Membership</div>
                     <div class="card-body">
                         <form method="post" asp-page-handler="Membership">
-                            <input type="hidden" name="id_token" id="id_token" value="@Model.IdToken"/>
-                            <input type="hidden" name="id" id="id" value="@Model.LtiRequest.Context.Id"/>
-                            <input type="submit" value="Get Membership" class="btn btn-secondary"/>
+                            <input type="hidden" name="id_token" id="id_token" value="@Model.IdToken" />
+                            <input type="hidden" name="id" id="id" value="@Model.LtiRequest.Context.Id" />
+                            <input type="hidden" asp-for="ClientId" />
+                            <input type="submit" value="Get Membership" class="btn btn-secondary" />
                         </form>
                         <pre>@Model.Membership</pre>
                     </div>

@@ -51,13 +51,19 @@
                     </h5>
                     <div class="card-body">
                         <div class="alert alert-info">
-                            The @Html.DisplayNameFor(m => m.Platform.ToolClientId) here must match the
-                            @Html.DisplayNameFor(m => m.Platform.ToolClientId) in the Platform.
+                            The @Html.DisplayNameFor(m => m.Platform.ToolClientId)
+                            and @Html.DisplayNameFor(m => m.Platform.ToolClientSecret)
+                            here must match the values in the Platform.
                         </div>
                         <div class="form-group">
                             <label asp-for="Platform.ToolClientId"></label>
                             <input asp-for="Platform.ToolClientId" class="form-control" />
                             <span asp-validation-for="Platform.ToolClientId" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Platform.ToolClientSecret"></label>
+                            <input asp-for="Platform.ToolClientSecret" class="form-control" />
+                            <span asp-validation-for="Platform.ToolClientSecret" class="text-danger"></span>
                         </div>
                     </div>
                 </div>

@@ -8,6 +8,7 @@ using AdvantageTool.Data;
 using IdentityModel.Client;
 using LtiAdvantageLibrary.NetCore.Lti;
 using LtiAdvantageLibrary.NetCore.Membership;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -22,13 +23,17 @@ namespace AdvantageTool.Pages
     public class ToolModel : PageModel
     {
         private readonly ApplicationDbContext _context;
-        private readonly IHttpClientFactory _clientFactory;
+        private readonly IHttpClientFactory _httpClientFactory;
 
-        public ToolModel(ApplicationDbContext context, IHttpClientFactory clientFactory)
+        public ToolModel(ApplicationDbContext context, 
+            IHttpClientFactory httpClientFactory)
         {
             _context = context;
-            _clientFactory = clientFactory;
+            _httpClientFactory = httpClientFactory;
         }
+
+        [BindProperty]
+        public string ClientId { get; set; }
 
         /// <summary>
         /// Get or set the error discovered while parsing the request.
@@ -115,6 +120,8 @@ namespace AdvantageTool.Pages
                 return Page();
             }
 
+            ClientId = client.ClientId;
+
             // Using the JwtSecurityTokenHandler.ValidateToken method, validate four things:
             //
             // 1. The Issuer Identifier for the Platform MUST exactly match the value of the iss
@@ -135,7 +142,7 @@ namespace AdvantageTool.Pages
             {
                 if (!string.IsNullOrEmpty(client.PlatformJsonWebKeysUrl))
                 {
-                    var httpClient = _clientFactory.CreateClient();
+                    var httpClient = _httpClientFactory.CreateClient();
                     var keySetJson = await httpClient.GetStringAsync(client.PlatformJsonWebKeysUrl);
                     var keySet = JsonConvert.DeserializeObject<JsonWebKeySet>(keySetJson);
                     var key = keySet.Keys.SingleOrDefault(k => k.Kid == Token.Header.Kid);
@@ -153,7 +160,7 @@ namespace AdvantageTool.Pages
                 }
                 else
                 {
-                    var httpClient = _clientFactory.CreateClient();
+                    var httpClient = _httpClientFactory.CreateClient();
                     var disco = await httpClient.GetDiscoveryDocumentAsync(Token.Issuer);
                     if (disco.IsError)
                     {
@@ -215,10 +222,41 @@ namespace AdvantageTool.Pages
 
         public async Task<IActionResult> OnPostMembership(string id)
         {
-            var client = _clientFactory.CreateClient();
+            var platform = await _context.Platforms.FirstOrDefaultAsync(p => p.ClientId == ClientId);
+            if (platform == null)
+            {
+                Membership = "Cannot find platform definition.";
+                return await OnPostAsync();
+            }
+
+            var httpClient = _httpClientFactory.CreateClient();
+            var disco = await httpClient.GetDiscoveryDocumentAsync(new DiscoveryDocumentRequest
+            {
+                Address = platform.PlatformIssuer,
+                Policy =
+                {
+                    Authority = platform.PlatformIssuer
+                }
+            });
+            if (disco.IsError)
+            {
+                Membership = disco.Error;
+                return await OnPostAsync();
+            }
+
+            var tokenClient = new TokenClient(disco.TokenEndpoint, platform.ClientId, platform.ClientSecret);
+            var tokenResponse = await tokenClient.RequestClientCredentialsAsync("api1");
+            if (tokenResponse.IsError)
+            {
+                Membership = tokenResponse.Error;
+                return await OnPostAsync();
+            }
+
+            httpClient.SetBearerToken(tokenResponse.AccessToken);
+
             try
             {
-                using (var response = await client.GetAsync($"https://localhost:5001/context/{id}/membership")
+                using (var response = await httpClient.GetAsync($"https://localhost:5001/context/{id}/membership")
                     .ConfigureAwait(false))
                 {
                     var content = await response.Content.ReadAsStringAsync();
@@ -231,14 +269,15 @@ namespace AdvantageTool.Pages
                     }
                     else
                     {
-                        Membership = content ?? response.ReasonPhrase;
+                        Membership = !string.IsNullOrEmpty(content) 
+                            ? content
+                            : response.ReasonPhrase;
                     }
                 }
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
-                throw;
+                Membership = e.Message;
             }
 
             return await OnPostAsync();

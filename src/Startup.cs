@@ -1,4 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
+using System.Net.Http;
 using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
@@ -7,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using AdvantageTool.Data;
+using IdentityModel.Client;
 using IdentityServer4.EntityFramework.DbContexts;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -49,7 +51,7 @@ namespace AdvantageTool
 
             services.AddHttpClient();
 
-                        // This app will host the LTI Platform and the Identity Server (Issuer). The Identity Server
+            // This app will host the LTI Platform and the Identity Server (Issuer). The Identity Server
             // will 1) sign requests that originate from the Platform and a keyset endpoint so the Tool 
             // (Client) can get the public key to validate the requests, and 2) issue access tokens to
             // the Tool and validate requests that originate from the Tool.

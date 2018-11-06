@@ -8,23 +8,26 @@ namespace AdvantageTool.Pages.Platforms
         public int Id { get; set; }
 
         [NullableUrl]
-        [Display(Name = "Platform Access Token URL")]
+        [Display(Name = "Access Token URL")]
         public string PlatformAccessTokenUrl { get; set; }
 
         [Required]
-        [Display(Name = "Tool Client ID")]
+        [Display(Name = "Client ID")]
         public string ToolClientId { get; set; }
 
+        [Display(Name = "Client Secret")]
+        public string ToolClientSecret { get; set; }
+
         [Required]
-        [Display(Name = "Platform Issuer", Description = "This is the Issuer for all messages that originate from the Platform.")]
+        [Display(Name = "Issuer", Description = "This is the Issuer for all messages that originate from the Platform.")]
         public string PlatformIssuer { get; set; }
 
         [NullableUrl]
-        [Display(Name = "Platform JSON Web Keys URL")]
+        [Display(Name = "JSON Web Keys URL")]
         public string PlatformJsonWebKeysUrl { get; set; }
 
         [Required]
-        [Display(Name = "Platform Name")]
+        [Display(Name = "Name")]
         public string PlatformName { get; set; }
     }
 }
