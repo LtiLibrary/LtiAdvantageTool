@@ -8,7 +8,6 @@ using AdvantageTool.Data;
 using IdentityModel.Client;
 using LtiAdvantageLibrary.NetCore.Lti;
 using LtiAdvantageLibrary.NetCore.Membership;
-using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
