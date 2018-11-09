@@ -41,12 +41,12 @@ namespace AdvantageTool.Pages.Platforms
 
             Platform = new PlatformModel
             {
-                PlatformAccessTokenUrl = client.PlatformAccessTokenUrl,
-                ToolClientId = client.ClientId,
-                PlatformName = client.Name,
+                AccessTokenUrl = client.AccessTokenUrl,
+                ClientId = client.ClientId,
+                Name = client.Name,
                 Id = client.Id,
-                PlatformIssuer = client.PlatformIssuer,
-                PlatformJsonWebKeysUrl = client.PlatformJsonWebKeysUrl
+                Issuer = client.Issuer,
+                JsonWebKeysUrl = client.JsonWebKeysUrl
             };
 
             return Page();

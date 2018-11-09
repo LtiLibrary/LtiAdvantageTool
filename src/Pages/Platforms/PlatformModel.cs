@@ -9,25 +9,28 @@ namespace AdvantageTool.Pages.Platforms
 
         [NullableUrl]
         [Display(Name = "Access Token URL")]
-        public string PlatformAccessTokenUrl { get; set; }
+        public string AccessTokenUrl { get; set; }
 
         [Required]
         [Display(Name = "Client ID")]
-        public string ToolClientId { get; set; }
+        public string ClientId { get; set; }
 
-        [Display(Name = "Client Secret")]
-        public string ToolClientSecret { get; set; }
+        [Display(Name = "Client Secret", Description = "This is the shared secret the tool will use for client credentials.")]
+        public string ClientSecret { get; set; }
+
+        [Display(Name = "Private Key", Description = "This is the private key the tool will use for client credentials.")]
+        public string ClientPrivateKey { get; set; }
 
         [Required]
         [Display(Name = "Issuer", Description = "This is the Issuer for all messages that originate from the Platform.")]
-        public string PlatformIssuer { get; set; }
+        public string Issuer { get; set; }
 
         [NullableUrl]
         [Display(Name = "JSON Web Keys URL")]
-        public string PlatformJsonWebKeysUrl { get; set; }
+        public string JsonWebKeysUrl { get; set; }
 
         [Required]
         [Display(Name = "Name")]
-        public string PlatformName { get; set; }
+        public string Name { get; set; }
     }
 }

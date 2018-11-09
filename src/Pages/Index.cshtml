@@ -56,16 +56,16 @@
                     <table class="table">
                         <thead>
                             <tr>
-                                <th>@Html.DisplayNameFor(m => m.Platforms[0].PlatformName)</th>
-                                <th>@Html.DisplayNameFor(m => m.Platforms[0].ToolClientId)</th>
+                                <th>@Html.DisplayNameFor(m => m.Platforms[0].Name)</th>
+                                <th>@Html.DisplayNameFor(m => m.Platforms[0].ClientId)</th>
                             </tr>
                         </thead>
                         <tbody>
                         @foreach (var client in Model.Platforms)
                         {
                             <tr>
-                                <td>@Html.DisplayFor(m => client.PlatformName)</td>
-                                <td>@Html.DisplayFor(m => client.ToolClientId)</td>
+                                <td>@Html.DisplayFor(m => client.Name)</td>
+                                <td>@Html.DisplayFor(m => client.ClientId)</td>
                             </tr>
                         }
                         </tbody>

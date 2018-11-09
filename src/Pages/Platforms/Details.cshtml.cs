@@ -1,7 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using AdvantageTool.Data;
-using IdentityServer4.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -20,9 +18,6 @@ namespace AdvantageTool.Pages.Platforms
         }
 
         public PlatformModel Platform { get; set; }
-
-        [Display(Name = "Tool Issuer", Description = "This is the Issuer for all messages that originate from this Tool.")]
-        public string ToolIssuer { get; set; }
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -45,15 +40,15 @@ namespace AdvantageTool.Pages.Platforms
             
             Platform = new PlatformModel
             {
-                PlatformAccessTokenUrl = client.PlatformAccessTokenUrl,
-                ToolClientId = client.ClientId,
-                PlatformName = client.Name,
+                AccessTokenUrl = client.AccessTokenUrl,
+                ClientId = client.ClientId,
+                ClientPrivateKey = client.ClientPrivateKey,
+                ClientSecret = client.ClientSecret,
+                Name = client.Name,
                 Id = client.Id,
-                PlatformIssuer = client.PlatformIssuer,
-                PlatformJsonWebKeysUrl = client.PlatformJsonWebKeysUrl
+                Issuer = client.Issuer,
+                JsonWebKeysUrl = client.JsonWebKeysUrl
             };
-
-            ToolIssuer = HttpContext.GetIdentityServerIssuerUri();
 
             return Page();
         }

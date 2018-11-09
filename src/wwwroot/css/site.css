@@ -26,3 +26,8 @@ body > .container, body > .container-fluid {
     padding-right: 15px;
     padding-left: 15px;
 }
+
+textarea.small {
+    font-size: 80%;
+    font-weight: 400;
+}

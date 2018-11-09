@@ -16,23 +16,17 @@
                 </h5>
                 <div class="card-body">
                     <dl>
-                        <dt>@Html.DisplayNameFor(m => m.Platform.PlatformName)</dt>
-                        <dd>@Model.Platform.PlatformName</dd>
+                        <dt>@Html.DisplayNameFor(m => m.Platform.Name)</dt>
+                        <dd>@Model.Platform.Name</dd>
                         <dt>
-                            @Html.DisplayNameFor(m => m.Platform.PlatformIssuer)
-                            <tooltip asp-for="Platform.PlatformIssuer"></tooltip>
+                            @Html.DisplayNameFor(m => m.Platform.Issuer)
+                            <tooltip asp-for="Platform.Issuer"></tooltip>
                         </dt>
-                        <dd>@Html.DisplayFor(m => m.Platform.PlatformIssuer)</dd>
-                    </dl>
-                    <div class="alert alert-info">
-                        If the Platform Issuer supports OpenID Connect Discover, the next two fields
-                        are not used by this Tool.
-                    </div>
-                    <dl>
-                        <dt>@Html.DisplayNameFor(m => m.Platform.PlatformJsonWebKeysUrl)</dt>
-                        <dd>@(Model.Platform.PlatformJsonWebKeysUrl??"[Not Set]")</dd>
-                        <dt>@Html.DisplayNameFor(m => m.Platform.PlatformAccessTokenUrl)</dt>
-                        <dd>@(Model.Platform.PlatformAccessTokenUrl??"[Not Set]")</dd>
+                        <dd>@Html.DisplayFor(m => m.Platform.Issuer)</dd>
+                        <dt>@Html.DisplayNameFor(m => m.Platform.JsonWebKeysUrl)</dt>
+                        <dd>@(Model.Platform.JsonWebKeysUrl??"[Not Set]")</dd>
+                        <dt>@Html.DisplayNameFor(m => m.Platform.AccessTokenUrl)</dt>
+                        <dd>@(Model.Platform.AccessTokenUrl??"[Not Set]")</dd>
                     </dl>
                 </div>
             </div>
@@ -43,21 +37,19 @@
                     Tool Settings
                 </h5>
                 <div class="card-body">
-                    <div class="alert alert-info">
-                        The @Html.DisplayNameFor(m => m.Platform.ToolClientId)
-                        and @Html.DisplayNameFor(m => m.Platform.ToolClientSecret)
-                        here must match the values in the Platform.
-                    </div>
                     <dl>
-                        <dt>@Html.DisplayNameFor(m => m.Platform.ToolClientId)</dt>
-                        <dd>@Html.DisplayFor(m => m.Platform.ToolClientId)</dd>
-                        <dt>@Html.DisplayNameFor(m => m.Platform.ToolClientSecret)</dt>
-                        <dd>[Not Displayed]</dd>
+                        <dt>@Html.DisplayNameFor(m => m.Platform.ClientId)</dt>
+                        <dd>@Html.DisplayFor(m => m.Platform.ClientId)</dd>
                         <dt>
-                            @Html.DisplayNameFor(m => m.ToolIssuer)
-                            <tooltip asp-for="ToolIssuer"></tooltip>
+                            @Html.DisplayNameFor(m => m.Platform.ClientSecret)
+                            <tooltip asp-for="Platform.ClientSecret"></tooltip>
                         </dt>
-                        <dd>@Html.DisplayFor(m => m.ToolIssuer)</dd>
+                        <dd>@(Model.Platform.ClientSecret??"[Not Set]")</dd>
+                        <dt>
+                            @Html.DisplayNameFor(m => m.Platform.ClientPrivateKey)
+                            <tooltip asp-for="Platform.ClientPrivateKey"></tooltip>
+                        </dt>
+                        <dd><pre><small>@(Model.Platform.ClientPrivateKey??"[Not Set]")</small></pre></dd>
                     </dl>
                 </div>
             </div>

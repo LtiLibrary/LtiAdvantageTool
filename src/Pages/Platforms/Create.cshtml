@@ -18,28 +18,28 @@
                     </h5>
                     <div class="card-body">
                         <div class="form-group">
-                            <label asp-for="Platform.PlatformName"></label>
-                            <input asp-for="Platform.PlatformName" class="form-control" />
-                            <span asp-validation-for="Platform.PlatformName" class="text-danger"></span>
+                            <label asp-for="Platform.Name"></label>
+                            <input asp-for="Platform.Name" class="form-control" />
+                            <span asp-validation-for="Platform.Name" class="text-danger"></span>
                         </div>
                         <div class="form-group">
-                            <label asp-for="Platform.PlatformIssuer"></label>
-                            <input asp-for="Platform.PlatformIssuer" class="form-control" />
-                            <span asp-validation-for="Platform.PlatformIssuer" class="text-danger"></span>
+                            <label asp-for="Platform.Issuer"></label>
+                            <input asp-for="Platform.Issuer" class="form-control" />
+                            <span asp-validation-for="Platform.Issuer" class="text-danger"></span>
                         </div>
                         <div class="alert alert-info">
-                            If the @Html.DisplayNameFor(m => m.Platform.PlatformIssuer) supports OpenID Connect Discover,
-                            you can leave the next two fields blank.
+                            If the @Html.DisplayNameFor(m => m.Platform.Issuer) supports OpenID Connect Discover,
+                            you can leave the next two fields blank and they will be filled in.
                         </div>
                         <div class="form-group">
-                            <label asp-for="Platform.PlatformJsonWebKeysUrl"></label>
-                            <input asp-for="Platform.PlatformJsonWebKeysUrl" class="form-control" />
-                            <span asp-validation-for="Platform.PlatformJsonWebKeysUrl" class="text-danger"></span>
+                            <label asp-for="Platform.JsonWebKeysUrl"></label>
+                            <input asp-for="Platform.JsonWebKeysUrl" class="form-control" />
+                            <span asp-validation-for="Platform.JsonWebKeysUrl" class="text-danger"></span>
                         </div>
                         <div class="form-group">
-                            <label asp-for="Platform.PlatformAccessTokenUrl"></label>
-                            <input asp-for="Platform.PlatformAccessTokenUrl" class="form-control" />
-                            <span asp-validation-for="Platform.PlatformAccessTokenUrl" class="text-danger"></span>
+                            <label asp-for="Platform.AccessTokenUrl"></label>
+                            <input asp-for="Platform.AccessTokenUrl" class="form-control" />
+                            <span asp-validation-for="Platform.AccessTokenUrl" class="text-danger"></span>
                         </div>
                     </div>
                 </div>
@@ -51,19 +51,27 @@
                     </h5>
                     <div class="card-body">
                         <div class="alert alert-info">
-                            The @Html.DisplayNameFor(m => m.Platform.ToolClientId)
-                            and @Html.DisplayNameFor(m => m.Platform.ToolClientSecret)
-                            here must match the values in the Platform.
+                            Copy and paste the tool settings below from your platform. Either
+                            @Html.DisplayNameFor(m => m.Platform.ClientSecret) or
+                            @Html.DisplayNameFor(m => m.Platform.ClientPrivateKey) is
+                            required.
                         </div>
                         <div class="form-group">
-                            <label asp-for="Platform.ToolClientId"></label>
-                            <input asp-for="Platform.ToolClientId" class="form-control" />
-                            <span asp-validation-for="Platform.ToolClientId" class="text-danger"></span>
+                            <label asp-for="Platform.ClientId"></label>
+                            <input asp-for="Platform.ClientId" class="form-control" />
+                            <span asp-validation-for="Platform.ClientId" class="text-danger"></span>
                         </div>
                         <div class="form-group">
-                            <label asp-for="Platform.ToolClientSecret"></label>
-                            <input asp-for="Platform.ToolClientSecret" class="form-control" />
-                            <span asp-validation-for="Platform.ToolClientSecret" class="text-danger"></span>
+                            <label asp-for="Platform.ClientSecret"></label>
+                            <tooltip asp-for="Platform.ClientSecret"></tooltip>
+                            <input asp-for="Platform.ClientSecret" class="form-control" />
+                            <span asp-validation-for="Platform.ClientSecret" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Platform.ClientPrivateKey"></label>
+                            <tooltip asp-for="Platform.ClientPrivateKey"></tooltip>
+                            <textarea asp-for="Platform.ClientPrivateKey" class="form-control text-monospace small" rows="5"></textarea>
+                            <span asp-validation-for="Platform.ClientPrivateKey" class="text-danger"></span>
                         </div>
                     </div>
                 </div>

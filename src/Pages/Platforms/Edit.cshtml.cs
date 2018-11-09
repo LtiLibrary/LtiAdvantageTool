@@ -1,6 +1,8 @@
 ﻿using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using AdvantageTool.Data;
+using IdentityModel.Client;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -10,12 +12,16 @@ namespace AdvantageTool.Pages.Platforms
 {
     public class EditModel : PageModel
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ApplicationDbContext _appContext;
+        private readonly IHttpClientFactory _httpClientFactory;
         private readonly UserManager<IdentityUser> _userManager;
 
-        public EditModel(ApplicationDbContext context, UserManager<IdentityUser> userManager)
+        public EditModel(ApplicationDbContext appContext, 
+            IHttpClientFactory httpClientFactory,
+            UserManager<IdentityUser> userManager)
         {
-            _context = context;
+            _appContext = appContext;
+            _httpClientFactory = httpClientFactory;
             _userManager = userManager;
         }
 
@@ -29,7 +35,7 @@ namespace AdvantageTool.Pages.Platforms
                 return NotFound();
             }
 
-            var client = await _context.Platforms.FindAsync(id);
+            var client = await _appContext.Platforms.FindAsync(id);
             if (client == null)
             {
                 return NotFound();
@@ -43,12 +49,14 @@ namespace AdvantageTool.Pages.Platforms
             
             Platform = new PlatformModel
             {
-                PlatformAccessTokenUrl = client.PlatformAccessTokenUrl,
-                ToolClientId = client.ClientId,
-                PlatformName = client.Name,
                 Id = client.Id,
-                PlatformIssuer = client.PlatformIssuer,
-                PlatformJsonWebKeysUrl = client.PlatformJsonWebKeysUrl
+                AccessTokenUrl = client.AccessTokenUrl,
+                ClientId = client.ClientId,
+                ClientPrivateKey = client.ClientPrivateKey,
+                ClientSecret = client.ClientSecret,
+                Issuer = client.Issuer,
+                JsonWebKeysUrl = client.JsonWebKeysUrl,
+                Name = client.Name
             };
 
             return Page();
@@ -61,22 +69,41 @@ namespace AdvantageTool.Pages.Platforms
                 return Page();
             }
 
-            var platform = await _context.Platforms.FindAsync(Platform.Id);
-            platform.ClientId = Platform.ToolClientId;
-            platform.Name = Platform.PlatformName;
-            platform.PlatformAccessTokenUrl = Platform.PlatformAccessTokenUrl;
-            platform.PlatformIssuer = Platform.PlatformIssuer;
-            platform.PlatformJsonWebKeysUrl = Platform.PlatformJsonWebKeysUrl;
-            if (!string.IsNullOrEmpty(Platform.ToolClientSecret))
+            if (Platform.ClientSecret.IsMissing() && Platform.ClientPrivateKey.IsMissing())
             {
-                platform.ClientSecret = Platform.ToolClientSecret;
+                ModelState.AddModelError("Platform.ClientSecret", "Either Client Secret or Private Key is required.");
+                ModelState.AddModelError("Platform.ClientPrivateKey", "Either Client Secret or Private Key is required.");
+                return Page();
             }
 
-            _context.Platforms.Update(platform);
+            // Attempt to discover the platform urls
+            if (Platform.AccessTokenUrl.IsMissing() || Platform.JsonWebKeysUrl.IsMissing())
+            {
+                var httpClient = _httpClientFactory.CreateClient();
+                var disco = await httpClient.GetDiscoveryDocumentAsync(Platform.Issuer);
+                if (!disco.IsError)
+                {
+                    Platform.AccessTokenUrl = disco.TokenEndpoint;
+                    Platform.JsonWebKeysUrl = disco.JwksUri;
+                }
+            }
+
+            var platform = await _appContext.Platforms.FindAsync(Platform.Id);
+            platform.AccessTokenUrl = Platform.AccessTokenUrl;
+            platform.ClientId = Platform.ClientId;
+            platform.ClientPrivateKey = Platform.ClientPrivateKey.IsPresent() 
+                ? Platform.ClientPrivateKey.Replace("\r\n\r\n", "\r\n")
+                : null;
+            platform.ClientSecret = Platform.ClientSecret;
+            platform.Name = Platform.Name;
+            platform.Issuer = Platform.Issuer;
+            platform.JsonWebKeysUrl = Platform.JsonWebKeysUrl;
+
+            _appContext.Platforms.Update(platform);
 
             try
             {
-                await _context.SaveChangesAsync();
+                await _appContext.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -93,7 +120,7 @@ namespace AdvantageTool.Pages.Platforms
 
         private bool PlatformExists(int id)
         {
-            return _context.Platforms.Any(e => e.Id == id);
+            return _appContext.Platforms.Any(e => e.Id == id);
         }
     }
 }

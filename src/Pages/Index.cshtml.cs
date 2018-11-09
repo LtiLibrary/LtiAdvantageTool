@@ -34,12 +34,12 @@ namespace AdvantageTool.Pages
                         .OrderBy(c => c.Name)
                         .Select(c => new PlatformModel
                         {
-                            PlatformAccessTokenUrl = c.PlatformAccessTokenUrl,
-                            ToolClientId = c.ClientId,
-                            PlatformName = c.Name,
+                            AccessTokenUrl = c.AccessTokenUrl,
+                            ClientId = c.ClientId,
+                            Name = c.Name,
                             Id = c.Id,
-                            PlatformIssuer = c.PlatformIssuer,
-                            PlatformJsonWebKeysUrl = c.PlatformJsonWebKeysUrl
+                            Issuer = c.Issuer,
+                            JsonWebKeysUrl = c.JsonWebKeysUrl
                         })
                         .ToListAsync();
                 }

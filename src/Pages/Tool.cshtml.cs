@@ -2,15 +2,18 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net.Http;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using AdvantageTool.Data;
 using IdentityModel.Client;
 using LtiAdvantageLibrary.NetCore.Lti;
 using LtiAdvantageLibrary.NetCore.Membership;
+using LtiAdvantageLibrary.NetCore.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 
@@ -33,6 +36,9 @@ namespace AdvantageTool.Pages
 
         [BindProperty]
         public string ClientId { get; set; }
+
+        [BindProperty(Name = "context_id")]
+        public string ContextId { get; set; }
 
         /// <summary>
         /// Get or set the error discovered while parsing the request.
@@ -139,10 +145,10 @@ namespace AdvantageTool.Pages
 
             try
             {
-                if (!string.IsNullOrEmpty(client.PlatformJsonWebKeysUrl))
+                if (!string.IsNullOrEmpty(client.JsonWebKeysUrl))
                 {
                     var httpClient = _httpClientFactory.CreateClient();
-                    var keySetJson = await httpClient.GetStringAsync(client.PlatformJsonWebKeysUrl);
+                    var keySetJson = await httpClient.GetStringAsync(client.JsonWebKeysUrl);
                     var keySet = JsonConvert.DeserializeObject<JsonWebKeySet>(keySetJson);
                     var key = keySet.Keys.SingleOrDefault(k => k.Kid == Token.Header.Kid);
                     if (key == null)
@@ -193,7 +199,7 @@ namespace AdvantageTool.Pages
                 ValidateAudience = true,
                 ValidAudiences = await _context.Platforms.Select(c => c.ClientId).ToListAsync(),
                 ValidateIssuer = true,
-                ValidIssuers = await _context.Platforms.Select(c => c.PlatformIssuer).ToListAsync(),
+                ValidIssuers = await _context.Platforms.Select(c => c.Issuer).ToListAsync(),
                 RequireSignedTokens = true,
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new RsaSecurityKey(rsaParameters),
@@ -219,22 +225,22 @@ namespace AdvantageTool.Pages
             return Page();
         }
 
-        public async Task<IActionResult> OnPostMembership(string id)
+        public async Task<IActionResult> OnPostMembership()
         {
             var platform = await _context.Platforms.FirstOrDefaultAsync(p => p.ClientId == ClientId);
             if (platform == null)
             {
-                Membership = "Cannot find platform definition.";
+                Membership = "Cannot find platform registration.";
                 return await OnPostAsync();
             }
 
             var httpClient = _httpClientFactory.CreateClient();
             var disco = await httpClient.GetDiscoveryDocumentAsync(new DiscoveryDocumentRequest
             {
-                Address = platform.PlatformIssuer,
+                Address = platform.Issuer,
                 Policy =
                 {
-                    Authority = platform.PlatformIssuer
+                    Authority = platform.Issuer
                 }
             });
             if (disco.IsError)
@@ -243,8 +249,33 @@ namespace AdvantageTool.Pages
                 return await OnPostAsync();
             }
 
-            var tokenClient = new TokenClient(disco.TokenEndpoint, platform.ClientId, platform.ClientSecret);
-            var tokenResponse = await tokenClient.RequestClientCredentialsAsync("api1");
+            TokenClient tokenClient;
+            TokenResponse tokenResponse;
+
+            if (platform.ClientSecret.IsPresent())
+            {
+                // Use shared secret credentials
+                tokenClient = new TokenClient(disco.TokenEndpoint, platform.ClientId, platform.ClientSecret);
+                tokenResponse = await tokenClient.RequestClientCredentialsAsync("api1");
+            }
+            else
+            {
+                // Use Signed JWT credentials
+                var payload = new JwtPayload();
+                payload.AddClaim(new Claim("iss", ClientId));
+                payload.AddClaim(new Claim("sub", ClientId));
+                payload.AddClaim(new Claim("aud", platform.AccessTokenUrl));
+                payload.AddClaim(new Claim("jti", LtiResourceLinkRequest.GenerateCryptographicNonce()));
+
+                var key = new RsaSecurityKey(RsaHelper.PrivateKeyFromPemString(platform.ClientPrivateKey));
+                var credentials = new SigningCredentials(key, SecurityAlgorithms.RsaSha256);
+                var handler = new JsonWebTokenHandler();
+                var jwt = handler.CreateToken(payload.SerializeToJson(), credentials);
+
+                tokenClient = new TokenClient(disco.TokenEndpoint, platform.ClientId);
+                tokenResponse = await tokenClient.RequestClientCredentialsWithSignedJwtAsync(jwt, "api1");
+            }
+
             if (tokenResponse.IsError)
             {
                 Membership = tokenResponse.Error;
@@ -255,7 +286,7 @@ namespace AdvantageTool.Pages
 
             try
             {
-                using (var response = await httpClient.GetAsync($"https://localhost:5001/context/{id}/membership")
+                using (var response = await httpClient.GetAsync($"https://localhost:5001/context/{ContextId}/membership")
                     .ConfigureAwait(false))
                 {
                     var content = await response.Content.ReadAsStringAsync();
