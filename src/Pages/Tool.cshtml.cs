@@ -7,6 +7,7 @@ using System.Security.Cryptography;
 using System.Threading.Tasks;
 using AdvantageTool.Data;
 using IdentityModel.Client;
+using LtiAdvantageLibrary.NetCore;
 using LtiAdvantageLibrary.NetCore.Lti;
 using LtiAdvantageLibrary.NetCore.Membership;
 using LtiAdvantageLibrary.NetCore.Utilities;
@@ -16,6 +17,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
+using JwtRegisteredClaimNames = System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames;
 
 namespace AdvantageTool.Pages
 {
@@ -256,16 +258,18 @@ namespace AdvantageTool.Pages
             {
                 // Use shared secret credentials
                 tokenClient = new TokenClient(disco.TokenEndpoint, platform.ClientId, platform.ClientSecret);
-                tokenResponse = await tokenClient.RequestClientCredentialsAsync("api1");
+                tokenResponse = await tokenClient.RequestClientCredentialsAsync(Constants.LtiScopes.MembershipReadonly);
             }
             else
             {
                 // Use Signed JWT credentials
                 var payload = new JwtPayload();
-                payload.AddClaim(new Claim("iss", ClientId));
-                payload.AddClaim(new Claim("sub", ClientId));
-                payload.AddClaim(new Claim("aud", platform.AccessTokenUrl));
-                payload.AddClaim(new Claim("jti", LtiResourceLinkRequest.GenerateCryptographicNonce()));
+                payload.AddClaim(new Claim(JwtRegisteredClaimNames.Iss, ClientId));
+                payload.AddClaim(new Claim(JwtRegisteredClaimNames.Sub, ClientId));
+                payload.AddClaim(new Claim(JwtRegisteredClaimNames.Aud, platform.AccessTokenUrl));
+                payload.AddClaim(new Claim(JwtRegisteredClaimNames.Iat, EpochTime.GetIntDate(DateTime.UtcNow).ToString()));
+                payload.AddClaim(new Claim(JwtRegisteredClaimNames.Exp, EpochTime.GetIntDate(DateTime.UtcNow.AddMinutes(5)).ToString()));
+                payload.AddClaim(new Claim(JwtRegisteredClaimNames.Jti, LtiResourceLinkRequest.GenerateCryptographicNonce()));
 
                 var key = new RsaSecurityKey(RsaHelper.PrivateKeyFromPemString(platform.ClientPrivateKey));
                 var credentials = new SigningCredentials(key, SecurityAlgorithms.RsaSha256);
@@ -273,7 +277,7 @@ namespace AdvantageTool.Pages
                 var jwt = handler.CreateToken(payload.SerializeToJson(), credentials);
 
                 tokenClient = new TokenClient(disco.TokenEndpoint, platform.ClientId);
-                tokenResponse = await tokenClient.RequestClientCredentialsWithSignedJwtAsync(jwt, "api1");
+                tokenResponse = await tokenClient.RequestClientCredentialsWithSignedJwtAsync(jwt, Constants.LtiScopes.MembershipReadonly);
             }
 
             if (tokenResponse.IsError)
