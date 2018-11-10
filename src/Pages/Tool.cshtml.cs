@@ -26,13 +26,13 @@ namespace AdvantageTool.Pages
     [IgnoreAntiforgeryToken(Order = 1001)]
     public class ToolModel : PageModel
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ApplicationDbContext _appContext;
         private readonly IHttpClientFactory _httpClientFactory;
 
-        public ToolModel(ApplicationDbContext context, 
+        public ToolModel(ApplicationDbContext appContext, 
             IHttpClientFactory httpClientFactory)
         {
-            _context = context;
+            _appContext = appContext;
             _httpClientFactory = httpClientFactory;
         }
 
@@ -117,7 +117,7 @@ namespace AdvantageTool.Pages
             }
 
             // The Audience must match a Client ID exactly.
-            var client = await _context.Platforms
+            var client = await _appContext.Platforms
                 .Where(c => Token.Payload.Aud.Contains(c.ClientId))
                 .FirstOrDefaultAsync();
 
@@ -199,9 +199,9 @@ namespace AdvantageTool.Pages
             {
                 ValidateTokenReplay = true,
                 ValidateAudience = true,
-                ValidAudiences = await _context.Platforms.Select(c => c.ClientId).ToListAsync(),
+                ValidAudiences = await _appContext.Platforms.Select(c => c.ClientId).ToListAsync(),
                 ValidateIssuer = true,
-                ValidIssuers = await _context.Platforms.Select(c => c.Issuer).ToListAsync(),
+                ValidIssuers = await _appContext.Platforms.Select(c => c.Issuer).ToListAsync(),
                 RequireSignedTokens = true,
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new RsaSecurityKey(rsaParameters),
@@ -229,7 +229,7 @@ namespace AdvantageTool.Pages
 
         public async Task<IActionResult> OnPostMembership()
         {
-            var platform = await _context.Platforms.FirstOrDefaultAsync(p => p.ClientId == ClientId);
+            var platform = await _appContext.Platforms.FirstOrDefaultAsync(p => p.ClientId == ClientId);
             if (platform == null)
             {
                 Membership = "Cannot find platform registration.";
