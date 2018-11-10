@@ -38,7 +38,9 @@ namespace AdvantageTool
             services.AddDefaultIdentity<IdentityUser>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
-            services.ConfigureApplicationCookie(options => { options.Cookie.Name = "AdvantageTool"; });
+            services.ConfigureApplicationCookie(options => options.Cookie.Name = "AdvantageTool" );
+
+            services.AddAntiforgery(options => options.SuppressXFrameOptionsHeader = true);
 
             services.AddMvc()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);

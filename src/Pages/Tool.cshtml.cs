@@ -254,15 +254,14 @@ namespace AdvantageTool.Pages
             TokenClient tokenClient;
             TokenResponse tokenResponse;
 
+            // Use shared secret client credentials if ClientSecret is present. Otherwise use a signed JWT.
             if (platform.ClientSecret.IsPresent())
             {
-                // Use shared secret credentials
                 tokenClient = new TokenClient(disco.TokenEndpoint, platform.ClientId, platform.ClientSecret);
                 tokenResponse = await tokenClient.RequestClientCredentialsAsync(Constants.LtiScopes.MembershipReadonly);
             }
             else
             {
-                // Use Signed JWT credentials
                 var payload = new JwtPayload();
                 payload.AddClaim(new Claim(JwtRegisteredClaimNames.Iss, ClientId));
                 payload.AddClaim(new Claim(JwtRegisteredClaimNames.Sub, ClientId));
@@ -290,7 +289,11 @@ namespace AdvantageTool.Pages
 
             try
             {
-                using (var response = await httpClient.GetAsync($"https://localhost:5001/context/{ContextId}/membership")
+                var handler = new JwtSecurityTokenHandler();
+                Token = handler.ReadJwtToken(IdToken);
+                LtiRequest = new LtiResourceLinkRequest(Token.Payload);
+
+                using (var response = await httpClient.GetAsync(LtiRequest.NamesRoleService.ContextMembershipUrl)
                     .ConfigureAwait(false))
                 {
                     var content = await response.Content.ReadAsStringAsync();
