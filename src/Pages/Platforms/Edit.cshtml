@@ -90,4 +90,17 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        $('#Platform_ClientPrivateKey').bind('paste', function(e){
+            window.setTimeout(function(){
+                var text = '';
+                $($('#Platform_ClientPrivateKey').val().split('\n')).each(function(i,v){
+                    v = $.trim(v);
+                    if (v.length > 0) text+= v+'\n';
+                });
+                console.log(text);
+                $('#Platform_ClientPrivateKey').val(text);
+            },1);
+        });
+    </script>
 }

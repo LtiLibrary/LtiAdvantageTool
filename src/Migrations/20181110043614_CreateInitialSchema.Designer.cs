@@ -7,11 +7,11 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-namespace AdvantageTool.Data.Migrations
+namespace AdvantageTool.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20181023035433_AddIssuerToClient")]
-    partial class AddIssuerToClient
+    [Migration("20181110043614_CreateInitialSchema")]
+    partial class CreateInitialSchema
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -21,7 +21,7 @@ namespace AdvantageTool.Data.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("AdvantageTool.Data.Client", b =>
+            modelBuilder.Entity("AdvantageTool.Data.Platform", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -29,47 +29,19 @@ namespace AdvantageTool.Data.Migrations
 
                     b.Property<string>("AccessTokenUrl");
 
-                    b.Property<string>("ClientId")
-                        .IsRequired();
+                    b.Property<string>("ClientId");
 
-                    b.Property<string>("ClientName")
-                        .IsRequired();
+                    b.Property<string>("ClientPrivateKey");
 
-                    b.Property<string>("ClientSecret")
-                        .IsRequired();
+                    b.Property<string>("ClientSecret");
 
-                    b.Property<string>("Issuer")
-                        .IsRequired();
+                    b.Property<string>("Issuer");
 
                     b.Property<string>("JsonWebKeysUrl");
 
-                    b.Property<string>("UserId");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Clients");
-                });
-
-            modelBuilder.Entity("AdvantageTool.Data.Platform", b =>
-                {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("ContactEmail");
-
-                    b.Property<string>("Description");
-
-                    b.Property<string>("Guid");
-
                     b.Property<string>("Name");
 
-                    b.Property<string>("ProductFamilyCode");
-
-                    b.Property<string>("Url");
-
                     b.Property<string>("UserId");
-
-                    b.Property<string>("Version");
 
                     b.HasKey("Id");
 

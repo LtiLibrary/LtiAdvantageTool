@@ -2,9 +2,9 @@
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace AdvantageTool.Data.Migrations
+namespace AdvantageTool.Migrations
 {
-    public partial class CreateIdentitySchema : Migration
+    public partial class CreateInitialSchema : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -45,6 +45,26 @@ namespace AdvantageTool.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Platforms",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    AccessTokenUrl = table.Column<string>(nullable: true),
+                    Name = table.Column<string>(nullable: true),
+                    ClientId = table.Column<string>(nullable: true),
+                    ClientPrivateKey = table.Column<string>(nullable: true),
+                    ClientSecret = table.Column<string>(nullable: true),
+                    Issuer = table.Column<string>(nullable: true),
+                    JsonWebKeysUrl = table.Column<string>(nullable: true),
+                    UserId = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Platforms", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -209,6 +229,9 @@ namespace AdvantageTool.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUserTokens");
+
+            migrationBuilder.DropTable(
+                name: "Platforms");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

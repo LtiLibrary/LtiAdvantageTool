@@ -23,10 +23,16 @@
                 <h4>Welcome!</h4>
                 <p>
                     This is a sample LTI Advantage Tool which you can use to test your Platform
-                    or as a <a href="https://github.com/andyfmiller/LtiAdvantageTool">reference
-                        implementation</a> of an LTI 1.3 Tool. This tool currently supports:
+                    or as a <a href="https://github.com/andyfmiller/LtiAdvantageTool" target="_blank">
+                        reference implementation
+                    </a> of an LTI 1.3 Tool. This tool currently supports:
                     <ul>
-                        <li>LtiResourceLinkRequest</li>
+                        <li><a href="https://www.imsglobal.org/spec/lti/v1p3/" target="_blank">
+                            LTI Core Specification v1.3
+                        </a></li>
+                        <li><a href="https://www.imsglobal.org/spec/lti-nrps/v2p0" target="_blank">
+                            Names and Role Provisioning Services v2.0
+                        </a></li>
                     </ul>
                 </p>
                 <h4>Getting Started</h4>
@@ -34,22 +40,22 @@
                     To use this Tool to test your Platform:
                     <ol>
                         <li>
-                            <a asp-page="./Clients/Index">Create a Client</a> to record the
-                            <code>Client ID</code> that was issued by the Platform, and the
-                            Platform's <code>Issuer</code>.
+                            Configure your Platform to launch this Tool:
+                            <pre class="mt-2 mb-2">@Url.Page("./Tool", null, null, "https")</pre>
                         </li>
                         <li>
-                            Configure your Platform to launch this Tool:
-                            <pre class="mt-2">@Url.Page("./Tool", null, null, "https")</pre>
+                            <a asp-page="./Platforms/Index">Register the Platform</a> to record the
+                            Client ID that was issued by the Platform, and to record the Platform's
+                            OpenID Connect endpoints.
                         </li>
                     </ol>
                 </p>
             </div>
             <div class="col-8">
                 <h4>Platforms</h4>
-                @if (!Model.Platforms.Any())
+                @if (Model.Platforms == null || !Model.Platforms.Any())
                 {
-                    <p>No Clients have been registered.</p>
+                    <p>No platforms have been registered.</p>
                 }
                 else
                 {
@@ -57,15 +63,17 @@
                         <thead>
                             <tr>
                                 <th>@Html.DisplayNameFor(m => m.Platforms[0].Name)</th>
+                                <th>@Html.DisplayNameFor(m => m.Platforms[0].Issuer)</th>
                                 <th>@Html.DisplayNameFor(m => m.Platforms[0].ClientId)</th>
                             </tr>
                         </thead>
                         <tbody>
-                        @foreach (var client in Model.Platforms)
+                        @foreach (var item in Model.Platforms)
                         {
                             <tr>
-                                <td>@Html.DisplayFor(m => client.Name)</td>
-                                <td>@Html.DisplayFor(m => client.ClientId)</td>
+                                <td>@item.Name</td>
+                                <td>@item.Issuer</td>
+                                <td>@item.ClientId</td>
                             </tr>
                         }
                         </tbody>
