@@ -43,6 +43,7 @@ namespace AdvantageTool
             services.AddAntiforgery(options => options.SuppressXFrameOptionsHeader = true);
 
             services.AddMvc()
+                .AddRazorPagesOptions(options => options.Conventions.AuthorizeFolder("/Platforms"))
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             services.AddHttpClient();
