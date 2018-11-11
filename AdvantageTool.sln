@@ -10,7 +10,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AdvantageTool", "src\AdvantageTool.csproj", "{4EBF015D-9B8C-4A2E-8A72-658F931718C0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LtiAdvantageLibrary.NetCore", "..\..\LTI\LtiAdvantageLibrary\src\LtiAdvantageLibrary.NetCore.csproj", "{7FD4EB92-8EFE-45EE-9307-4D60935C01D0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LtiAdvantageLibrary", "..\..\LTI\LtiAdvantage\src\LtiAdvantageLibrary\LtiAdvantageLibrary.csproj", "{78E6C8C6-3F85-47E2-ABB3-4F9B005EE50B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -22,10 +22,10 @@ Global
 		{4EBF015D-9B8C-4A2E-8A72-658F931718C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4EBF015D-9B8C-4A2E-8A72-658F931718C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4EBF015D-9B8C-4A2E-8A72-658F931718C0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7FD4EB92-8EFE-45EE-9307-4D60935C01D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7FD4EB92-8EFE-45EE-9307-4D60935C01D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7FD4EB92-8EFE-45EE-9307-4D60935C01D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7FD4EB92-8EFE-45EE-9307-4D60935C01D0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{78E6C8C6-3F85-47E2-ABB3-4F9B005EE50B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{78E6C8C6-3F85-47E2-ABB3-4F9B005EE50B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{78E6C8C6-3F85-47E2-ABB3-4F9B005EE50B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{78E6C8C6-3F85-47E2-ABB3-4F9B005EE50B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
