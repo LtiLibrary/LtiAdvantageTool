@@ -270,7 +270,7 @@ namespace AdvantageTool.Pages
                 payload.AddClaim(new Claim(JwtRegisteredClaimNames.Exp, EpochTime.GetIntDate(DateTime.UtcNow.AddMinutes(5)).ToString()));
                 payload.AddClaim(new Claim(JwtRegisteredClaimNames.Jti, LtiResourceLinkRequest.GenerateCryptographicNonce()));
 
-                var key = new RsaSecurityKey(RsaHelper.PrivateKeyFromPemString(platform.ClientPrivateKey));
+                var key = RsaHelper.PrivateKeyFromPemString(platform.ClientPrivateKey);
                 var credentials = new SigningCredentials(key, SecurityAlgorithms.RsaSha256);
                 var handler = new JsonWebTokenHandler();
                 var jwt = handler.CreateToken(payload.SerializeToJson(), credentials);

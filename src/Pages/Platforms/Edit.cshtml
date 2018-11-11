@@ -91,7 +91,7 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
-        $('#Platform_ClientPrivateKey').bind('paste', function(e){
+        $('#Platform_ClientPrivateKey').bind('paste', function(){
             window.setTimeout(function(){
                 var text = '';
                 $($('#Platform_ClientPrivateKey').val().split('\n')).each(function(i,v){
