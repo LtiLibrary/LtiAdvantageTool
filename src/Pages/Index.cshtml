@@ -22,37 +22,45 @@
             <div class="col-6">
                 <h4>Welcome!</h4>
                 <p>
-                    This is a sample LTI Advantage Tool which you can use to test your Platform
-                    or as a <a href="https://github.com/andyfmiller/LtiAdvantageTool" target="_blank">
-                        reference implementation
-                    </a> of an LTI 1.3 Tool. This tool currently supports:
+                    This is a demonstration LTI Advantage Tool which you can use with your Platform.
+                    The project is hosted on
+                    <a href="https://github.com/andyfmiller/LtiAdvantageTool" target="_blank">
+                        GitHub
+                    </a>.
+                </p>
+                <p>
+                    This tool currently supports:
                     <ul>
-                        <li><a href="https://www.imsglobal.org/spec/lti/v1p3/" target="_blank">
-                            LTI Core Specification v1.3
-                        </a></li>
-                        <li><a href="https://www.imsglobal.org/spec/lti-nrps/v2p0" target="_blank">
-                            Names and Role Provisioning Services v2.0
-                        </a></li>
+                        <li>
+                            <a href="https://www.imsglobal.org/spec/lti/v1p3/" target="_blank">
+                                LTI Core Specification v1.3
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.imsglobal.org/spec/lti-nrps/v2p0" target="_blank">
+                                Names and Role Provisioning Services v2.0
+                            </a>
+                        </li>
                     </ul>
                 </p>
                 <h4>Getting Started</h4>
                 <p>
-                    To use this Tool to test your Platform:
+                    To use this Tool with your Platform:
                     <ol>
                         <li>
                             Configure your Platform to launch this Tool:
                             <pre class="mt-2 mb-2">@Url.Page("./Tool", null, null, "https")</pre>
                         </li>
                         <li>
-                            <a asp-page="./Platforms/Index">Register the Platform</a> to record the
-                            Client ID that was issued by the Platform, and to record the Platform's
-                            OpenID Connect endpoints.
+                            <a asp-page="./Platforms/Index">Register your Platform</a> to record the
+                            platform's OpenID Connect endpoints, and the client credentials you want
+                            this tool to use.
                         </li>
                     </ol>
                 </p>
             </div>
             <div class="col-6">
-                <h4>Platforms</h4>
+                <h4>Registered Platforms</h4>
                 @if (Model.Platforms == null || !Model.Platforms.Any())
                 {
                     <p>No platforms have been registered.</p>
@@ -68,14 +76,14 @@
                             </tr>
                         </thead>
                         <tbody>
-                        @foreach (var item in Model.Platforms)
-                        {
-                            <tr>
-                                <td>@item.Name</td>
-                                <td>@item.Issuer</td>
-                                <td>@item.ClientId</td>
-                            </tr>
-                        }
+                            @foreach (var item in Model.Platforms)
+                            {
+                                <tr>
+                                    <td>@item.Name</td>
+                                    <td>@item.Issuer</td>
+                                    <td>@item.ClientId</td>
+                                </tr>
+                            }
                         </tbody>
                     </table>
                 }

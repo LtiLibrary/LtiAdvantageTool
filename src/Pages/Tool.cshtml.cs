@@ -54,7 +54,8 @@ namespace AdvantageTool.Pages
         [BindProperty(Name = "id_token")]
         public string IdToken { get; set; }
 
-        public string Membership { get; set; }
+        public MembershipContainer Membership { get; set; }
+        public string MembershipStatus { get; set; }
 
         /// <summary>
         /// This is a wrapper around the JwtPayload that makes it easy to examine the
@@ -232,7 +233,7 @@ namespace AdvantageTool.Pages
             var platform = await _appContext.Platforms.FirstOrDefaultAsync(p => p.ClientId == ClientId);
             if (platform == null)
             {
-                Membership = "Cannot find platform registration.";
+                MembershipStatus = "Cannot find platform registration.";
                 return await OnPostAsync();
             }
 
@@ -251,7 +252,7 @@ namespace AdvantageTool.Pages
                 });
                 if (disco.IsError)
                 {
-                    Membership = disco.Error;
+                    MembershipStatus = disco.Error;
                     return await OnPostAsync();
                 }
 
@@ -288,7 +289,7 @@ namespace AdvantageTool.Pages
 
             if (tokenResponse.IsError && tokenResponse.Error != "Created")
             {
-                Membership = tokenResponse.Error;
+                MembershipStatus = tokenResponse.Error;
                 return await OnPostAsync();
             }
 
@@ -307,13 +308,11 @@ namespace AdvantageTool.Pages
 
                     if (response.IsSuccessStatusCode)
                     {
-                        var membership = JsonConvert.DeserializeObject<MembershipContainer>(content);
-                        Membership = JsonConvert.SerializeObject(membership, Formatting.Indented,
-                            new JsonSerializerSettings {NullValueHandling = NullValueHandling.Ignore});
+                        Membership = JsonConvert.DeserializeObject<MembershipContainer>(content);
                     }
                     else
                     {
-                        Membership = !string.IsNullOrEmpty(content) 
+                        MembershipStatus = !string.IsNullOrEmpty(content) 
                             ? content
                             : response.ReasonPhrase;
                     }
@@ -321,7 +320,7 @@ namespace AdvantageTool.Pages
             }
             catch (Exception e)
             {
-                Membership = e.Message;
+                MembershipStatus = e.Message;
             }
 
             return await OnPostAsync();
