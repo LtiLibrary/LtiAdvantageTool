@@ -237,18 +237,25 @@ namespace AdvantageTool.Pages
             }
 
             var httpClient = _httpClientFactory.CreateClient();
-            var disco = await httpClient.GetDiscoveryDocumentAsync(new DiscoveryDocumentRequest
+            var tokenEndPoint = platform.AccessTokenUrl;
+
+            if (tokenEndPoint.IsMissing())
             {
-                Address = platform.Issuer,
-                Policy =
+                var disco = await httpClient.GetDiscoveryDocumentAsync(new DiscoveryDocumentRequest
                 {
-                    Authority = platform.Issuer
+                    Address = platform.Issuer,
+                    Policy =
+                    {
+                        Authority = platform.Issuer
+                    }
+                });
+                if (disco.IsError)
+                {
+                    Membership = disco.Error;
+                    return await OnPostAsync();
                 }
-            });
-            if (disco.IsError)
-            {
-                Membership = disco.Error;
-                return await OnPostAsync();
+
+                tokenEndPoint = disco.TokenEndpoint;
             }
 
             TokenClient tokenClient;
@@ -257,7 +264,7 @@ namespace AdvantageTool.Pages
             // Use shared secret client credentials if ClientSecret is present. Otherwise use a signed JWT.
             if (platform.ClientSecret.IsPresent())
             {
-                tokenClient = new TokenClient(disco.TokenEndpoint, platform.ClientId, platform.ClientSecret);
+                tokenClient = new TokenClient(tokenEndPoint, platform.ClientId, platform.ClientSecret);
                 tokenResponse = await tokenClient.RequestClientCredentialsAsync(Constants.LtiScopes.MembershipReadonly);
             }
             else
@@ -275,11 +282,11 @@ namespace AdvantageTool.Pages
                 var handler = new JsonWebTokenHandler();
                 var jwt = handler.CreateToken(payload.SerializeToJson(), credentials);
 
-                tokenClient = new TokenClient(disco.TokenEndpoint, platform.ClientId);
+                tokenClient = new TokenClient(tokenEndPoint, platform.ClientId);
                 tokenResponse = await tokenClient.RequestClientCredentialsWithSignedJwtAsync(jwt, Constants.LtiScopes.MembershipReadonly);
             }
 
-            if (tokenResponse.IsError)
+            if (tokenResponse.IsError && tokenResponse.Error != "Created")
             {
                 Membership = tokenResponse.Error;
                 return await OnPostAsync();
