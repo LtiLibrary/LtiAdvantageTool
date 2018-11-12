@@ -9,7 +9,7 @@ using AdvantageTool.Data;
 using IdentityModel.Client;
 using LtiAdvantageLibrary;
 using LtiAdvantageLibrary.Lti;
-using LtiAdvantageLibrary.Membership;
+using LtiAdvantageLibrary.NamesRoleService;
 using LtiAdvantageLibrary.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -227,7 +227,7 @@ namespace AdvantageTool.Pages
             return Page();
         }
 
-        public async Task<IActionResult> OnPostMembership()
+        public async Task<IActionResult> OnPostNamesRoleServiceAsync()
         {
             var platform = await _appContext.Platforms.FirstOrDefaultAsync(p => p.ClientId == ClientId);
             if (platform == null)

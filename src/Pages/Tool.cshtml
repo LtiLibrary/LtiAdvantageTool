@@ -54,13 +54,13 @@
                 @if (Model.LtiRequest.NamesRoleService != null)
                 {
                     <div class="card mb-3">
-                        <div class="card-header">Membership</div>
+                        <div class="card-header">Names and Role Service</div>
                         <div class="card-body">
-                            <form method="post" asp-page-handler="Membership">
+                            <form method="post" asp-page-handler="NamesRoleService">
                                 <input type="hidden" name="id_token" id="id_token" value="@Model.IdToken" />
                                 <input type="hidden" name="context_id" id="context_id" value="@Model.LtiRequest.Context.Id" />
                                 <input type="hidden" asp-for="ClientId" />
-                                <input type="submit" value="Get Membership" class="btn btn-secondary" />
+                                <input type="submit" value="Get Course Members" class="btn btn-secondary" />
                             </form>
                             <pre class="mt-3">@Model.Membership</pre>
                         </div>
