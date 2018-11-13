@@ -14,7 +14,6 @@ using LtiAdvantageLibrary.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using JwtRegisteredClaimNames = System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames;
@@ -275,18 +274,17 @@ namespace AdvantageTool.Pages
                 payload.AddClaim(new Claim(JwtRegisteredClaimNames.Sub, ClientId));
                 payload.AddClaim(new Claim(JwtRegisteredClaimNames.Aud, platform.AccessTokenUrl));
                 payload.AddClaim(new Claim(JwtRegisteredClaimNames.Iat, EpochTime.GetIntDate(DateTime.UtcNow).ToString()));
+                payload.AddClaim(new Claim(JwtRegisteredClaimNames.Nbf, EpochTime.GetIntDate(DateTime.UtcNow.AddSeconds(-5)).ToString()));
                 payload.AddClaim(new Claim(JwtRegisteredClaimNames.Exp, EpochTime.GetIntDate(DateTime.UtcNow.AddMinutes(5)).ToString()));
                 payload.AddClaim(new Claim(JwtRegisteredClaimNames.Jti, LtiResourceLinkRequest.GenerateCryptographicNonce()));
 
-                var key = RsaHelper.PrivateKeyFromPemString(platform.ClientPrivateKey);
-                var credentials = new SigningCredentials(key, SecurityAlgorithms.RsaSha256);
-                var handler = new JsonWebTokenHandler();
-                var jwt = handler.CreateToken(payload.SerializeToJson(), credentials);
+                var jwt = RsaHelper.CreateSignedJwt(payload, platform.ClientPrivateKey);
 
                 tokenClient = new TokenClient(tokenEndPoint, platform.ClientId);
                 tokenResponse = await tokenClient.RequestClientCredentialsWithSignedJwtAsync(jwt, Constants.LtiScopes.MembershipReadonly);
             }
 
+            // The IMS reference implementation returns "Created" with success. 
             if (tokenResponse.IsError && tokenResponse.Error != "Created")
             {
                 MembershipStatus = tokenResponse.Error;

@@ -170,34 +170,39 @@
                                                             </div>
                                                         </dd>
                                                     </dl>
-                                                    @if (Model.Membership != null)
-                                                    {
-                                                        foreach (var member in @Model.Membership.Members)
-                                                        {
-                                                            if (member.UserId != Model.LtiRequest.Sub)
-                                                            {
-                                                                <dl class="col-sm-auto">
-                                                                    <dt>Other Member</dt>
-                                                                    <dd>
-                                                                        <div>
-                                                                            @(member.GivenName ?? "(no first name)")
-                                                                            @(member.FamilyName ?? "(no last name)")
-                                                                        </div>
-                                                                        <div>
-                                                                            @(member.Email ?? "(no email)")
-                                                                        </div>
-                                                                        <div>
-                                                                            @(string.Join(", ", member.Roles))
-                                                                        </div>
-                                                                        <div>
-                                                                            @(member.SourcedId ?? "(no sis id)")
-                                                                        </div>
-                                                                    </dd>
-                                                                </dl>
-                                                            }
-                                                        }
-                                                    }
                                                 </div>
+                                                @if (Model.Membership != null)
+                                                {
+                                                    <div class="row">
+                                                        <dl class="col">
+                                                            <dt>Course Members</dt>
+                                                            <dd>
+                                                                <div class="row">
+                                                                    @foreach (var member in Model.Membership.Members)
+                                                                    {
+                                                                        <div class="card bg-secondary" style="width: 10rem">
+                                                                            <div class="card-body">
+                                                                                <div class="card-title">
+                                                                                    @(member.GivenName ?? "(no first name)")
+                                                                                    @(member.FamilyName ?? "(no last name)")
+                                                                                </div>
+                                                                                <div>
+                                                                                    @(member.Email ?? "(no email)")
+                                                                                </div>
+                                                                                <div>
+                                                                                    @(string.Join(", ", member.Roles))
+                                                                                </div>
+                                                                                <div>
+                                                                                    @(member.SourcedId ?? "(no sis id)")
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    }
+                                                                </div>
+                                                            </dd>
+                                                        </dl>
+                                                    </div>
+                                                }
                                                 <div class="row">
                                                     <dl class="col-sm-auto">
                                                         <dt>Resource Link</dt>
