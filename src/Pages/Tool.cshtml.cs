@@ -35,11 +35,11 @@ namespace AdvantageTool.Pages
             _httpClientFactory = httpClientFactory;
         }
 
+        /// <summary>
+        /// The tool's Client ID
+        /// </summary>
         [BindProperty]
         public string ClientId { get; set; }
-
-        [BindProperty(Name = "context_id")]
-        public string ContextId { get; set; }
 
         /// <summary>
         /// Get or set the error discovered while parsing the request.
@@ -53,15 +53,18 @@ namespace AdvantageTool.Pages
         [BindProperty(Name = "id_token")]
         public string IdToken { get; set; }
 
-        public MembershipContainer Membership { get; set; }
-        public string MembershipStatus { get; set; }
-
         /// <summary>
         /// This is a wrapper around the JwtPayload that makes it easy to examine the
         /// claims. For example, LtiRequest.Roles gets the role claims as an Enum array
         /// so you don't have to match string values.
         /// </summary>
         public LtiResourceLinkRequest LtiRequest { get; set; }
+
+        /// <summary>
+        /// Results from calling NameRoleService.
+        /// </summary>
+        public MembershipContainer Membership { get; set; }
+        public string MembershipStatus { get; set; }
 
         /// <summary>
         /// Get or set the JwtSecurityToken (id_token) in the request.
@@ -227,6 +230,11 @@ namespace AdvantageTool.Pages
             return Page();
         }
 
+        /// <summary>
+        /// Handler for requesting course members.
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
         public async Task<IActionResult> OnPostNamesRoleServiceAsync()
         {
             var platform = await _appContext.Platforms.FirstOrDefaultAsync(p => p.ClientId == ClientId);
