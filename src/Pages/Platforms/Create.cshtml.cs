@@ -46,14 +46,14 @@ namespace AdvantageTool.Pages.Platforms
             }
             
             // Attempt to discover the platform urls
-            if (Platform.AccessTokenUrl.IsMissing() || Platform.JsonWebKeysUrl.IsMissing())
+            if (Platform.AccessTokenUrl.IsMissing() || Platform.JsonWebKeySetUrl.IsMissing())
             {
                 var httpClient = _httpClientFactory.CreateClient();
                 var disco = await httpClient.GetDiscoveryDocumentAsync(Platform.Issuer);
                 if (!disco.IsError)
                 {
                     Platform.AccessTokenUrl = disco.TokenEndpoint;
-                    Platform.JsonWebKeysUrl = disco.JwksUri;
+                    Platform.JsonWebKeySetUrl = disco.JwksUri;
                 }
             }
 
@@ -68,7 +68,7 @@ namespace AdvantageTool.Pages.Platforms
                 ClientSecret = Platform.ClientSecret,
                 Name = Platform.Name,
                 Issuer = Platform.Issuer,
-                JsonWebKeysUrl = Platform.JsonWebKeysUrl,
+                JsonWebKeySetUrl = Platform.JsonWebKeySetUrl,
                 UserId = user.Id
             };
 

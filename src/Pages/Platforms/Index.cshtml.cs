@@ -25,17 +25,9 @@ namespace AdvantageTool.Pages.Platforms
         {
             var user = await _userManager.GetUserAsync(User);
             Platforms = await _context.Platforms
-                .Where(c => c.UserId == user.Id)
-                .OrderBy(c => c.Name)
-                .Select(c => new PlatformModel
-                {
-                    AccessTokenUrl = c.AccessTokenUrl,
-                    ClientId = c.ClientId,
-                    Name = c.Name,
-                    Id = c.Id,
-                    Issuer = c.Issuer,
-                    JsonWebKeysUrl = c.JsonWebKeysUrl
-                })
+                .Where(p => p.UserId == user.Id)
+                .OrderBy(p => p.Name)
+                .Select(p => new PlatformModel(p))
                 .ToListAsync();
         }
     }

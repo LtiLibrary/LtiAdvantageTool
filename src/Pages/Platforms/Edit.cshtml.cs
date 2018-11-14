@@ -35,29 +35,19 @@ namespace AdvantageTool.Pages.Platforms
                 return NotFound();
             }
 
-            var client = await _appContext.Platforms.FindAsync(id);
-            if (client == null)
+            var platform = await _appContext.Platforms.FindAsync(id);
+            if (platform == null)
             {
                 return NotFound();
             }
 
             var user = await _userManager.GetUserAsync(User);
-            if (client.UserId != user.Id)
+            if (platform.UserId != user.Id)
             {
                 return NotFound();
             }
-            
-            Platform = new PlatformModel
-            {
-                Id = client.Id,
-                AccessTokenUrl = client.AccessTokenUrl,
-                ClientId = client.ClientId,
-                ClientPrivateKey = client.ClientPrivateKey,
-                ClientSecret = client.ClientSecret,
-                Issuer = client.Issuer,
-                JsonWebKeysUrl = client.JsonWebKeysUrl,
-                Name = client.Name
-            };
+
+            Platform = new PlatformModel(platform);
 
             return Page();
         }
@@ -77,14 +67,14 @@ namespace AdvantageTool.Pages.Platforms
             }
 
             // Attempt to discover the platform urls
-            if (Platform.AccessTokenUrl.IsMissing() || Platform.JsonWebKeysUrl.IsMissing())
+            if (Platform.AccessTokenUrl.IsMissing() || Platform.JsonWebKeySetUrl.IsMissing())
             {
                 var httpClient = _httpClientFactory.CreateClient();
                 var disco = await httpClient.GetDiscoveryDocumentAsync(Platform.Issuer);
                 if (!disco.IsError)
                 {
                     Platform.AccessTokenUrl = disco.TokenEndpoint;
-                    Platform.JsonWebKeysUrl = disco.JwksUri;
+                    Platform.JsonWebKeySetUrl = disco.JwksUri;
                 }
             }
 
@@ -97,7 +87,7 @@ namespace AdvantageTool.Pages.Platforms
             platform.ClientSecret = Platform.ClientSecret;
             platform.Name = Platform.Name;
             platform.Issuer = Platform.Issuer;
-            platform.JsonWebKeysUrl = Platform.JsonWebKeysUrl;
+            platform.JsonWebKeySetUrl = Platform.JsonWebKeySetUrl;
 
             _appContext.Platforms.Update(platform);
 

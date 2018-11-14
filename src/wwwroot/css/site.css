@@ -27,7 +27,24 @@ body > .container, body > .container-fluid {
     padding-left: 15px;
 }
 
+/* ReSharper disable once CssBrowserCompatibility */
+.form-control:disabled, .form-control[readonly] {
+    background-color: #b6c5d4;
+    /* ReSharper disable once CssBrowserCompatibility */
+    opacity: 1;
+}
+
 textarea.small {
     font-size: 80%;
-    font-weight: 400;
+}
+
+pre.securitykey {
+    font-size: 80%;
+    height: 80px;
+    line-height: 1.05;
+    overflow-y: scroll
+}
+
+a.fa-edit {
+    margin-top: -6px;
 }

@@ -23,10 +23,10 @@
                             <tooltip asp-for="Platform.Issuer"></tooltip>
                         </dt>
                         <dd>@Html.DisplayFor(m => m.Platform.Issuer)</dd>
-                        <dt>@Html.DisplayNameFor(m => m.Platform.JsonWebKeysUrl)</dt>
-                        <dd>@(Model.Platform.JsonWebKeysUrl??"[Not Set]")</dd>
+                        <dt>@Html.DisplayNameFor(m => m.Platform.JsonWebKeySetUrl)</dt>
+                        <dd>@(Model.Platform.JsonWebKeySetUrl ?? "[Not Set]")</dd>
                         <dt>@Html.DisplayNameFor(m => m.Platform.AccessTokenUrl)</dt>
-                        <dd>@(Model.Platform.AccessTokenUrl??"[Not Set]")</dd>
+                        <dd>@(Model.Platform.AccessTokenUrl ?? "[Not Set]")</dd>
                     </dl>
                 </div>
             </div>
@@ -40,23 +40,39 @@
                     <dl>
                         <dt>@Html.DisplayNameFor(m => m.Platform.ClientId)</dt>
                         <dd>@Html.DisplayFor(m => m.Platform.ClientId)</dd>
+                    </dl>
+                    <p>Advantage Platform accepts either a shared secret or a signed jwt as client credentials.</p>
+                    <dl>
                         <dt>
                             @Html.DisplayNameFor(m => m.Platform.ClientSecret)
-                            <tooltip asp-for="Platform.ClientSecret"></tooltip>
+                            <tooltip asp-for="Platform.ClientSecret" html="true"></tooltip>
                         </dt>
-                        <dd>@(Model.Platform.ClientSecret??"[Not Set]")</dd>
+                        <dd>@(Model.Platform.ClientSecret ?? "[Not Set]")</dd>
+                    </dl>
+                    <hr />
+                    <dl>
                         <dt>
                             @Html.DisplayNameFor(m => m.Platform.ClientPrivateKey)
-                            <tooltip asp-for="Platform.ClientPrivateKey"></tooltip>
+                            <tooltip asp-for="Platform.ClientPrivateKey" html="true"></tooltip>
                         </dt>
-                        <dd><pre style="height: 80px; overflow-y: scroll"><small>@(Model.Platform.ClientPrivateKey??"[Not Set]")</small></pre></dd>
+                        <dd>
+                            <pre class="securitykey">@(Model.Platform.ClientPrivateKey ?? "[Not Set]")</pre>
+                        </dd>
+                        <dt>
+                            @Html.DisplayNameFor(m => m.Platform.ClientPublicKey)
+                            <tooltip asp-for="Platform.ClientPublicKey" html="true"></tooltip>
+                            <a class="float-right" href="#" onclick="copyToClipboard($('#@Html.IdFor(m => m.Platform.ClientPublicKey)').text());">Copy Public Key</a>
+                        </dt>
+                        <dd>
+                            <pre id="@Html.IdFor(m => m.Platform.ClientPublicKey)" class="securitykey">@(Model.Platform.ClientPublicKey ?? "[Not Set]")</pre>
+                        </dd>
                     </dl>
                 </div>
             </div>
         </div>
-    </div>
-    <div>
-        <a asp-page="./Edit" asp-route-id="@Model.Platform.Id">Edit</a> |
-        <a asp-page="./Index">Back to List</a>
+        <div>
+            <a asp-page="./Edit" asp-route-id="@Model.Platform.Id">Edit</a> |
+            <a asp-page="./Index">Back to List</a>
+        </div>
     </div>
 </div>

@@ -39,7 +39,7 @@ namespace AdvantageTool.Pages
                             Name = c.Name,
                             Id = c.Id,
                             Issuer = c.Issuer,
-                            JsonWebKeysUrl = c.JsonWebKeysUrl
+                            JsonWebKeySetUrl = c.JsonWebKeySetUrl
                         })
                         .ToListAsync();
                 }
