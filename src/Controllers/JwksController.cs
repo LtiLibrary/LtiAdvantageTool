@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AdvantageTool.Data;
+using LtiAdvantageLibrary.Utilities;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 namespace AdvantageTool.Controllers
@@ -7,30 +10,33 @@ namespace AdvantageTool.Controllers
     [ApiController]
     public class JwksController : ControllerBase
     {
-        private readonly SigningCredentials _signingCredentials;
+        private readonly ApplicationDbContext _context;
 
-        public JwksController(SigningCredentials signingCredentials)
+        public JwksController(ApplicationDbContext context)
         {
-            _signingCredentials = signingCredentials;
+            _context = context;
         }
 
         public IActionResult OnGet()
         {
-            var keyset = new JsonWebKeySet();
-            var key = (RsaSecurityKey) _signingCredentials.Key;
-            var parameters = key.Parameters;
-            var jwk = new JsonWebKey
-            {
-                Alg = SecurityAlgorithms.RsaSha256,
-                Kty = JsonWebAlgorithmsKeyTypes.RSA,
-                Use = JsonWebKeyUseNames.Sig,
-                Kid = key.KeyId,
-                E = Base64UrlEncoder.Encode(parameters.Exponent),
-                N = Base64UrlEncoder.Encode(parameters.Modulus)
-            };
-            keyset.Keys.Add(jwk);
+            var jsonWebKeySet = new JsonWebKeySet();
 
-            return new JsonResult(keyset);
+            foreach (var client in _context.Clients)
+            {
+                var key = RsaHelper.PublicKeyFromPemString(client.PublicKey);
+                var parameters = key.Parameters;
+                var jwk = new JsonWebKey
+                {
+                    Alg = SecurityAlgorithms.RsaSha256,
+                    Kty = JsonWebAlgorithmsKeyTypes.RSA,
+                    Use = JsonWebKeyUseNames.Sig,
+                    Kid = client.KeyId,
+                    E = Base64UrlEncoder.Encode(parameters.Exponent),
+                    N = Base64UrlEncoder.Encode(parameters.Modulus)
+                };
+                jsonWebKeySet.Keys.Add(jwk);
+            }
+            return new JsonResult(jsonWebKeySet);
         }
     }
 }

@@ -14,6 +14,11 @@ namespace AdvantageTool.Data
         public string ClientId { get; set; }
 
         /// <summary>
+        /// The Key ID (kid) for the private/public key pair.
+        /// </summary>
+        public string KeyId { get; set; }
+
+        /// <summary>
         /// Tool's private key in PEM format
         /// </summary>
         [Required]

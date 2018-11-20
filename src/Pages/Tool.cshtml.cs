@@ -11,6 +11,7 @@ using IdentityModel.Client;
 using LtiAdvantageLibrary;
 using LtiAdvantageLibrary.Lti;
 using LtiAdvantageLibrary.NamesRoleService;
+using LtiAdvantageLibrary.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -25,17 +26,14 @@ namespace AdvantageTool.Pages
     [IgnoreAntiforgeryToken(Order = 1001)]
     public class ToolModel : PageModel
     {
-        private readonly ApplicationDbContext _appContext;
+        private readonly ApplicationDbContext _context;
         private readonly IHttpClientFactory _httpClientFactory;
-        private readonly SigningCredentials _signingCredentials;
 
-        public ToolModel(ApplicationDbContext appContext, 
-            IHttpClientFactory httpClientFactory,
-            SigningCredentials signingCredentials)
+        public ToolModel(ApplicationDbContext context, 
+            IHttpClientFactory httpClientFactory)
         {
-            _appContext = appContext;
+            _context = context;
             _httpClientFactory = httpClientFactory;
-            _signingCredentials = signingCredentials;
         }
 
         /// <summary>
@@ -123,7 +121,7 @@ namespace AdvantageTool.Pages
             }
 
             // The Audience must match a Client ID exactly.
-            var client = await _appContext.Platforms
+            var client = await _context.Platforms
                 .Where(c => Token.Payload.Aud.Contains(c.ClientId))
                 .FirstOrDefaultAsync();
 
@@ -205,9 +203,9 @@ namespace AdvantageTool.Pages
             {
                 ValidateTokenReplay = true,
                 ValidateAudience = true,
-                ValidAudiences = await _appContext.Platforms.Select(c => c.ClientId).ToListAsync(),
+                ValidAudiences = await _context.Platforms.Select(c => c.ClientId).ToListAsync(),
                 ValidateIssuer = true,
-                ValidIssuers = await _appContext.Platforms.Select(c => c.Issuer).ToListAsync(),
+                ValidIssuers = await _context.Platforms.Select(c => c.Issuer).ToListAsync(),
                 RequireSignedTokens = true,
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new RsaSecurityKey(rsaParameters),
@@ -240,7 +238,7 @@ namespace AdvantageTool.Pages
         [HttpPost]
         public async Task<IActionResult> OnPostNamesRoleServiceAsync()
         {
-            var platform = await _appContext.Platforms.FirstOrDefaultAsync(p => p.ClientId == ClientId);
+            var platform = await _context.Platforms.FirstOrDefaultAsync(p => p.ClientId == ClientId);
             if (platform == null)
             {
                 MembershipStatus = "Cannot find platform registration.";
@@ -279,7 +277,9 @@ namespace AdvantageTool.Pages
             payload.AddClaim(new Claim(JwtRegisteredClaimNames.Exp, EpochTime.GetIntDate(DateTime.UtcNow.AddMinutes(5)).ToString()));
             payload.AddClaim(new Claim(JwtRegisteredClaimNames.Jti, LtiResourceLinkRequest.GenerateCryptographicNonce()));
 
-            var header = new JwtHeader(_signingCredentials);
+            var client = await _context.Clients.SingleOrDefaultAsync(c => c.ClientId == ClientId);
+            var credentials = RsaHelper.SigningCredentialsFromPemString(client.PrivateKey, client.KeyId);
+            var header = new JwtHeader(credentials);
             var token = new JwtSecurityToken(header, payload);
             var handler = new JwtSecurityTokenHandler();
             var jwt = handler.WriteToken(token);

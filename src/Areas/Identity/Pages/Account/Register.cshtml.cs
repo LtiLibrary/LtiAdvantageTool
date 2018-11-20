@@ -82,7 +82,8 @@ namespace AdvantageTool.Areas.Identity.Pages.Account
                     var keyPair = RsaHelper.GenerateRsaKeyPair();
                     var client = new Client
                     {
-                        ClientId = StringGenerator.GenerateRandomString(8),
+                        ClientId = CryptoRandom.GenerateRandomString(),
+                        KeyId = CryptoRandom.GenerateRandomNumber(),
                         PrivateKey = keyPair.PrivateKey,
                         PublicKey = keyPair.PublicKey,
                         User = user
