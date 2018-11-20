@@ -14,11 +14,11 @@ namespace AdvantageTool.Pages.Platforms
     {
         private readonly ApplicationDbContext _appContext;
         private readonly IHttpClientFactory _httpClientFactory;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<AdvantageToolUser> _userManager;
 
         public CreateModel(ApplicationDbContext appContext, 
             IHttpClientFactory httpClientFactory,
-            UserManager<IdentityUser> userManager)
+            UserManager<AdvantageToolUser> userManager)
         {
             _appContext = appContext;
             _httpClientFactory = httpClientFactory;

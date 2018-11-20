@@ -9,9 +9,9 @@ namespace AdvantageTool.Pages.Platforms
     public class DeleteModel : PageModel
     {
         private readonly ApplicationDbContext _context;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<AdvantageToolUser> _userManager;
 
-        public DeleteModel(ApplicationDbContext context, UserManager<IdentityUser> userManager)
+        public DeleteModel(ApplicationDbContext context, UserManager<AdvantageToolUser> userManager)
         {
             _context = context;
             _userManager = userManager;

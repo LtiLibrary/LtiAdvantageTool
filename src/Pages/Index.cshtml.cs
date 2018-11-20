@@ -12,11 +12,11 @@ namespace AdvantageTool.Pages
     public class IndexModel : PageModel
     {
         private readonly ApplicationDbContext _context;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<AdvantageToolUser> _userManager;
 
         public IList<PlatformModel> Platforms { get; set; }
 
-        public IndexModel(ApplicationDbContext context, UserManager<IdentityUser> userManager)
+        public IndexModel(ApplicationDbContext context, UserManager<AdvantageToolUser> userManager)
         {
             _context = context;
             _userManager = userManager;
