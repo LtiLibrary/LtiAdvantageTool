@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using IdentityModel;
 using IdentityModel.Client;
 
-namespace AdvantageTool
+namespace AdvantageTool.Utility
 {
     /// <summary>
     /// Extensions for <see cref="TokenClient"/>.

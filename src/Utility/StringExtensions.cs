@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace AdvantageTool
+namespace AdvantageTool.Utility
 {
     /// <summary>
     /// Local version of Identity Server 4 internal static class StringExtensions

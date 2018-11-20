@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace AdvantageTool
+namespace AdvantageTool.Utility
 {
     public static class JsonExtensions
     {
