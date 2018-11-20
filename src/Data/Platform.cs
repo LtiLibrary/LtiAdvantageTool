@@ -23,14 +23,14 @@
         public string ClientId { get; set; }
 
         /// <summary>
-        /// Tool's RSA private key (this or secret is required)
+        /// Tool's private key in PEM format
         /// </summary>
         public string ClientPrivateKey { get; set; }
 
         /// <summary>
-        /// Tool's HMAC shared secret (this or private key is required)
+        /// Tool's public key in PEM format
         /// </summary>
-        public string ClientSecret { get; set; }
+        public string ClientPublicKey { get; set; }
 
         /// <summary>
         /// Platform's issuer

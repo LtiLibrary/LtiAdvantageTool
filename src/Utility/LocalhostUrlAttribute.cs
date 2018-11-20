@@ -3,10 +3,11 @@ using System.ComponentModel.DataAnnotations;
 
 namespace AdvantageTool.Utility
 {
+    /// <inheritdoc />
     /// <summary>
-    /// Validates a URL.
+    /// Validates a URL. Accepts localhost.
     /// </summary>
-    public class NullableUrlAttribute : ValidationAttribute
+    public class LocalhostUrlAttribute : ValidationAttribute
     {
         public override bool IsValid(object value)
         {

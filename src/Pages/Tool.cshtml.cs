@@ -6,11 +6,11 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using AdvantageTool.Data;
+using AdvantageTool.Utility;
 using IdentityModel.Client;
 using LtiAdvantageLibrary;
 using LtiAdvantageLibrary.Lti;
 using LtiAdvantageLibrary.NamesRoleService;
-using LtiAdvantageLibrary.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -20,19 +20,22 @@ using JwtRegisteredClaimNames = System.IdentityModel.Tokens.Jwt.JwtRegisteredCla
 
 namespace AdvantageTool.Pages
 {
-    // Tool launches typically come from outsite this app. Order will not be required starting with AspNetCore 2.2.
+    // Tool launches typically come from outside this app. Order will not be required starting with AspNetCore 2.2.
     // See https://github.com/aspnet/Mvc/issues/7795#issuecomment-397071059
     [IgnoreAntiforgeryToken(Order = 1001)]
     public class ToolModel : PageModel
     {
         private readonly ApplicationDbContext _appContext;
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly SigningCredentials _signingCredentials;
 
         public ToolModel(ApplicationDbContext appContext, 
-            IHttpClientFactory httpClientFactory)
+            IHttpClientFactory httpClientFactory,
+            SigningCredentials signingCredentials)
         {
             _appContext = appContext;
             _httpClientFactory = httpClientFactory;
+            _signingCredentials = signingCredentials;
         }
 
         /// <summary>
@@ -266,31 +269,23 @@ namespace AdvantageTool.Pages
                 tokenEndPoint = disco.TokenEndpoint;
             }
 
-            TokenClient tokenClient;
-            TokenResponse tokenResponse;
+            // Use a signed JWT as client credentials.
+            var payload = new JwtPayload();
+            payload.AddClaim(new Claim(JwtRegisteredClaimNames.Iss, ClientId));
+            payload.AddClaim(new Claim(JwtRegisteredClaimNames.Sub, ClientId));
+            payload.AddClaim(new Claim(JwtRegisteredClaimNames.Aud, platform.AccessTokenUrl));
+            payload.AddClaim(new Claim(JwtRegisteredClaimNames.Iat, EpochTime.GetIntDate(DateTime.UtcNow).ToString()));
+            payload.AddClaim(new Claim(JwtRegisteredClaimNames.Nbf, EpochTime.GetIntDate(DateTime.UtcNow.AddSeconds(-5)).ToString()));
+            payload.AddClaim(new Claim(JwtRegisteredClaimNames.Exp, EpochTime.GetIntDate(DateTime.UtcNow.AddMinutes(5)).ToString()));
+            payload.AddClaim(new Claim(JwtRegisteredClaimNames.Jti, LtiResourceLinkRequest.GenerateCryptographicNonce()));
 
-            // Use shared secret client credentials if ClientSecret is present. Otherwise use a signed JWT.
-            if (platform.ClientSecret.IsPresent())
-            {
-                tokenClient = new TokenClient(tokenEndPoint, platform.ClientId, platform.ClientSecret);
-                tokenResponse = await tokenClient.RequestClientCredentialsAsync(Constants.LtiScopes.MembershipReadonly);
-            }
-            else
-            {
-                var payload = new JwtPayload();
-                payload.AddClaim(new Claim(JwtRegisteredClaimNames.Iss, ClientId));
-                payload.AddClaim(new Claim(JwtRegisteredClaimNames.Sub, ClientId));
-                payload.AddClaim(new Claim(JwtRegisteredClaimNames.Aud, platform.AccessTokenUrl));
-                payload.AddClaim(new Claim(JwtRegisteredClaimNames.Iat, EpochTime.GetIntDate(DateTime.UtcNow).ToString()));
-                payload.AddClaim(new Claim(JwtRegisteredClaimNames.Nbf, EpochTime.GetIntDate(DateTime.UtcNow.AddSeconds(-5)).ToString()));
-                payload.AddClaim(new Claim(JwtRegisteredClaimNames.Exp, EpochTime.GetIntDate(DateTime.UtcNow.AddMinutes(5)).ToString()));
-                payload.AddClaim(new Claim(JwtRegisteredClaimNames.Jti, LtiResourceLinkRequest.GenerateCryptographicNonce()));
+            var header = new JwtHeader(_signingCredentials);
+            var token = new JwtSecurityToken(header, payload);
+            var handler = new JwtSecurityTokenHandler();
+            var jwt = handler.WriteToken(token);
 
-                var jwt = RsaHelper.CreateSignedJwt(payload, platform.ClientPrivateKey);
-
-                tokenClient = new TokenClient(tokenEndPoint, platform.ClientId);
-                tokenResponse = await tokenClient.RequestClientCredentialsWithSignedJwtAsync(jwt, Constants.LtiScopes.MembershipReadonly);
-            }
+            var tokenClient = new TokenClient(tokenEndPoint, platform.ClientId);
+            var tokenResponse = await tokenClient.RequestClientCredentialsWithSignedJwtAsync(jwt, Constants.LtiScopes.MembershipReadonly);
 
             // The IMS reference implementation returns "Created" with success. 
             if (tokenResponse.IsError && tokenResponse.Error != "Created")
@@ -303,7 +298,6 @@ namespace AdvantageTool.Pages
 
             try
             {
-                var handler = new JwtSecurityTokenHandler();
                 Token = handler.ReadJwtToken(IdToken);
                 LtiRequest = new LtiResourceLinkRequest(Token.Payload);
 

@@ -2,7 +2,9 @@
 using System.Net.Http;
 using System.Threading.Tasks;
 using AdvantageTool.Data;
+using AdvantageTool.Utility;
 using IdentityModel.Client;
+using LtiAdvantageLibrary.Utilities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -59,35 +61,15 @@ namespace AdvantageTool.Pages.Platforms
                 return Page();
             }
 
-            if (Platform.ClientSecret.IsMissing() && Platform.ClientPrivateKey.IsMissing())
+            await Platform.DiscoverEndpoints(_httpClientFactory);
+            
+            if (Platform.ClientPublicKey.IsMissing())
             {
-                ModelState.AddModelError("Platform.ClientSecret", "Either Client Secret or Private Key is required.");
-                ModelState.AddModelError("Platform.ClientPrivateKey", "Either Client Secret or Private Key is required.");
-                return Page();
-            }
-
-            // Attempt to discover the platform urls
-            if (Platform.AccessTokenUrl.IsMissing() || Platform.JsonWebKeySetUrl.IsMissing())
-            {
-                var httpClient = _httpClientFactory.CreateClient();
-                var disco = await httpClient.GetDiscoveryDocumentAsync(Platform.Issuer);
-                if (!disco.IsError)
-                {
-                    Platform.AccessTokenUrl = disco.TokenEndpoint;
-                    Platform.JsonWebKeySetUrl = disco.JwksUri;
-                }
+                Platform.ClientPublicKey = RsaHelper.GetPublicKeyStringFromPrivateKey(Platform.ClientPrivateKey);
             }
 
             var platform = await _appContext.Platforms.FindAsync(Platform.Id);
-            platform.AccessTokenUrl = Platform.AccessTokenUrl;
-            platform.ClientId = Platform.ClientId;
-            platform.ClientPrivateKey = Platform.ClientPrivateKey.IsPresent() 
-                ? Platform.ClientPrivateKey.Replace("\r\n\r\n", "\r\n")
-                : null;
-            platform.ClientSecret = Platform.ClientSecret;
-            platform.Name = Platform.Name;
-            platform.Issuer = Platform.Issuer;
-            platform.JsonWebKeySetUrl = Platform.JsonWebKeySetUrl;
+            Platform.FillEntity(platform);
 
             _appContext.Platforms.Update(platform);
 

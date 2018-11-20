@@ -24,20 +24,19 @@
                         </div>
                         <div class="form-group">
                             <label asp-for="Platform.Issuer"></label>
+                            <tooltip asp-for="Platform.Issuer"></tooltip>
                             <input asp-for="Platform.Issuer" class="form-control" />
                             <span asp-validation-for="Platform.Issuer" class="text-danger"></span>
                         </div>
-                        <div class="alert alert-info">
-                            If the @Html.DisplayNameFor(m => m.Platform.Issuer) supports OpenID Connect Discover,
-                            you can leave the next two fields blank and they will be filled in.
-                        </div>
                         <div class="form-group">
                             <label asp-for="Platform.JsonWebKeySetUrl"></label>
+                            <tooltip asp-for="Platform.JsonWebKeySetUrl"></tooltip>
                             <input asp-for="Platform.JsonWebKeySetUrl" class="form-control" />
                             <span asp-validation-for="Platform.JsonWebKeySetUrl" class="text-danger"></span>
                         </div>
                         <div class="form-group">
                             <label asp-for="Platform.AccessTokenUrl"></label>
+                            <tooltip asp-for="Platform.AccessTokenUrl"></tooltip>
                             <input asp-for="Platform.AccessTokenUrl" class="form-control" />
                             <span asp-validation-for="Platform.AccessTokenUrl" class="text-danger"></span>
                         </div>
@@ -50,22 +49,16 @@
                         Tool Settings
                     </h5>
                     <div class="card-body">
-                        <div class="alert alert-info">
-                            Copy and paste the tool settings below from your platform. Either
-                            @Html.DisplayNameFor(m => m.Platform.ClientSecret) or
-                            @Html.DisplayNameFor(m => m.Platform.ClientPrivateKey) is
-                            required.
-                        </div>
                         <div class="form-group">
                             <label asp-for="Platform.ClientId"></label>
                             <input asp-for="Platform.ClientId" class="form-control" />
                             <span asp-validation-for="Platform.ClientId" class="text-danger"></span>
                         </div>
                         <div class="form-group">
-                            <label asp-for="Platform.ClientSecret"></label>
-                            <tooltip asp-for="Platform.ClientSecret"></tooltip>
-                            <input asp-for="Platform.ClientSecret" class="form-control" />
-                            <span asp-validation-for="Platform.ClientSecret" class="text-danger"></span>
+                            <label asp-for="Platform.ClientPublicKey"></label>
+                            <tooltip asp-for="Platform.ClientPublicKey"></tooltip>
+                            <textarea asp-for="Platform.ClientPublicKey" class="form-control text-monospace small" rows="5"></textarea>
+                            <span asp-validation-for="Platform.ClientPublicKey" class="text-danger"></span>
                         </div>
                         <div class="form-group">
                             <label asp-for="Platform.ClientPrivateKey"></label>

@@ -1,4 +1,5 @@
 ﻿@page
+@using AdvantageTool.Utility
 @using Newtonsoft.Json
 @model ToolModel
 @{
@@ -56,12 +57,27 @@
                     <p>
                         On the right a representation of the data in the launch request.
                     </p>
-                    @if (Model.LtiRequest.NamesRoleService != null)
+                    @if (Model.LtiRequest.Context == null)
                     {
-                        <h5>Names and Role Service</h5>
+                        <h5>Course</h5>
+                        <p>
+                            The request does not include a course context. It likely came from an
+                            admin interface.
+                        </p>
+                    }
+                    <h5>Names and Role Service</h5>
+                    @if (Model.LtiRequest.NamesRoleService == null)
+                    {
+                        <p>
+                            The request does not include the Names and Role Provisioning Service
+                            endpoint.
+                        </p>
+                    }
+                    else
+                    {
                         <form method="post" asp-page-handler="NamesRoleService">
                             <input type="hidden" name="id_token" id="id_token" value="@Model.IdToken" />
-                            <input type="hidden" name="context_id" id="context_id" value="@Model.LtiRequest.Context.Id" />
+                            <input type="hidden" name="context_id" id="context_id" value="@Model.LtiRequest.Context?.Id" />
                             <input type="hidden" asp-for="ClientId" />
                             <input type="submit" value="Get Course Members" class="btn btn-secondary" />
                         </form>
@@ -148,6 +164,9 @@
                                                             <div>
                                                                 @(Model.LtiRequest.Context.Label ?? "(no label)")
                                                             </div>
+                                                            <div>
+                                                                @(Model.LtiRequest.Lis?.CourseSectionSourcedId ?? "(no sis id)")
+                                                            </div>
                                                         </dd>
                                                     </dl>
                                                 </div>
@@ -193,7 +212,7 @@
                                                                                     @(string.Join(", ", member.Roles))
                                                                                 </div>
                                                                                 <div>
-                                                                                    @(member.SourcedId ?? "(no sis id)")
+                                                                                    @(member.LisPersonSourcedId ?? "(no sis id)")
                                                                                 </div>
                                                                             </div>
                                                                         </div>

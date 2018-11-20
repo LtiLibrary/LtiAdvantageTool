@@ -40,6 +40,8 @@ namespace AdvantageTool
 
             services.ConfigureApplicationCookie(options => options.Cookie.Name = "AdvantageTool" );
 
+            // Prevent X-Frame-Options header from being sent so that the Tool can appear
+            // within an iframe on the platform
             services.AddAntiforgery(options => options.SuppressXFrameOptionsHeader = true);
 
             services.AddMvc()
@@ -47,6 +49,8 @@ namespace AdvantageTool
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             services.AddHttpClient();
+
+            services.AddDeveloperSigningCredential();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

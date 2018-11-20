@@ -40,31 +40,20 @@
                     <dl>
                         <dt>@Html.DisplayNameFor(m => m.Platform.ClientId)</dt>
                         <dd>@Html.DisplayFor(m => m.Platform.ClientId)</dd>
-                    </dl>
-                    <p>Advantage Platform accepts either a shared secret or a signed jwt as client credentials.</p>
-                    <dl>
-                        <dt>
-                            @Html.DisplayNameFor(m => m.Platform.ClientSecret)
-                            <tooltip asp-for="Platform.ClientSecret" html="true"></tooltip>
-                        </dt>
-                        <dd>@(Model.Platform.ClientSecret ?? "[Not Set]")</dd>
-                    </dl>
-                    <hr />
-                    <dl>
                         <dt>
                             @Html.DisplayNameFor(m => m.Platform.ClientPrivateKey)
-                            <tooltip asp-for="Platform.ClientPrivateKey" html="true"></tooltip>
+                            <tooltip asp-for="Platform.ClientPrivateKey"></tooltip>
                         </dt>
                         <dd>
-                            <pre class="securitykey">@(Model.Platform.ClientPrivateKey ?? "[Not Set]")</pre>
+                            <pre class="security-key">@(Model.Platform.ClientPrivateKey ?? "[Not Set]")</pre>
                         </dd>
                         <dt>
                             @Html.DisplayNameFor(m => m.Platform.ClientPublicKey)
-                            <tooltip asp-for="Platform.ClientPublicKey" html="true"></tooltip>
+                            <tooltip asp-for="Platform.ClientPublicKey"></tooltip>
                             <a class="float-right" href="#" onclick="copyToClipboard($('#@Html.IdFor(m => m.Platform.ClientPublicKey)').text());">Copy Public Key</a>
                         </dt>
                         <dd>
-                            <pre id="@Html.IdFor(m => m.Platform.ClientPublicKey)" class="securitykey">@(Model.Platform.ClientPublicKey ?? "[Not Set]")</pre>
+                            <pre id="@Html.IdFor(m => m.Platform.ClientPublicKey)" class="security-key">@(Model.Platform.ClientPublicKey ?? "[Not Set]")</pre>
                         </dd>
                     </dl>
                 </div>

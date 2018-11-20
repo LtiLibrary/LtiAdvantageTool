@@ -1,7 +1,9 @@
 ﻿using System.Net.Http;
 using System.Threading.Tasks;
 using AdvantageTool.Data;
+using AdvantageTool.Utility;
 using IdentityModel.Client;
+using LtiAdvantageLibrary.Utilities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -28,6 +30,14 @@ namespace AdvantageTool.Pages.Platforms
 
         public IActionResult OnGet()
         {
+            var keyPair = RsaHelper.GenerateRsaKeyPair();
+
+            Platform = new PlatformModel
+            {
+                ClientPrivateKey = keyPair.PrivateKey,
+                ClientPublicKey = keyPair.PublicKey
+            };
+
             return Page();
         }
 
@@ -37,40 +47,17 @@ namespace AdvantageTool.Pages.Platforms
             {
                 return Page();
             }
-            
-            if (Platform.ClientSecret.IsMissing() && Platform.ClientPrivateKey.IsMissing())
+
+            await Platform.DiscoverEndpoints(_httpClientFactory);
+
+            if (Platform.ClientPublicKey.IsMissing())
             {
-                ModelState.AddModelError("Platform.ClientSecret", "Either Client Secret or Private Key is required.");
-                ModelState.AddModelError("Platform.ClientPrivateKey", "Either Client Secret or Private Key is required.");
-                return Page();
-            }
-            
-            // Attempt to discover the platform urls
-            if (Platform.AccessTokenUrl.IsMissing() || Platform.JsonWebKeySetUrl.IsMissing())
-            {
-                var httpClient = _httpClientFactory.CreateClient();
-                var disco = await httpClient.GetDiscoveryDocumentAsync(Platform.Issuer);
-                if (!disco.IsError)
-                {
-                    Platform.AccessTokenUrl = disco.TokenEndpoint;
-                    Platform.JsonWebKeySetUrl = disco.JwksUri;
-                }
+                Platform.ClientPublicKey = RsaHelper.GetPublicKeyStringFromPrivateKey(Platform.ClientPrivateKey);
             }
 
             var user = await _userManager.GetUserAsync(User);
-            var platform = new Platform
-            {
-                AccessTokenUrl = Platform.AccessTokenUrl,
-                ClientId = Platform.ClientId,
-                ClientPrivateKey = Platform.ClientPrivateKey.IsPresent() 
-                    ? Platform.ClientPrivateKey.Replace("\r\n\r\n", "\r\n")
-                    : null,
-                ClientSecret = Platform.ClientSecret,
-                Name = Platform.Name,
-                Issuer = Platform.Issuer,
-                JsonWebKeySetUrl = Platform.JsonWebKeySetUrl,
-                UserId = user.Id
-            };
+            var platform = new Platform { UserId = user.Id };
+            Platform.FillEntity(platform);
 
             _appContext.Platforms.Add(platform);
             await _appContext.SaveChangesAsync();
