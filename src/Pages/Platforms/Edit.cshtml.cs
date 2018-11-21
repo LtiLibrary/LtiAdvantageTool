@@ -5,7 +5,6 @@ using AdvantageTool.Data;
 using AdvantageTool.Utility;
 using IdentityModel.Client;
 using LtiAdvantageLibrary.Utilities;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -16,17 +15,15 @@ namespace AdvantageTool.Pages.Platforms
     {
         private readonly ApplicationDbContext _context;
         private readonly IHttpClientFactory _httpClientFactory;
-        private readonly UserManager<AdvantageToolUser> _userManager;
 
         public EditModel(ApplicationDbContext context, 
-            IHttpClientFactory httpClientFactory,
-            UserManager<AdvantageToolUser> userManager)
+            IHttpClientFactory httpClientFactory)
         {
             _context = context;
             _httpClientFactory = httpClientFactory;
-            _userManager = userManager;
         }
 
+        [BindProperty]
         public Client Client { get; set; }
 
         [BindProperty]
@@ -61,6 +58,14 @@ namespace AdvantageTool.Pages.Platforms
         {
             if (!ModelState.IsValid)
             {
+                return Page();
+            }
+
+            var user = await _context.GetUserAsync(User);
+            if (user.Platforms.Any(p => p.Issuer == Platform.Issuer && p.Id != Platform.Id))
+            {
+                ModelState.AddModelError($"{nameof(Platform)}.{nameof(Platform.Issuer)}",
+                    "This Issuer is already registered.");
                 return Page();
             }
 

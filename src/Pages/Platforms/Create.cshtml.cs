@@ -1,4 +1,5 @@
-﻿using System.Net.Http;
+﻿using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using AdvantageTool.Data;
 using Microsoft.AspNetCore.Mvc;
@@ -18,6 +19,7 @@ namespace AdvantageTool.Pages.Platforms
             _httpClientFactory = httpClientFactory;
         }
 
+        [BindProperty]
         public Client Client { get; set; }
 
         [BindProperty]
@@ -38,9 +40,16 @@ namespace AdvantageTool.Pages.Platforms
                 return Page();
             }
 
+            var user = await _context.GetUserAsync(User);
+            if (user.Platforms.Any(p => p.Issuer == Platform.Issuer))
+            {
+                ModelState.AddModelError($"{nameof(Platform)}.{nameof(Platform.Issuer)}",
+                    "This Issuer is already registered.");
+                return Page();
+            }
+
             await Platform.DiscoverEndpoints(_httpClientFactory);
 
-            var user = await _context.GetUserAsync(User);
             var platform = new Platform { User = user };
             Platform.UpdateEntity(platform);
 
