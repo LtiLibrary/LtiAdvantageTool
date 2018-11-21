@@ -295,7 +295,7 @@ namespace AdvantageTool.Pages
             payload.AddClaim(new Claim(JwtRegisteredClaimNames.Exp, EpochTime.GetIntDate(DateTime.UtcNow.AddMinutes(5)).ToString()));
             payload.AddClaim(new Claim(JwtRegisteredClaimNames.Jti, LtiResourceLinkRequest.GenerateCryptographicNonce()));
 
-            var credentials = RsaHelper.SigningCredentialsFromPemString(client.PrivateKey, client.KeyId);
+            var credentials = PemHelper.SigningCredentialsFromPemString(client.PrivateKey, client.KeyId);
             var header = new JwtHeader(credentials);
             var token = new JwtSecurityToken(header, payload);
             var handler = new JwtSecurityTokenHandler();

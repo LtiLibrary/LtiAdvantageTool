@@ -79,11 +79,11 @@ namespace AdvantageTool.Areas.Identity.Pages.Account
                     _logger.LogInformation("User created a new account with password.");
 
                     // Create the Client for this tenant
-                    var keyPair = RsaHelper.GenerateRsaKeyPair();
+                    var keyPair = PemHelper.GenerateRsaKeyPair();
                     var client = new Client
                     {
                         ClientId = CryptoRandom.GenerateRandomString(),
-                        KeyId = CryptoRandom.GenerateRandomNumber(),
+                        KeyId = keyPair.KeyId,
                         PrivateKey = keyPair.PrivateKey,
                         PublicKey = keyPair.PublicKey,
                         User = user

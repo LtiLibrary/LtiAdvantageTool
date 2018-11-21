@@ -1,4 +1,5 @@
 ﻿using AdvantageTool.Data;
+using AdvantageTool.Utility;
 using LtiAdvantageLibrary.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -23,7 +24,7 @@ namespace AdvantageTool.Controllers
 
             foreach (var client in _context.Clients)
             {
-                var key = RsaHelper.PublicKeyFromPemString(client.PublicKey);
+                var key = PemHelper.PublicKeyFromPemString(client.PublicKey);
                 var parameters = key.Parameters;
                 var jwk = new JsonWebKey
                 {

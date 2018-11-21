@@ -15,7 +15,7 @@ namespace AdvantageTool.Utility
             return Base64UrlEncoder.Encode(buffer);
         }
 
-        public static string GenerateRandomNumber()
+        public static string GenerateRandomKeyId()
         {
             var buffer = new byte[8];
             Rng.GetBytes(buffer);
