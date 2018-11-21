@@ -2,21 +2,17 @@
 using System.Linq;
 using System.Threading.Tasks;
 using AdvantageTool.Data;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
 
 namespace AdvantageTool.Pages.Platforms
 {
     public class IndexModel : PageModel
     {
         private readonly ApplicationDbContext _context;
-        private readonly UserManager<AdvantageToolUser> _userManager;
 
-        public IndexModel(ApplicationDbContext context, UserManager<AdvantageToolUser> userManager)
+        public IndexModel(ApplicationDbContext context)
         {
             _context = context;
-            _userManager = userManager;
         }
 
         public IList<PlatformModel> Platforms { get; set; }

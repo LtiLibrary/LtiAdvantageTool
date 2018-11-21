@@ -1,8 +1,6 @@
 ﻿using AdvantageTool.Data;
 using AdvantageTool.Utility;
-using LtiAdvantageLibrary.Utilities;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 namespace AdvantageTool.Controllers

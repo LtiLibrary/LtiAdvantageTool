@@ -100,8 +100,7 @@ namespace AdvantageTool.Utility
                     D = keyParameters.Exponent.ToByteArrayUnsigned(),
                     Exponent = keyParameters.PublicExponent.ToByteArrayUnsigned()
                 };
-                var key = new RsaSecurityKey(parameters);
-                key.KeyId = keyId;
+                var key = new RsaSecurityKey(parameters) {KeyId = keyId};
                 return new SigningCredentials(key, SecurityAlgorithms.RsaSha256);
             }  
         }

@@ -2,9 +2,6 @@
 using System.Net.Http;
 using System.Threading.Tasks;
 using AdvantageTool.Data;
-using AdvantageTool.Utility;
-using IdentityModel.Client;
-using LtiAdvantageLibrary.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;

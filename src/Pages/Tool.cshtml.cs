@@ -11,7 +11,6 @@ using IdentityModel.Client;
 using LtiAdvantageLibrary;
 using LtiAdvantageLibrary.Lti;
 using LtiAdvantageLibrary.NamesRoleService;
-using LtiAdvantageLibrary.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;

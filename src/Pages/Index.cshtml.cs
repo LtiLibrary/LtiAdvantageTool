@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using AdvantageTool.Data;
 using AdvantageTool.Pages.Platforms;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
 
 namespace AdvantageTool.Pages
 {
