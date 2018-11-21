@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AdvantageTool.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20181121025317_RemoveUserIdFromPlatform")]
-    partial class RemoveUserIdFromPlatform
+    [Migration("20181121034351_CreateInitialDatabase")]
+    partial class CreateInitialDatabase
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
