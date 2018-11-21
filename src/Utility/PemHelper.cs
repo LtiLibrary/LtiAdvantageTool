@@ -123,56 +123,5 @@ namespace AdvantageTool.Utility
                 return new RsaSecurityKey(parameters);
             }
         }
-
-        /// <summary>
-        /// Returns a public key in PEM format from a private key in PEM format.
-        /// </summary>
-        /// <param name="privateKey">The private key in PEM format.</param>
-        /// <returns>The public key in PEM format.</returns>
-        public static string GetPublicKeyStringFromPrivateKey(string privateKey)
-        {
-            using (var reader = new StringReader(privateKey))
-            {
-                var pemReader = new PemReader(reader);
-                var cipherKeyPair = (AsymmetricCipherKeyPair) pemReader.ReadObject();  
-
-                var keyParameters = (RsaKeyParameters) cipherKeyPair.Public;
-
-                using (var writer = new StringWriter())
-                {
-                    var pemWriter = new PemWriter(writer);
-                    pemWriter.WriteObject(keyParameters);
-                    return writer.ToString();
-                }
-            }
-        }
-        
-        /// <summary>
-        /// Returns a public key <see cref="RsaKeyParameters"/> from a private key in PEM format.
-        /// </summary>
-        /// <param name="privateKey">The private key in PEM format.</param>
-        /// <returns>The public key.</returns>
-        public static JsonWebKey GetPublicJsonWebKeyFromPrivateKey(string privateKey)
-        {
-            using (var reader = new StringReader(privateKey))
-            {
-                var pemReader = new PemReader(reader);
-                var cipherKeyPair = (AsymmetricCipherKeyPair) pemReader.ReadObject();  
-
-                var publicKey = (RsaKeyParameters) cipherKeyPair.Public;
-
-                var webKey = new JsonWebKey
-                {
-                    Kty = "RSA",
-                    Use = "sig",
-                    Alg = "RS256",
-                    E = Base64UrlEncoder.Encode(publicKey.Exponent.ToByteArrayUnsigned()),
-                    N = Base64UrlEncoder.Encode(publicKey.Modulus.ToByteArrayUnsigned())
-                };
-
-                return webKey;
-            }
-        }
-
     }
 }
