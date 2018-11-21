@@ -37,32 +37,35 @@ namespace AdvantageTool.Pages
         }
 
         /// <summary>
-        /// The tool's Client ID
+        /// The client's id.
         /// </summary>
         [BindProperty]
-        public string ClientId { get; set; }
+        public int ClientId { get; set; }
 
         /// <summary>
-        /// Get or set the error discovered while parsing the request.
+        /// The error discovered while parsing the request.
         /// </summary>
         public string Error { get; set; }
 
         /// <summary>
-        /// Get or set the id_token (JWT) in the request. Platforms will always send the
-        /// id_token of a launch request in the body of a form post.
+        /// The id_token posted in the launch request.
         /// </summary>
         [BindProperty(Name = "id_token")]
         public string IdToken { get; set; }
 
         /// <summary>
-        /// This is a wrapper around the JwtPayload that makes it easy to examine the
-        /// claims. For example, LtiRequest.Roles gets the role claims as an Enum array
-        /// so you don't have to match string values.
+        /// The platform's id.
+        /// </summary>
+        [BindProperty]
+        public int PlatformId { get; set; }
+
+        /// <summary>
+        /// Wrapper around the request payload.
         /// </summary>
         public LtiResourceLinkRequest LtiRequest { get; set; }
 
         /// <summary>
-        /// Results from calling NameRoleService.
+        /// Results from NameRoleService.
         /// </summary>
         public MembershipContainer Membership { get; set; }
         public string MembershipStatus { get; set; }
@@ -109,29 +112,39 @@ namespace AdvantageTool.Pages
             var nonce = Token.Claims.SingleOrDefault(c => c.Type == "nonce")?.Value;
             if (string.IsNullOrEmpty(nonce))
             {
-                Error = "Nonce is missing from id_token";
+                Error = "Nonce is missing.";
                 return Page();
             }
 
             // The Token must include a Payload
             if (Token.Payload == null)
             {
-                Error = "The token payload is unrecognized";
+                Error = "Payload is missing.";
                 return Page();
             }
 
             // The Audience must match a Client ID exactly.
-            var client = await _context.Platforms
+            var client = await _context.Clients
                 .Where(c => Token.Payload.Aud.Contains(c.ClientId))
-                .FirstOrDefaultAsync();
-
+                .SingleOrDefaultAsync();
             if (client == null)
             {
-                Error = "Unknown audience";
+                Error = "Unknown audience.";
                 return Page();
             }
 
-            ClientId = client.ClientId;
+            ClientId = client.Id;
+
+            var platform = await _context.Platforms
+                .Where(p => p.Issuer == Token.Payload.Iss)
+                .SingleOrDefaultAsync();
+            if (platform == null)
+            {
+                Error = "Unknown issuer.";
+                return Page();
+            }
+
+            PlatformId = platform.Id;
 
             // Using the JwtSecurityTokenHandler.ValidateToken method, validate four things:
             //
@@ -151,10 +164,10 @@ namespace AdvantageTool.Pages
 
             try
             {
-                if (!string.IsNullOrEmpty(client.JsonWebKeySetUrl))
+                if (!string.IsNullOrEmpty(platform.JsonWebKeySetUrl))
                 {
                     var httpClient = _httpClientFactory.CreateClient();
-                    var keySetJson = await httpClient.GetStringAsync(client.JsonWebKeySetUrl);
+                    var keySetJson = await httpClient.GetStringAsync(platform.JsonWebKeySetUrl);
                     var keySet = JsonConvert.DeserializeObject<JsonWebKeySet>(keySetJson);
                     var key = keySet.Keys.SingleOrDefault(k => k.Kid == Token.Header.Kid);
                     if (key == null)
@@ -202,10 +215,8 @@ namespace AdvantageTool.Pages
             var validationParameters = new TokenValidationParameters
             {
                 ValidateTokenReplay = true,
-                ValidateAudience = true,
-                ValidAudiences = await _context.Platforms.Select(c => c.ClientId).ToListAsync(),
-                ValidateIssuer = true,
-                ValidIssuers = await _context.Platforms.Select(c => c.Issuer).ToListAsync(),
+                ValidateAudience = false, // Validated above
+                ValidateIssuer = false, // Validated above
                 RequireSignedTokens = true,
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new RsaSecurityKey(rsaParameters),
@@ -238,7 +249,14 @@ namespace AdvantageTool.Pages
         [HttpPost]
         public async Task<IActionResult> OnPostNamesRoleServiceAsync()
         {
-            var platform = await _context.Platforms.FirstOrDefaultAsync(p => p.ClientId == ClientId);
+            var client = await _context.Clients.FindAsync(ClientId);
+            if (client == null)
+            {
+                MembershipStatus = "Cannot find client registration.";
+                return await OnPostAsync();
+            }
+
+            var platform = await _context.Platforms.FindAsync(PlatformId);
             if (platform == null)
             {
                 MembershipStatus = "Cannot find platform registration.";
@@ -269,22 +287,21 @@ namespace AdvantageTool.Pages
 
             // Use a signed JWT as client credentials.
             var payload = new JwtPayload();
-            payload.AddClaim(new Claim(JwtRegisteredClaimNames.Iss, ClientId));
-            payload.AddClaim(new Claim(JwtRegisteredClaimNames.Sub, ClientId));
+            payload.AddClaim(new Claim(JwtRegisteredClaimNames.Iss, client.ClientId));
+            payload.AddClaim(new Claim(JwtRegisteredClaimNames.Sub, client.ClientId));
             payload.AddClaim(new Claim(JwtRegisteredClaimNames.Aud, platform.AccessTokenUrl));
             payload.AddClaim(new Claim(JwtRegisteredClaimNames.Iat, EpochTime.GetIntDate(DateTime.UtcNow).ToString()));
             payload.AddClaim(new Claim(JwtRegisteredClaimNames.Nbf, EpochTime.GetIntDate(DateTime.UtcNow.AddSeconds(-5)).ToString()));
             payload.AddClaim(new Claim(JwtRegisteredClaimNames.Exp, EpochTime.GetIntDate(DateTime.UtcNow.AddMinutes(5)).ToString()));
             payload.AddClaim(new Claim(JwtRegisteredClaimNames.Jti, LtiResourceLinkRequest.GenerateCryptographicNonce()));
 
-            var client = await _context.Clients.SingleOrDefaultAsync(c => c.ClientId == ClientId);
             var credentials = RsaHelper.SigningCredentialsFromPemString(client.PrivateKey, client.KeyId);
             var header = new JwtHeader(credentials);
             var token = new JwtSecurityToken(header, payload);
             var handler = new JwtSecurityTokenHandler();
             var jwt = handler.WriteToken(token);
 
-            var tokenClient = new TokenClient(tokenEndPoint, platform.ClientId);
+            var tokenClient = new TokenClient(tokenEndPoint, client.ClientId);
             var tokenResponse = await tokenClient.RequestClientCredentialsWithSignedJwtAsync(jwt, Constants.LtiScopes.MembershipReadonly);
 
             // The IMS reference implementation returns "Created" with success. 

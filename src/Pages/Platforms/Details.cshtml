@@ -38,22 +38,21 @@
                 </h5>
                 <div class="card-body">
                     <dl>
-                        <dt>@Html.DisplayNameFor(m => m.Platform.ClientId)</dt>
-                        <dd>@Html.DisplayFor(m => m.Platform.ClientId)</dd>
+                        <dt>@Html.DisplayNameFor(m => m.Client.ClientId)</dt>
+                        <dd>@Model.Client.ClientId</dd>
                         <dt>
-                            @Html.DisplayNameFor(m => m.Platform.ClientPrivateKey)
-                            <tooltip asp-for="Platform.ClientPrivateKey"></tooltip>
+                            @Html.DisplayNameFor(m => m.Client.PrivateKey)
+                            <tooltip asp-for="Client.PrivateKey"></tooltip>
                         </dt>
                         <dd>
-                            <pre class="security-key">@(Model.Platform.ClientPrivateKey ?? "[Not Set]")</pre>
+                            <pre class="security-key">@(Model.Client.PrivateKey ?? "[Not Set]")</pre>
                         </dd>
                         <dt>
-                            @Html.DisplayNameFor(m => m.Platform.ClientPublicKey)
-                            <tooltip asp-for="Platform.ClientPublicKey"></tooltip>
-                            <a class="float-right" href="#" onclick="copyToClipboard($('#@Html.IdFor(m => m.Platform.ClientPublicKey)').text());">Copy Public Key</a>
+                            @Html.DisplayNameFor(m => m.Client.PublicKey)
+                            <tooltip asp-for="Client.PublicKey"></tooltip>
                         </dt>
                         <dd>
-                            <pre id="@Html.IdFor(m => m.Platform.ClientPublicKey)" class="security-key">@(Model.Platform.ClientPublicKey ?? "[Not Set]")</pre>
+                            <pre id="@Html.IdFor(m => m.Client.PublicKey)" class="security-key">@(Model.Client.PublicKey ?? "[Not Set]")</pre>
                         </dd>
                     </dl>
                 </div>

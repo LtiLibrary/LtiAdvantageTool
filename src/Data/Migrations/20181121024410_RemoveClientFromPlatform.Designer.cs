@@ -4,14 +4,16 @@ using AdvantageTool.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace AdvantageTool.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20181121024410_RemoveClientFromPlatform")]
+    partial class RemoveClientFromPlatform
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -106,6 +108,8 @@ namespace AdvantageTool.Migrations
 
                     b.Property<string>("AccessTokenUrl");
 
+                    b.Property<string>("AdvantageToolUserId");
+
                     b.Property<string>("Issuer");
 
                     b.Property<string>("JsonWebKeySetUrl");
@@ -116,7 +120,7 @@ namespace AdvantageTool.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("AdvantageToolUserId");
 
                     b.ToTable("Platforms");
                 });
@@ -244,9 +248,9 @@ namespace AdvantageTool.Migrations
 
             modelBuilder.Entity("AdvantageTool.Data.Platform", b =>
                 {
-                    b.HasOne("AdvantageTool.Data.AdvantageToolUser", "User")
+                    b.HasOne("AdvantageTool.Data.AdvantageToolUser")
                         .WithMany("Platforms")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("AdvantageToolUserId");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

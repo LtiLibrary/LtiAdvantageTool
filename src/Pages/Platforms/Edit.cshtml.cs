@@ -14,18 +14,20 @@ namespace AdvantageTool.Pages.Platforms
 {
     public class EditModel : PageModel
     {
-        private readonly ApplicationDbContext _appContext;
+        private readonly ApplicationDbContext _context;
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly UserManager<AdvantageToolUser> _userManager;
 
-        public EditModel(ApplicationDbContext appContext, 
+        public EditModel(ApplicationDbContext context, 
             IHttpClientFactory httpClientFactory,
             UserManager<AdvantageToolUser> userManager)
         {
-            _appContext = appContext;
+            _context = context;
             _httpClientFactory = httpClientFactory;
             _userManager = userManager;
         }
+
+        public Client Client { get; set; }
 
         [BindProperty]
         public PlatformModel Platform { get; set; }
@@ -37,18 +39,19 @@ namespace AdvantageTool.Pages.Platforms
                 return NotFound();
             }
 
-            var platform = await _appContext.Platforms.FindAsync(id);
+            var user = await _context.GetUserAsync(User);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var platform = user.Platforms.SingleOrDefault(p => p.Id == id);
             if (platform == null)
             {
                 return NotFound();
             }
 
-            var user = await _userManager.GetUserAsync(User);
-            if (platform.UserId != user.Id)
-            {
-                return NotFound();
-            }
-
+            Client = user.Client;
             Platform = new PlatformModel(platform);
 
             return Page();
@@ -62,20 +65,15 @@ namespace AdvantageTool.Pages.Platforms
             }
 
             await Platform.DiscoverEndpoints(_httpClientFactory);
-            
-            if (Platform.ClientPublicKey.IsMissing())
-            {
-                Platform.ClientPublicKey = RsaHelper.GetPublicKeyStringFromPrivateKey(Platform.ClientPrivateKey);
-            }
 
-            var platform = await _appContext.Platforms.FindAsync(Platform.Id);
-            Platform.FillEntity(platform);
+            var platform = await _context.Platforms.FindAsync(Platform.Id);
+            Platform.UpdateEntity(platform);
 
-            _appContext.Platforms.Update(platform);
+            _context.Platforms.Update(platform);
 
             try
             {
-                await _appContext.SaveChangesAsync();
+                await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -92,7 +90,7 @@ namespace AdvantageTool.Pages.Platforms
 
         private bool PlatformExists(int id)
         {
-            return _appContext.Platforms.Any(e => e.Id == id);
+            return _context.Platforms.Any(e => e.Id == id);
         }
     }
 }

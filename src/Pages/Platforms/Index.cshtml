@@ -15,7 +15,6 @@
             <tr>
                 <th>@Html.DisplayNameFor(m => m.Platforms[0].Name)</th>
                 <th>@Html.DisplayNameFor(m => m.Platforms[0].Issuer)</th>
-                <th>@Html.DisplayNameFor(m => m.Platforms[0].ClientId)</th>
                 <th></th>
             </tr>
         </thead>
@@ -25,7 +24,6 @@
             <tr>
                 <td>@Html.DisplayFor(m => item.Name)</td>
                 <td>@Html.DisplayFor(m => item.Issuer)</td>
-                <td>@Html.DisplayFor(m => item.ClientId)</td>
                 <td>
                     <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
                     <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |

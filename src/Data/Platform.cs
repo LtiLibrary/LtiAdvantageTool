@@ -18,21 +18,6 @@
         public string Name { get; set; }
 
         /// <summary>
-        /// Tool's OpenID Client ID
-        /// </summary>
-        public string ClientId { get; set; }
-
-        /// <summary>
-        /// Tool's private key in PEM format
-        /// </summary>
-        public string ClientPrivateKey { get; set; }
-
-        /// <summary>
-        /// Tool's public key in PEM format
-        /// </summary>
-        public string ClientPublicKey { get; set; }
-
-        /// <summary>
         /// Platform's issuer
         /// </summary>
         public string Issuer { get; set; }
@@ -43,8 +28,8 @@
         public string JsonWebKeySetUrl { get; set; }
 
         /// <summary>
-        /// The user that owns this platform configuration
+        /// The user that created this platform registration.
         /// </summary>
-        public string UserId { get; set; }
+        public AdvantageToolUser User { get; set; }
     }
 }

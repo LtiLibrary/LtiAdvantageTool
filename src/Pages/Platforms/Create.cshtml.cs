@@ -1,10 +1,6 @@
 ﻿using System.Net.Http;
 using System.Threading.Tasks;
 using AdvantageTool.Data;
-using AdvantageTool.Utility;
-using IdentityModel.Client;
-using LtiAdvantageLibrary.Utilities;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -12,31 +8,25 @@ namespace AdvantageTool.Pages.Platforms
 {
     public class CreateModel : PageModel
     {
-        private readonly ApplicationDbContext _appContext;
+        private readonly ApplicationDbContext _context;
         private readonly IHttpClientFactory _httpClientFactory;
-        private readonly UserManager<AdvantageToolUser> _userManager;
 
-        public CreateModel(ApplicationDbContext appContext, 
-            IHttpClientFactory httpClientFactory,
-            UserManager<AdvantageToolUser> userManager)
+        public CreateModel(ApplicationDbContext context, 
+            IHttpClientFactory httpClientFactory)
         {
-            _appContext = appContext;
+            _context = context;
             _httpClientFactory = httpClientFactory;
-            _userManager = userManager;
         }
+
+        public Client Client { get; set; }
 
         [BindProperty]
         public PlatformModel Platform { get; set; }
 
-        public IActionResult OnGet()
+        public async Task<IActionResult> OnGet()
         {
-            var keyPair = RsaHelper.GenerateRsaKeyPair();
-
-            Platform = new PlatformModel
-            {
-                ClientPrivateKey = keyPair.PrivateKey,
-                ClientPublicKey = keyPair.PublicKey
-            };
+            var user = await _context.GetUserAsync(User);
+            Client = user.Client;
 
             return Page();
         }
@@ -50,17 +40,12 @@ namespace AdvantageTool.Pages.Platforms
 
             await Platform.DiscoverEndpoints(_httpClientFactory);
 
-            if (Platform.ClientPublicKey.IsMissing())
-            {
-                Platform.ClientPublicKey = RsaHelper.GetPublicKeyStringFromPrivateKey(Platform.ClientPrivateKey);
-            }
+            var user = await _context.GetUserAsync(User);
+            var platform = new Platform { User = user };
+            Platform.UpdateEntity(platform);
 
-            var user = await _userManager.GetUserAsync(User);
-            var platform = new Platform { UserId = user.Id };
-            Platform.FillEntity(platform);
-
-            _appContext.Platforms.Add(platform);
-            await _appContext.SaveChangesAsync();
+            _context.Platforms.Add(platform);
+            await _context.SaveChangesAsync();
 
             return RedirectToPage("./Index");
         }

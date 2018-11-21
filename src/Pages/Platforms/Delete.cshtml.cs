@@ -1,6 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using AdvantageTool.Data;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -9,12 +9,10 @@ namespace AdvantageTool.Pages.Platforms
     public class DeleteModel : PageModel
     {
         private readonly ApplicationDbContext _context;
-        private readonly UserManager<AdvantageToolUser> _userManager;
 
-        public DeleteModel(ApplicationDbContext context, UserManager<AdvantageToolUser> userManager)
+        public DeleteModel(ApplicationDbContext context)
         {
             _context = context;
-            _userManager = userManager;
         }
 
         [BindProperty]
@@ -27,14 +25,14 @@ namespace AdvantageTool.Pages.Platforms
                 return NotFound();
             }
 
-            var platform = await _context.Platforms.FindAsync(id);
-            if (platform == null)
+            var user = await _context.GetUserAsync(User);
+            if (user == null)
             {
                 return NotFound();
             }
-            
-            var user = await _userManager.GetUserAsync(User);
-            if (platform.UserId != user.Id)
+
+            var platform = user.Platforms.SingleOrDefault(p => p.Id == id);
+            if (platform == null)
             {
                 return NotFound();
             }
@@ -51,10 +49,10 @@ namespace AdvantageTool.Pages.Platforms
                 return NotFound();
             }
 
-            var client = await _context.Platforms.FindAsync(id);
-            if (client != null)
+            var platform = await _context.Platforms.FindAsync(id);
+            if (platform != null)
             {
-                _context.Platforms.Remove(client);
+                _context.Platforms.Remove(platform);
                 await _context.SaveChangesAsync();
             }
 

@@ -3,7 +3,6 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens.Saml2;
 
 namespace AdvantageTool.Data
 {
@@ -61,6 +60,7 @@ namespace AdvantageTool.Data
 
             return await Users
                 .Include(u => u.Client)
+                .Include(u => u.Platforms)
                 .SingleOrDefaultAsync(u => u.Id == id);
         }
 

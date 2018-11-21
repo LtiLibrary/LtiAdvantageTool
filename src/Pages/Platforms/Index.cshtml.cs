@@ -23,12 +23,11 @@ namespace AdvantageTool.Pages.Platforms
 
         public async Task OnGetAsync()
         {
-            var user = await _userManager.GetUserAsync(User);
-            Platforms = await _context.Platforms
-                .Where(p => p.UserId == user.Id)
+            var user = await _context.GetUserAsync(User);
+            Platforms = user.Platforms
                 .OrderBy(p => p.Name)
                 .Select(p => new PlatformModel(p))
-                .ToListAsync();
+                .ToList();
         }
     }
 }

@@ -48,24 +48,27 @@
                 <div class="card">
                     <h5 class="card-header bg-secondary text-light">
                         Tool Settings
+                        <a class="btn text-light fas fa-edit"
+                           data-toggle="tooltip"
+                           title="Edit the client settings"
+                           asp-area="Identity"
+                           asp-page="/Account/Manage/Client">
+                        </a>
                     </h5>
                     <div class="card-body">
                         <div class="form-group">
-                            <label asp-for="Platform.ClientId"></label>
-                            <input asp-for="Platform.ClientId" class="form-control" />
-                            <span asp-validation-for="Platform.ClientId" class="text-danger"></span>
+                            <label asp-for="Client.ClientId"></label>
+                            <input asp-for="Client.ClientId" class="form-control" readonly="readonly" />
                         </div>
                         <div class="form-group">
-                            <label asp-for="Platform.ClientPrivateKey"></label>
-                            <tooltip asp-for="Platform.ClientPrivateKey"></tooltip>
-                            <textarea asp-for="Platform.ClientPrivateKey" class="form-control text-monospace small" rows="5"></textarea>
-                            <span asp-validation-for="Platform.ClientPrivateKey" class="text-danger"></span>
+                            <label asp-for="Client.PrivateKey"></label>
+                            <tooltip asp-for="Client.PrivateKey"></tooltip>
+                            <textarea asp-for="Client.PrivateKey" class="form-control text-monospace small" rows="5" readonly="readonly"></textarea>
                         </div>
                         <div class="form-group">
-                            <label asp-for="Platform.ClientPublicKey"></label>
-                            <tooltip asp-for="Platform.ClientPublicKey"></tooltip>
-                            <textarea asp-for="Platform.ClientPublicKey" class="form-control text-monospace small" rows="5"></textarea>
-                            <span asp-validation-for="Platform.ClientPublicKey" class="text-danger"></span>
+                            <label asp-for="Client.PublicKey"></label>
+                            <tooltip asp-for="Client.PublicKey"></tooltip>
+                            <textarea asp-for="Client.PublicKey" class="form-control text-monospace small" rows="5" readonly="readonly"></textarea>
                         </div>
                     </div>
                 </div>
