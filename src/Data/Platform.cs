@@ -25,7 +25,7 @@
         /// <summary>
         /// Platform's JWKS endpoint
         /// </summary>
-        public string JsonWebKeySetUrl { get; set; }
+        public string JwkSetUrl { get; set; }
 
         /// <summary>
         /// The user that created this platform registration.

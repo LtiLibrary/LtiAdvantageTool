@@ -19,7 +19,7 @@ namespace AdvantageTool.Pages.Platforms
             Id = platform.Id;
             AccessTokenUrl = platform.AccessTokenUrl;
             Issuer = platform.Issuer;
-            JsonWebKeySetUrl = platform.JsonWebKeySetUrl;
+            JwkSetUrl = platform.JwkSetUrl;
             Name = platform.Name;
         }
 
@@ -37,7 +37,7 @@ namespace AdvantageTool.Pages.Platforms
         [LocalhostUrl]
         [Required]
         [Display(Name = "JWK Set URL", Description = "If the Issuer supports Open ID Connect Discovery, then you can enter the Issuer URL and the JWK Set URL will be discovered.")]
-        public string JsonWebKeySetUrl { get; set; }
+        public string JwkSetUrl { get; set; }
 
         [Required]
         [Display(Name = "Display Name")]
@@ -50,7 +50,7 @@ namespace AdvantageTool.Pages.Platforms
             if (!disco.IsError)
             {
                 AccessTokenUrl = disco.TokenEndpoint;
-                JsonWebKeySetUrl = disco.JwksUri;
+                JwkSetUrl = disco.JwksUri;
             }
             else if (AccessTokenUrl.IsPresent())
             {
@@ -58,15 +58,15 @@ namespace AdvantageTool.Pages.Platforms
                 if (!disco.IsError)
                 {
                     AccessTokenUrl = disco.TokenEndpoint;
-                    JsonWebKeySetUrl = disco.JwksUri;
+                    JwkSetUrl = disco.JwksUri;
                 }
-                else if (JsonWebKeySetUrl.IsPresent())
+                else if (JwkSetUrl.IsPresent())
                 {
-                    disco = await httpClient.GetDiscoveryDocumentAsync(JsonWebKeySetUrl);
+                    disco = await httpClient.GetDiscoveryDocumentAsync(JwkSetUrl);
                     if (!disco.IsError)
                     {
                         AccessTokenUrl = disco.TokenEndpoint;
-                        JsonWebKeySetUrl = disco.JwksUri;
+                        JwkSetUrl = disco.JwksUri;
                     }
                 }
             }
@@ -77,7 +77,7 @@ namespace AdvantageTool.Pages.Platforms
             platform.AccessTokenUrl = AccessTokenUrl;
             platform.Name = Name;
             platform.Issuer = Issuer;
-            platform.JsonWebKeySetUrl = JsonWebKeySetUrl;
+            platform.JwkSetUrl = JwkSetUrl;
         }
     }
 }

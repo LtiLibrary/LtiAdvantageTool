@@ -23,8 +23,8 @@
                             <tooltip asp-for="Platform.Issuer"></tooltip>
                         </dt>
                         <dd>@Html.DisplayFor(m => m.Platform.Issuer)</dd>
-                        <dt>@Html.DisplayNameFor(m => m.Platform.JsonWebKeySetUrl)</dt>
-                        <dd>@(Model.Platform.JsonWebKeySetUrl ?? "[Not Set]")</dd>
+                        <dt>@Html.DisplayNameFor(m => m.Platform.JwkSetUrl)</dt>
+                        <dd>@(Model.Platform.JwkSetUrl ?? "[Not Set]")</dd>
                         <dt>@Html.DisplayNameFor(m => m.Platform.AccessTokenUrl)</dt>
                         <dd>@(Model.Platform.AccessTokenUrl ?? "[Not Set]")</dd>
                     </dl>

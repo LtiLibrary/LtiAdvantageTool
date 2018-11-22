@@ -163,10 +163,10 @@ namespace AdvantageTool.Pages
 
             try
             {
-                if (!string.IsNullOrEmpty(platform.JsonWebKeySetUrl))
+                if (!string.IsNullOrEmpty(platform.JwkSetUrl))
                 {
                     var httpClient = _httpClientFactory.CreateClient();
-                    var keySetJson = await httpClient.GetStringAsync(platform.JsonWebKeySetUrl);
+                    var keySetJson = await httpClient.GetStringAsync(platform.JwkSetUrl);
                     var keySet = JsonConvert.DeserializeObject<JsonWebKeySet>(keySetJson);
                     var key = keySet.Keys.SingleOrDefault(k => k.Kid == Token.Header.Kid);
                     if (key == null)
