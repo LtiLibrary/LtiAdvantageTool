@@ -27,7 +27,7 @@ namespace AdvantageTool.Pages.Platforms
 
         [LocalhostUrl]
         [Required]
-        [Display(Name = "Access Token URL", Description = "If the Issuer supports Open ID Connect Discovery, then you can enter the Issuer URL and the token URL will be discovered.")]
+        [Display(Name = "Access Token URL", Description = "The tool can request an access token using this endpoint (for example to use the Names and Role Service).")]
         public string AccessTokenUrl { get; set; }
 
         [Required]
@@ -36,7 +36,7 @@ namespace AdvantageTool.Pages.Platforms
 
         [LocalhostUrl]
         [Required]
-        [Display(Name = "JWK Set URL", Description = "If the Issuer supports Open ID Connect Discovery, then you can enter the Issuer URL and the JWK Set URL will be discovered.")]
+        [Display(Name = "JWK Set Url", Description = "The tool can retrieve the platform's public keys using this endpoint.")]
         public string JwkSetUrl { get; set; }
 
         [Required]

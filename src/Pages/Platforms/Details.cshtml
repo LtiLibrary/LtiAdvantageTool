@@ -23,9 +23,15 @@
                             <tooltip asp-for="Platform.Issuer"></tooltip>
                         </dt>
                         <dd>@Html.DisplayFor(m => m.Platform.Issuer)</dd>
-                        <dt>@Html.DisplayNameFor(m => m.Platform.JwkSetUrl)</dt>
+                        <dt>
+                            @Html.DisplayNameFor(m => m.Platform.JwkSetUrl)
+                            <tooltip asp-for="Platform.JwkSetUrl"></tooltip>
+                        </dt>
                         <dd>@(Model.Platform.JwkSetUrl ?? "[Not Set]")</dd>
-                        <dt>@Html.DisplayNameFor(m => m.Platform.AccessTokenUrl)</dt>
+                        <dt>
+                            @Html.DisplayNameFor(m => m.Platform.AccessTokenUrl)
+                            <tooltip asp-for="Platform.AccessTokenUrl"></tooltip>
+                        </dt>
                         <dd>@(Model.Platform.AccessTokenUrl ?? "[Not Set]")</dd>
                     </dl>
                 </div>
@@ -35,11 +41,22 @@
             <div class="card">
                 <h5 class="card-header bg-secondary text-light">
                     Tool Settings
+                    <a class="btn text-light fas fa-edit"
+                       data-toggle="tooltip"
+                       title="Edit the client settings"
+                       asp-area="Identity"
+                       asp-page="/Account/Manage/Client">
+                    </a>
                 </h5>
                 <div class="card-body">
                     <dl>
                         <dt>@Html.DisplayNameFor(m => m.Client.ClientId)</dt>
                         <dd>@Model.Client.ClientId</dd>
+                        <dt>
+                            @Html.DisplayNameFor(m => m.Client.JwkSetUrl)
+                            <tooltip asp-for="Client.JwkSetUrl"></tooltip>
+                        </dt>
+                        <dd>@Model.Client.JwkSetUrl</dd>
                         <dt>
                             @Html.DisplayNameFor(m => m.Client.PrivateKey)
                             <tooltip asp-for="Client.PrivateKey"></tooltip>
