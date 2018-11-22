@@ -36,7 +36,7 @@ namespace AdvantageTool.Pages.Platforms
 
         [LocalhostUrl]
         [Required]
-        [Display(Name = "JSON Web Key Set URL", Description = "If the Issuer supports Open ID Connect Discovery, then you can enter the Issuer URL and the JWKS URL will be discovered.")]
+        [Display(Name = "JWK Set URL", Description = "If the Issuer supports Open ID Connect Discovery, then you can enter the Issuer URL and the JWK Set URL will be discovered.")]
         public string JsonWebKeySetUrl { get; set; }
 
         [Required]
