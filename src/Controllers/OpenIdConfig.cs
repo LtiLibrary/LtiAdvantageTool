@@ -2,6 +2,9 @@
 
 namespace AdvantageTool.Controllers
 {
+    /// <summary>
+    /// OpenID Connect configuration. Only supports the OpenID Connect JWKS Service.
+    /// </summary>
     public class OpenIdConfig
     {
         [JsonProperty("issuer")]

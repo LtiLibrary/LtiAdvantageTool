@@ -5,10 +5,16 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace AdvantageTool.Controllers
 {
-    [Route(".well-known/openid-configuration/jwks", Name = "jwks")]
+    /// <inheritdoc />
+    /// <summary>
+    /// Implements the OpenID Connect JWK Set Service.
+    /// </summary>
+    [Route(JwksUri)]
     [ApiController]
     public class JwksController : ControllerBase
     {
+        public const string JwksUri = "oauth2/jwks";
+
         private readonly ApplicationDbContext _context;
 
         public JwksController(ApplicationDbContext context)
@@ -16,6 +22,10 @@ namespace AdvantageTool.Controllers
             _context = context;
         }
 
+        /// <summary>
+        /// Return a JWK Set for all clients.
+        /// </summary>
+        /// <returns></returns>
         public IActionResult OnGet()
         {
             var jsonWebKeySet = new JsonWebKeySet();
