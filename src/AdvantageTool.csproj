@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\LTI\LtiAdvantage\src\LtiAdvantageLibrary\LtiAdvantageLibrary.csproj" />
+    <ProjectReference Include="..\..\..\LTI\LtiAdvantage\src\LtiAdvantage\LtiAdvantage.csproj" />
   </ItemGroup>
 
 </Project>

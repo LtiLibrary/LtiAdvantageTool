@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 using AdvantageTool.Data;
 using AdvantageTool.Utility;
 using IdentityModel.Client;
-using LtiAdvantageLibrary;
-using LtiAdvantageLibrary.Lti;
-using LtiAdvantageLibrary.NamesRoleService;
+using LtiAdvantage;
+using LtiAdvantage.Lti;
+using LtiAdvantage.NamesRoleService;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -301,7 +301,7 @@ namespace AdvantageTool.Pages
             var jwt = handler.WriteToken(token);
 
             var tokenClient = new TokenClient(tokenEndPoint, client.ClientId);
-            var tokenResponse = await tokenClient.RequestClientCredentialsWithSignedJwtAsync(jwt, Constants.LtiScopes.MembershipReadonly);
+            var tokenResponse = await tokenClient.RequestClientCredentialsWithSignedJwtAsync(jwt, Constants.LtiScopes.NamesRoleReadonly);
 
             // The IMS reference implementation returns "Created" with success. 
             if (tokenResponse.IsError && tokenResponse.Error != "Created")
