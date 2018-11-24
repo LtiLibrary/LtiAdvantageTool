@@ -12,6 +12,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AdvantageTool", "src\Advant
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LtiAdvantage", "..\..\LTI\LtiAdvantage\src\LtiAdvantage\LtiAdvantage.csproj", "{097C6757-60C8-44C2-B378-F9A8E3A08377}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LtiAdvantage.IdentityModel", "..\..\LTI\LtiAdvantage\src\LtiAdvantage.IdentityModel\LtiAdvantage.IdentityModel.csproj", "{C55CD2BF-0A0E-43F2-A285-E82904CCD727}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,6 +28,10 @@ Global
 		{097C6757-60C8-44C2-B378-F9A8E3A08377}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{097C6757-60C8-44C2-B378-F9A8E3A08377}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{097C6757-60C8-44C2-B378-F9A8E3A08377}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C55CD2BF-0A0E-43F2-A285-E82904CCD727}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C55CD2BF-0A0E-43F2-A285-E82904CCD727}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C55CD2BF-0A0E-43F2-A285-E82904CCD727}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C55CD2BF-0A0E-43F2-A285-E82904CCD727}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

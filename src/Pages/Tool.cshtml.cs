@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using AdvantageTool.Data;
 using AdvantageTool.Utility;
 using IdentityModel.Client;
+using LtiAdvantage.IdentityModel.Client;
 using LtiAdvantage;
 using LtiAdvantage.Lti;
 using LtiAdvantage.NamesRoleService;
@@ -288,7 +289,7 @@ namespace AdvantageTool.Pages
             var payload = new JwtPayload();
             payload.AddClaim(new Claim(JwtRegisteredClaimNames.Iss, client.ClientId));
             payload.AddClaim(new Claim(JwtRegisteredClaimNames.Sub, client.ClientId));
-            payload.AddClaim(new Claim(JwtRegisteredClaimNames.Aud, platform.AccessTokenUrl));
+            payload.AddClaim(new Claim(JwtRegisteredClaimNames.Aud, tokenEndPoint));
             payload.AddClaim(new Claim(JwtRegisteredClaimNames.Iat, EpochTime.GetIntDate(DateTime.UtcNow).ToString()));
             payload.AddClaim(new Claim(JwtRegisteredClaimNames.Nbf, EpochTime.GetIntDate(DateTime.UtcNow.AddSeconds(-5)).ToString()));
             payload.AddClaim(new Claim(JwtRegisteredClaimNames.Exp, EpochTime.GetIntDate(DateTime.UtcNow.AddMinutes(5)).ToString()));
@@ -300,8 +301,13 @@ namespace AdvantageTool.Pages
             var handler = new JwtSecurityTokenHandler();
             var jwt = handler.WriteToken(token);
 
-            var tokenClient = new TokenClient(tokenEndPoint, client.ClientId);
-            var tokenResponse = await tokenClient.RequestClientCredentialsWithSignedJwtAsync(jwt, Constants.LtiScopes.NamesRoleReadonly);
+            var tokenResponse = await httpClient.RequestClientCredentialsTokenWithJwtAsync(
+                    new JwtClientCredentialsTokenRequest
+                    {
+                        Address = tokenEndPoint,
+                        Jwt = jwt,
+                        Scope = Constants.LtiScopes.NamesRoleReadonly
+                    });
 
             // The IMS reference implementation returns "Created" with success. 
             if (tokenResponse.IsError && tokenResponse.Error != "Created")
