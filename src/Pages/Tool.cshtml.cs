@@ -256,65 +256,7 @@ namespace AdvantageTool.Pages
         [HttpPost]
         public async Task<IActionResult> OnPostGetMembershipAsync()
         {
-            var client = await _context.Clients.FindAsync(ClientId);
-            if (client == null)
-            {
-                MembershipStatus = "Cannot find client registration.";
-                return await OnPostAsync();
-            }
-
-            var platform = await _context.Platforms.FindAsync(PlatformId);
-            if (platform == null)
-            {
-                MembershipStatus = "Cannot find platform registration.";
-                return await OnPostAsync();
-            }
-
-            var httpClient = _httpClientFactory.CreateClient();
-            var tokenEndPoint = platform.AccessTokenUrl;
-
-            if (tokenEndPoint.IsMissing())
-            {
-                var disco = await httpClient.GetDiscoveryDocumentAsync(new DiscoveryDocumentRequest
-                {
-                    Address = platform.Issuer,
-                    Policy =
-                    {
-                        Authority = platform.Issuer
-                    }
-                });
-                if (disco.IsError)
-                {
-                    MembershipStatus = disco.Error;
-                    return await OnPostAsync();
-                }
-
-                tokenEndPoint = disco.TokenEndpoint;
-            }
-
-            // Use a signed JWT as client credentials.
-            var payload = new JwtPayload();
-            payload.AddClaim(new Claim(JwtRegisteredClaimNames.Iss, client.ClientId));
-            payload.AddClaim(new Claim(JwtRegisteredClaimNames.Sub, client.ClientId));
-            payload.AddClaim(new Claim(JwtRegisteredClaimNames.Aud, tokenEndPoint));
-            payload.AddClaim(new Claim(JwtRegisteredClaimNames.Iat, EpochTime.GetIntDate(DateTime.UtcNow).ToString()));
-            payload.AddClaim(new Claim(JwtRegisteredClaimNames.Nbf, EpochTime.GetIntDate(DateTime.UtcNow.AddSeconds(-5)).ToString()));
-            payload.AddClaim(new Claim(JwtRegisteredClaimNames.Exp, EpochTime.GetIntDate(DateTime.UtcNow.AddMinutes(5)).ToString()));
-            payload.AddClaim(new Claim(JwtRegisteredClaimNames.Jti, LtiResourceLinkRequest.GenerateCryptographicNonce()));
-
-            var credentials = PemHelper.SigningCredentialsFromPemString(client.PrivateKey, client.KeyId);
-            var header = new JwtHeader(credentials);
-            var token = new JwtSecurityToken(header, payload);
-            var handler = new JwtSecurityTokenHandler();
-            var jwt = handler.WriteToken(token);
-
-            var tokenResponse = await httpClient.RequestClientCredentialsTokenWithJwtAsync(
-                    new JwtClientCredentialsTokenRequest
-                    {
-                        Address = tokenEndPoint,
-                        Jwt = jwt,
-                        Scope = Constants.LtiScopes.NrpsMembershipReadonly
-                    });
+            var tokenResponse = await GetToken(Constants.LtiScopes.NrpsMembershipReadonly);
 
             // The IMS reference implementation returns "Created" with success. 
             if (tokenResponse.IsError && tokenResponse.Error != "Created")
@@ -323,10 +265,12 @@ namespace AdvantageTool.Pages
                 return await OnPostAsync();
             }
 
+            var httpClient = _httpClientFactory.CreateClient();
             httpClient.SetBearerToken(tokenResponse.AccessToken);
 
             try
             {
+                var handler = new JwtSecurityTokenHandler();
                 Token = handler.ReadJwtToken(IdToken);
                 LtiRequest = new LtiResourceLinkRequest(Token.Payload);
 
@@ -362,65 +306,7 @@ namespace AdvantageTool.Pages
         [HttpPost]
         public async Task<IActionResult> OnPostGetLineItemsAsync()
         {
-            var client = await _context.Clients.FindAsync(ClientId);
-            if (client == null)
-            {
-                AgsStatus = "Cannot find client registration.";
-                return await OnPostAsync();
-            }
-
-            var platform = await _context.Platforms.FindAsync(PlatformId);
-            if (platform == null)
-            {
-                AgsStatus = "Cannot find platform registration.";
-                return await OnPostAsync();
-            }
-
-            var httpClient = _httpClientFactory.CreateClient();
-            var tokenEndPoint = platform.AccessTokenUrl;
-
-            if (tokenEndPoint.IsMissing())
-            {
-                var disco = await httpClient.GetDiscoveryDocumentAsync(new DiscoveryDocumentRequest
-                {
-                    Address = platform.Issuer,
-                    Policy =
-                    {
-                        Authority = platform.Issuer
-                    }
-                });
-                if (disco.IsError)
-                {
-                    AgsStatus = disco.Error;
-                    return await OnPostAsync();
-                }
-
-                tokenEndPoint = disco.TokenEndpoint;
-            }
-
-            // Use a signed JWT as client credentials.
-            var payload = new JwtPayload();
-            payload.AddClaim(new Claim(JwtRegisteredClaimNames.Iss, client.ClientId));
-            payload.AddClaim(new Claim(JwtRegisteredClaimNames.Sub, client.ClientId));
-            payload.AddClaim(new Claim(JwtRegisteredClaimNames.Aud, tokenEndPoint));
-            payload.AddClaim(new Claim(JwtRegisteredClaimNames.Iat, EpochTime.GetIntDate(DateTime.UtcNow).ToString()));
-            payload.AddClaim(new Claim(JwtRegisteredClaimNames.Nbf, EpochTime.GetIntDate(DateTime.UtcNow.AddSeconds(-5)).ToString()));
-            payload.AddClaim(new Claim(JwtRegisteredClaimNames.Exp, EpochTime.GetIntDate(DateTime.UtcNow.AddMinutes(5)).ToString()));
-            payload.AddClaim(new Claim(JwtRegisteredClaimNames.Jti, LtiResourceLinkRequest.GenerateCryptographicNonce()));
-
-            var credentials = PemHelper.SigningCredentialsFromPemString(client.PrivateKey, client.KeyId);
-            var header = new JwtHeader(credentials);
-            var token = new JwtSecurityToken(header, payload);
-            var handler = new JwtSecurityTokenHandler();
-            var jwt = handler.WriteToken(token);
-
-            var tokenResponse = await httpClient.RequestClientCredentialsTokenWithJwtAsync(
-                    new JwtClientCredentialsTokenRequest
-                    {
-                        Address = tokenEndPoint,
-                        Jwt = jwt,
-                        Scope = Constants.LtiScopes.AgsLineItem
-                    });
+            var tokenResponse = await GetToken(Constants.LtiScopes.AgsLineItem);
 
             // The IMS reference implementation returns "Created" with success. 
             if (tokenResponse.IsError && tokenResponse.Error != "Created")
@@ -429,10 +315,12 @@ namespace AdvantageTool.Pages
                 return await OnPostAsync();
             }
 
+            var httpClient = _httpClientFactory.CreateClient();
             httpClient.SetBearerToken(tokenResponse.AccessToken);
 
             try
             {
+                var handler = new JwtSecurityTokenHandler();
                 Token = handler.ReadJwtToken(IdToken);
                 LtiRequest = new LtiResourceLinkRequest(Token.Payload);
 
@@ -454,6 +342,67 @@ namespace AdvantageTool.Pages
             }
 
             return await OnPostAsync();
+        }
+
+        private async Task<TokenResponse> GetToken(string scope)
+        {
+            var client = await _context.Clients.FindAsync(ClientId);
+            if (client == null)
+            {
+                return new TokenResponse(new Exception("Cannot find client registration."));
+            }
+
+            var platform = await _context.Platforms.FindAsync(PlatformId);
+            if (platform == null)
+            {
+                return new TokenResponse(new Exception("Cannot find platform registration."));
+            }
+
+            var httpClient = _httpClientFactory.CreateClient();
+            var tokenEndPoint = platform.AccessTokenUrl;
+
+            if (tokenEndPoint.IsMissing())
+            {
+                var disco = await httpClient.GetDiscoveryDocumentAsync(new DiscoveryDocumentRequest
+                {
+                    Address = platform.Issuer,
+                    Policy =
+                    {
+                        Authority = platform.Issuer
+                    }
+                });
+                if (disco.IsError)
+                {
+                    return new TokenResponse(new Exception(disco.Error));
+                }
+
+                tokenEndPoint = disco.TokenEndpoint;
+            }
+
+            // Use a signed JWT as client credentials.
+            var payload = new JwtPayload();
+            payload.AddClaim(new Claim(JwtRegisteredClaimNames.Iss, client.ClientId));
+            payload.AddClaim(new Claim(JwtRegisteredClaimNames.Sub, client.ClientId));
+            payload.AddClaim(new Claim(JwtRegisteredClaimNames.Aud, tokenEndPoint));
+            payload.AddClaim(new Claim(JwtRegisteredClaimNames.Iat, EpochTime.GetIntDate(DateTime.UtcNow).ToString()));
+            payload.AddClaim(new Claim(JwtRegisteredClaimNames.Nbf, EpochTime.GetIntDate(DateTime.UtcNow.AddSeconds(-5)).ToString()));
+            payload.AddClaim(new Claim(JwtRegisteredClaimNames.Exp, EpochTime.GetIntDate(DateTime.UtcNow.AddMinutes(5)).ToString()));
+            payload.AddClaim(new Claim(JwtRegisteredClaimNames.Jti, LtiResourceLinkRequest.GenerateCryptographicNonce()));
+
+            var credentials = PemHelper.SigningCredentialsFromPemString(client.PrivateKey, client.KeyId);
+            var header = new JwtHeader(credentials);
+            var token = new JwtSecurityToken(header, payload);
+            var handler = new JwtSecurityTokenHandler();
+            var jwt = handler.WriteToken(token);
+
+            return await httpClient.RequestClientCredentialsTokenWithJwtAsync(
+                    new JwtClientCredentialsTokenRequest
+                    {
+                        Address = tokenEndPoint,
+                        Jwt = jwt,
+                        Scope = scope
+                    });
+
         }
     }
 }
