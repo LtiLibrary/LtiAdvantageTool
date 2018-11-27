@@ -313,7 +313,7 @@ namespace AdvantageTool.Pages
                     {
                         Address = tokenEndPoint,
                         Jwt = jwt,
-                        Scope = Constants.LtiScopes.NamesRoleReadonly
+                        Scope = Constants.LtiScopes.NrpsMembershipReadonly
                     });
 
             // The IMS reference implementation returns "Created" with success. 
@@ -419,7 +419,7 @@ namespace AdvantageTool.Pages
                     {
                         Address = tokenEndPoint,
                         Jwt = jwt,
-                        Scope = Constants.LtiScopes.AssignmentGradesLineItem
+                        Scope = Constants.LtiScopes.AgsLineItem
                     });
 
             // The IMS reference implementation returns "Created" with success. 
