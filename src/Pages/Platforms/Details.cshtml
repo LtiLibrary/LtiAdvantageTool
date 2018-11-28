@@ -41,36 +41,16 @@
             <div class="card">
                 <h5 class="card-header bg-secondary text-light">
                     Tool Settings
-                    <a class="btn text-light fas fa-edit"
-                       data-toggle="tooltip"
-                       title="Edit the client settings"
-                       asp-area="Identity"
-                       asp-page="/Account/Manage/Client">
-                    </a>
                 </h5>
                 <div class="card-body">
                     <dl>
-                        <dt>@Html.DisplayNameFor(m => m.Client.ClientId)</dt>
-                        <dd>@Model.Client.ClientId</dd>
+                        <dt>@Html.DisplayNameFor(m => m.Platform.ClientId)</dt>
+                        <dd>@Model.Platform.ClientId</dd>
                         <dt>
-                            @Html.DisplayNameFor(m => m.Client.JwkSetUrl)
-                            <tooltip asp-for="Client.JwkSetUrl"></tooltip>
+                            @Html.DisplayNameFor(m => m.Platform.PrivateKey)
+                            <tooltip asp-for="Platform.PrivateKey"></tooltip>
                         </dt>
-                        <dd>@Model.Client.JwkSetUrl</dd>
-                        <dt>
-                            @Html.DisplayNameFor(m => m.Client.PrivateKey)
-                            <tooltip asp-for="Client.PrivateKey"></tooltip>
-                        </dt>
-                        <dd>
-                            <pre class="security-key">@(Model.Client.PrivateKey ?? "[Not Set]")</pre>
-                        </dd>
-                        <dt>
-                            @Html.DisplayNameFor(m => m.Client.PublicKey)
-                            <tooltip asp-for="Client.PublicKey"></tooltip>
-                        </dt>
-                        <dd>
-                            <pre id="@Html.IdFor(m => m.Client.PublicKey)" class="security-key">@(Model.Client.PublicKey ?? "[Not Set]")</pre>
-                        </dd>
+                        <dd><pre class="security-key">@Model.Platform.PrivateKey</pre></dd>
                     </dl>
                 </div>
             </div>

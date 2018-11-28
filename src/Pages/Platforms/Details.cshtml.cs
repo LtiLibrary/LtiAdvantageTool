@@ -1,10 +1,6 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
-using AdvantageTool.Controllers;
 using AdvantageTool.Data;
-using AdvantageTool.Utility;
-using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -19,7 +15,6 @@ namespace AdvantageTool.Pages.Platforms
             _context = context;
         }
 
-        public ClientModel Client { get; set; }
         public PlatformModel Platform { get; set; }
 
         public async Task<IActionResult> OnGetAsync(int? id)
@@ -36,10 +31,6 @@ namespace AdvantageTool.Pages.Platforms
                 return NotFound();
             }
 
-            var jwksUrl = new Uri($"{Request.Scheme}://{Request.Host}").AbsoluteUri.EnsureTrailingSlash()
-                          + JwksController.JwksUri;
-
-            Client = new ClientModel(user.Client, jwksUrl);
             Platform = new PlatformModel(platform);
 
             return Page();

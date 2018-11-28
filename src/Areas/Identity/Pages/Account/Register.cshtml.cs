@@ -3,7 +3,6 @@ using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using AdvantageTool.Data;
-using AdvantageTool.Utility;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -74,20 +73,6 @@ namespace AdvantageTool.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
-
-                    // Create the Client for this tenant
-                    var keyPair = PemHelper.GenerateRsaKeyPair();
-                    var client = new Client
-                    {
-                        ClientId = CryptoRandom.GenerateRandomString(),
-                        KeyId = keyPair.KeyId,
-                        PrivateKey = keyPair.PrivateKey,
-                        PublicKey = keyPair.PublicKey,
-                        User = user
-                    };
-                    await _context.Clients.AddAsync(client);
-                    await _context.SaveChangesAsync();
-                    // Done creating Client
 
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     var callbackUrl = Url.Page(

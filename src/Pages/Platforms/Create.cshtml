@@ -50,18 +50,15 @@
                     </h5>
                     <div class="card-body">
                         <div class="form-group">
-                            <label asp-for="Client.ClientId"></label>
-                            <input asp-for="Client.ClientId" class="form-control" readonly="readonly" />
+                            <label asp-for="Platform.ClientId"></label>
+                            <input asp-for="Platform.ClientId" class="form-control" />
+                            <span asp-validation-for="Platform.ClientId" class="text-danger"></span>
                         </div>
                         <div class="form-group">
-                            <label asp-for="Client.PublicKey"></label>
-                            <tooltip asp-for="Client.PublicKey"></tooltip>
-                            <textarea asp-for="Client.PublicKey" class="form-control text-monospace small" rows="5" readonly="readonly"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label asp-for="Client.PrivateKey"></label>
-                            <tooltip asp-for="Client.PrivateKey"></tooltip>
-                            <textarea asp-for="Client.PrivateKey" class="form-control text-monospace small" rows="5" readonly="readonly"></textarea>
+                            <label asp-for="Platform.PrivateKey"></label>
+                            <tooltip asp-for="Platform.PrivateKey"></tooltip>
+                            <textarea asp-for="Platform.PrivateKey" class="form-control text-monospace small" rows="5" placeholder="Enter the private key in PEM format."></textarea>
+                            <span asp-validation-for="Platform.ClientId" class="text-danger"></span>
                         </div>
                     </div>
                 </div>
@@ -79,4 +76,17 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        $('#@($"{nameof(Model.Platform)}_{nameof(Model.Platform.PrivateKey)}")').bind('paste', function(){
+            window.setTimeout(function(){
+                var text = '';
+                $($('#($"{nameof(Model.Platform)}_{nameof(Model.Platform.PrivateKey)}")').val().split('\n')).each(function(i,v){
+                    v = $.trim(v);
+                    if (v.length > 0) text+= v+'\n';
+                });
+                console.log(text);
+                $('#($"{nameof(Model.Platform)}_{nameof(Model.Platform.PrivateKey)}")').val(text);
+            },1);
+        });
+    </script>
 }

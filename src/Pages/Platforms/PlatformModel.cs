@@ -21,9 +21,14 @@ namespace AdvantageTool.Pages.Platforms
             Issuer = platform.Issuer;
             JwkSetUrl = platform.JwkSetUrl;
             Name = platform.Name;
+
+            ClientId = platform.ClientId;
+            PrivateKey = platform.PrivateKey;
         }
 
         public int Id { get; set; }
+
+        #region Platform properties
 
         [LocalhostUrl]
         [Required]
@@ -42,6 +47,26 @@ namespace AdvantageTool.Pages.Platforms
         [Required]
         [Display(Name = "Display Name")]
         public string Name { get; set; }
+
+        #endregion
+
+        #region Tool properties
+
+        /// <summary>
+        /// Tool's OpenID Client ID
+        /// </summary>
+        [Required]
+        [Display(Name = "Client ID")]
+        public string ClientId { get; set; }
+
+        /// <summary>
+        /// Tool's private key in PEM format
+        /// </summary>
+        [Required]
+        [Display(Name = "Private Key", Description = "This is the private key the tool will use to sign client credentials.")]
+        public string PrivateKey { get; set; }
+
+        #endregion
 
         public async Task DiscoverEndpoints(IHttpClientFactory factory)
         {
@@ -78,6 +103,9 @@ namespace AdvantageTool.Pages.Platforms
             platform.Name = Name;
             platform.Issuer = Issuer;
             platform.JwkSetUrl = JwkSetUrl;
+
+            platform.ClientId = ClientId;
+            platform.PrivateKey = PrivateKey;
         }
     }
 }

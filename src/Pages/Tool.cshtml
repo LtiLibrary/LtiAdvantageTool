@@ -78,7 +78,6 @@
                         <form method="post" asp-page-handler="GetMembership">
                             <input type="hidden" name="id_token" id="id_token" value="@Model.IdToken" />
                             <input type="hidden" name="context_id" id="context_id" value="@Model.LtiRequest.Context?.Id" />
-                            <input type="hidden" asp-for="ClientId" />
                             <input type="hidden" asp-for="PlatformId" />
                             <input type="submit" value="Get Course Members" class="btn btn-secondary" />
                         </form>
@@ -96,7 +95,6 @@
                         <form method="post" asp-page-handler="GetLineItems">
                             <input type="hidden" name="id_token" id="id_token" value="@Model.IdToken" />
                             <input type="hidden" name="context_id" id="context_id" value="@Model.LtiRequest.Context?.Id" />
-                            <input type="hidden" asp-for="ClientId" />
                             <input type="hidden" asp-for="PlatformId" />
                             <input type="submit" value="Get Line Items" class="btn btn-secondary" />
                         </form>

@@ -21,9 +21,6 @@ namespace AdvantageTool.Pages.Platforms
         }
 
         [BindProperty]
-        public Client Client { get; set; }
-
-        [BindProperty]
         public PlatformModel Platform { get; set; }
 
         public async Task<IActionResult> OnGetAsync(int? id)
@@ -45,7 +42,6 @@ namespace AdvantageTool.Pages.Platforms
                 return NotFound();
             }
 
-            Client = user.Client;
             Platform = new PlatformModel(platform);
 
             return Page();
@@ -53,16 +49,16 @@ namespace AdvantageTool.Pages.Platforms
 
         public async Task<IActionResult> OnPostAsync()
         {
-            if (!ModelState.IsValid)
-            {
-                return Page();
-            }
-
             var user = await _context.GetUserAsync(User);
             if (user.Platforms.Any(p => p.Issuer == Platform.Issuer && p.Id != Platform.Id))
             {
                 ModelState.AddModelError($"{nameof(Platform)}.{nameof(Platform.Issuer)}",
                     "This Issuer is already registered.");
+                return Page();
+            }
+
+            if (!ModelState.IsValid)
+            {
                 return Page();
             }
 

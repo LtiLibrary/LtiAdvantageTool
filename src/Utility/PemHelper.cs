@@ -80,9 +80,8 @@ namespace AdvantageTool.Utility
         /// Converts a private key in PEM format into an <see cref="RsaSecurityKey"/>.
         /// </summary>
         /// <param name="privateKey">The private key.</param>
-        /// <param name="keyId">The key ID (kid).</param>
         /// <returns>The private key as an <see cref="RsaSecurityKey"/>.</returns>
-        public static SigningCredentials SigningCredentialsFromPemString(string privateKey, string keyId)  
+        public static SigningCredentials SigningCredentialsFromPemString(string privateKey)  
         {  
             using (var keyTextReader = new StringReader(privateKey))  
             {  
@@ -100,7 +99,7 @@ namespace AdvantageTool.Utility
                     D = keyParameters.Exponent.ToByteArrayUnsigned(),
                     Exponent = keyParameters.PublicExponent.ToByteArrayUnsigned()
                 };
-                var key = new RsaSecurityKey(parameters) {KeyId = keyId};
+                var key = new RsaSecurityKey(parameters);
                 return new SigningCredentials(key, SecurityAlgorithms.RsaSha256);
             }  
         }

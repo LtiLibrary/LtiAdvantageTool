@@ -14,19 +14,7 @@ namespace AdvantageTool.Data
         {
         }
 
-        public DbSet<Client> Clients { get; set; }
         public DbSet<Platform> Platforms { get; set; }
-
-        protected override void OnModelCreating(ModelBuilder builder)
-        {
-            builder.Entity<AdvantageToolUser>()
-                .HasOne(u => u.Client)
-                .WithOne(c => c.User)
-                .HasForeignKey<Client>(c => c.UserId);
-
-            base.OnModelCreating(builder);
-        }
-
         
         /// <summary>
         /// Returns the fully populated <see cref="AdvantageToolUser"/> corresponding to the
@@ -59,7 +47,6 @@ namespace AdvantageTool.Data
             }
 
             return await Users
-                .Include(u => u.Client)
                 .Include(u => u.Platforms)
                 .SingleOrDefaultAsync(u => u.Id == id);
         }

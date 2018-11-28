@@ -38,12 +38,6 @@ namespace AdvantageTool.Pages
         }
 
         /// <summary>
-        /// The client's id.
-        /// </summary>
-        [BindProperty]
-        public int ClientId { get; set; }
-
-        /// <summary>
         /// The error discovered while parsing the request.
         /// </summary>
         public string Error { get; set; }
@@ -131,16 +125,11 @@ namespace AdvantageTool.Pages
             }
 
             // The Audience must match a Client ID exactly.
-            var client = await _context.Clients
-                .Where(c => Token.Payload.Aud.Contains(c.ClientId))
-                .SingleOrDefaultAsync();
-            if (client == null)
+            if (!await _context.Platforms.AnyAsync(p => Token.Payload.Aud.Contains(p.ClientId)))
             {
                 Error = "Unknown audience.";
                 return Page();
             }
-
-            ClientId = client.Id;
 
             var platform = await _context.Platforms
                 .Where(p => p.Issuer == Token.Payload.Iss)
@@ -346,12 +335,6 @@ namespace AdvantageTool.Pages
 
         private async Task<TokenResponse> GetToken(string scope)
         {
-            var client = await _context.Clients.FindAsync(ClientId);
-            if (client == null)
-            {
-                return new TokenResponse(new Exception("Cannot find client registration."));
-            }
-
             var platform = await _context.Platforms.FindAsync(PlatformId);
             if (platform == null)
             {
@@ -381,15 +364,15 @@ namespace AdvantageTool.Pages
 
             // Use a signed JWT as client credentials.
             var payload = new JwtPayload();
-            payload.AddClaim(new Claim(JwtRegisteredClaimNames.Iss, client.ClientId));
-            payload.AddClaim(new Claim(JwtRegisteredClaimNames.Sub, client.ClientId));
+            payload.AddClaim(new Claim(JwtRegisteredClaimNames.Iss, platform.ClientId));
+            payload.AddClaim(new Claim(JwtRegisteredClaimNames.Sub, platform.ClientId));
             payload.AddClaim(new Claim(JwtRegisteredClaimNames.Aud, tokenEndPoint));
             payload.AddClaim(new Claim(JwtRegisteredClaimNames.Iat, EpochTime.GetIntDate(DateTime.UtcNow).ToString()));
             payload.AddClaim(new Claim(JwtRegisteredClaimNames.Nbf, EpochTime.GetIntDate(DateTime.UtcNow.AddSeconds(-5)).ToString()));
             payload.AddClaim(new Claim(JwtRegisteredClaimNames.Exp, EpochTime.GetIntDate(DateTime.UtcNow.AddMinutes(5)).ToString()));
             payload.AddClaim(new Claim(JwtRegisteredClaimNames.Jti, LtiResourceLinkRequest.GenerateCryptographicNonce()));
 
-            var credentials = PemHelper.SigningCredentialsFromPemString(client.PrivateKey, client.KeyId);
+            var credentials = PemHelper.SigningCredentialsFromPemString(platform.PrivateKey);
             var header = new JwtHeader(credentials);
             var token = new JwtSecurityToken(header, payload);
             var handler = new JwtSecurityTokenHandler();
