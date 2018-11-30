@@ -18,20 +18,17 @@ namespace AdvantageTool.Areas.Identity.Pages.Account
         private readonly UserManager<AdvantageToolUser> _userManager;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
-        private readonly ApplicationDbContext _context;
 
         public RegisterModel(
             UserManager<AdvantageToolUser> userManager,
             SignInManager<AdvantageToolUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender,
-            ApplicationDbContext context)
+            IEmailSender emailSender)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
-            _context = context;
         }
 
         [BindProperty]
