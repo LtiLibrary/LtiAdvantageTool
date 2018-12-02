@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using AdvantageTool.Utility;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -43,9 +44,9 @@ namespace AdvantageTool.Data
         /// <returns>The user corresponding to the user id.</returns>
         public async Task<AdvantageToolUser> GetUserAsync(string id)
         {
-            if (id == null)
+            if (id.IsMissing())
             {
-                return null;
+                throw new ArgumentNullException(nameof(id));
             }
 
             return await Users
@@ -62,23 +63,34 @@ namespace AdvantageTool.Data
             return principal.FindFirstValue(ClaimTypes.NameIdentifier);
         }
 
-        public async Task<Platform> GetPlatformByIssuerAsync(string issuer)
-        {
-            return await Platforms
-                .Where(p => p.Issuer == issuer)
-                .SingleOrDefaultAsync();
-        }
-
-        public async Task<Platform> GetPlatformByClientIdAsync(string clientId)
-        {
-            return await Platforms
-                .Where(p => p.ClientId == clientId)
-                .SingleOrDefaultAsync();
-        }
-
         public async Task<Platform> GetPlatformByIssuerAndAudienceAsync(string issuer, IList<string> audience)
         {
+            if (issuer.IsMissing())
+            {
+                throw new ArgumentNullException(nameof(issuer));
+            }
+
+            if (audience == null || audience.Count == 0)
+            {
+                throw new ArgumentException($"{nameof(audience)} is null or empty.");
+            }
+
             return await Platforms.SingleOrDefaultAsync(p => p.Issuer == issuer && audience.Any(a => a == p.ClientId));
+        }
+
+        public async Task<Platform> GetPlatformByIssuerAndAudienceAsync(string issuer, string audience)
+        {
+            if (issuer.IsMissing())
+            {
+                throw new ArgumentNullException(nameof(issuer));
+            }
+
+            if (audience.IsMissing())
+            {
+                throw new ArgumentNullException(nameof(audience));
+            }
+
+            return await GetPlatformByIssuerAndAudienceAsync(issuer, new List<string> {audience});
         }
     }
 }
