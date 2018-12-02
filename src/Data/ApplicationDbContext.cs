@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -66,6 +67,18 @@ namespace AdvantageTool.Data
             return await Platforms
                 .Where(p => p.Issuer == issuer)
                 .SingleOrDefaultAsync();
+        }
+
+        public async Task<Platform> GetPlatformByClientIdAsync(string clientId)
+        {
+            return await Platforms
+                .Where(p => p.ClientId == clientId)
+                .SingleOrDefaultAsync();
+        }
+
+        public async Task<Platform> GetPlatformByIssuerAndAudienceAsync(string issuer, IList<string> audience)
+        {
+            return await Platforms.SingleOrDefaultAsync(p => p.Issuer == issuer && audience.Any(a => a == p.ClientId));
         }
     }
 }

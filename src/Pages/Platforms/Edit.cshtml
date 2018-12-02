@@ -86,12 +86,12 @@
         $('#@($"{nameof(Model.Platform)}_{nameof(Model.Platform.PrivateKey)}")').bind('paste', function(){
             window.setTimeout(function(){
                 var text = '';
-                $($('#($"{nameof(Model.Platform)}_{nameof(Model.Platform.PrivateKey)}")').val().split('\n')).each(function(i,v){
+                $($('#@($"{nameof(Model.Platform)}_{nameof(Model.Platform.PrivateKey)}")').val().split('\n')).each(function(i,v){
                     v = $.trim(v);
                     if (v.length > 0) text+= v+'\n';
                 });
                 console.log(text);
-                $('#($"{nameof(Model.Platform)}_{nameof(Model.Platform.PrivateKey)}")').val(text);
+                $('#@($"{nameof(Model.Platform)}_{nameof(Model.Platform.PrivateKey)}")').val(text);
             },1);
         });
     </script>

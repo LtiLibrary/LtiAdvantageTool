@@ -125,16 +125,10 @@ namespace AdvantageTool.Pages
             }
 
             // The Audience must match a Client ID exactly.
-            if (!await _context.Platforms.AnyAsync(p => Token.Payload.Aud.Contains(p.ClientId)))
-            {
-                Error = "Unknown audience.";
-                return Page();
-            }
-
-            var platform = await _context.GetPlatformByIssuerAsync(Token.Payload.Iss);
+            var platform = await _context.GetPlatformByIssuerAndAudienceAsync(Token.Payload.Iss, Token.Payload.Aud);
             if (platform == null)
             {
-                Error = "Unknown issuer.";
+                Error = "Unknown issuer/audience.";
                 return Page();
             }
 

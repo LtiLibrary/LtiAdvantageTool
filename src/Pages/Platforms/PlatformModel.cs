@@ -84,6 +84,7 @@ namespace AdvantageTool.Pages.Platforms
             if (!disco.IsError)
             {
                 AccessTokenUrl = disco.TokenEndpoint;
+                AuthorizeUrl = disco.AuthorizeEndpoint;
                 JwkSetUrl = disco.JwksUri;
             }
             else if (AccessTokenUrl.IsPresent())
@@ -94,6 +95,16 @@ namespace AdvantageTool.Pages.Platforms
                     AccessTokenUrl = disco.TokenEndpoint;
                     AuthorizeUrl = disco.AuthorizeEndpoint;
                     JwkSetUrl = disco.JwksUri;
+                }
+                else if (AuthorizeUrl.IsPresent())
+                {
+                    disco = await httpClient.GetDiscoveryDocumentAsync(AuthorizeUrl);
+                    if (!disco.IsError)
+                    {
+                        AccessTokenUrl = disco.TokenEndpoint;
+                        AuthorizeUrl = disco.AuthorizeEndpoint;
+                        JwkSetUrl = disco.JwksUri;
+                    }
                 }
                 else if (JwkSetUrl.IsPresent())
                 {

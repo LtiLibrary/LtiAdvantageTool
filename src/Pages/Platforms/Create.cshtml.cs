@@ -29,13 +29,6 @@ namespace AdvantageTool.Pages.Platforms
 
         public async Task<IActionResult> OnPostAsync()
         {
-            var user = await _context.GetUserAsync(User);
-            if (user.Platforms.Any(p => p.Issuer == Platform.Issuer))
-            {
-                ModelState.AddModelError($"{nameof(Platform)}.{nameof(Platform.Issuer)}",
-                    "This Issuer is already registered.");
-            }
-
             if (!ModelState.IsValid)
             {
                 return Page();
@@ -43,6 +36,7 @@ namespace AdvantageTool.Pages.Platforms
 
             await Platform.DiscoverEndpoints(_httpClientFactory);
 
+            var user = await _context.GetUserAsync(User);
             var platform = new Platform { User = user };
             Platform.UpdateEntity(platform);
 

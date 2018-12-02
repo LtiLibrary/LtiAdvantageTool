@@ -23,6 +23,9 @@ namespace AdvantageTool.Pages
         [BindProperty(Name = "iss", SupportsGet = true)]
         public string Issuer { get; set; }
 
+        [BindProperty(Name = "aud", SupportsGet = true)]
+        public string Audience { get; set; }
+
         [BindProperty(Name = "login_hint", SupportsGet = true)]
         public string LoginHint { get; set; }
 
@@ -37,6 +40,12 @@ namespace AdvantageTool.Pages
             if (string.IsNullOrWhiteSpace(Issuer))
             {
                 _logger.LogError(new ArgumentNullException(nameof(Issuer)), $"{nameof(Issuer)} is missing.");
+                return BadRequest();
+            }
+
+            if (string.IsNullOrWhiteSpace(Audience))
+            {
+                _logger.LogError(new ArgumentNullException(nameof(Audience)), $"{nameof(Audience)} is missing.");
                 return BadRequest();
             }
 
@@ -58,17 +67,17 @@ namespace AdvantageTool.Pages
                 return BadRequest();
             }
 
-            var platform = await _context.GetPlatformByIssuerAsync(Issuer);
+            var platform = await _context.GetPlatformByClientIdAsync(Audience);
             if (platform == null)
             {
-                _logger.LogError("Platform not found.");
-                return NotFound();
+                _logger.LogError($"Issuer not found for audience [{Audience}].");
+                return BadRequest();
             }
 
             var ru = new RequestUrl(platform.AuthorizeUrl);
             var url = ru.CreateAuthorizeUrl
             (
-                clientId: platform.ClientId,
+                clientId: Audience,
                 responseType: OidcConstants.ResponseTypes.IdToken,
                 redirectUri: TargetLinkUri,
                 responseMode: OidcConstants.ResponseModes.FormPost,
