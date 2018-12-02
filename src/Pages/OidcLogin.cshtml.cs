@@ -67,7 +67,7 @@ namespace AdvantageTool.Pages
                 return BadRequest();
             }
 
-            var platform = await _context.GetPlatformByClientIdAsync(Audience);
+            var platform = await _context.GetPlatformByIssuerAndAudienceAsync(Issuer, Audience);
             if (platform == null)
             {
                 _logger.LogError($"Issuer not found for audience [{Audience}].");
