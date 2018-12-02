@@ -40,6 +40,12 @@
                             <input asp-for="Platform.AccessTokenUrl" class="form-control" />
                             <span asp-validation-for="Platform.AccessTokenUrl" class="text-danger"></span>
                         </div>
+                        <div class="form-group">
+                            <label asp-for="Platform.AuthorizeUrl"></label>
+                            <tooltip asp-for="Platform.AuthorizeUrl"></tooltip>
+                            <input asp-for="Platform.AuthorizeUrl" class="form-control" />
+                            <span asp-validation-for="Platform.AuthorizeUrl" class="text-danger"></span>
+                        </div>
                     </div>
                 </div>
             </div>

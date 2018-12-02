@@ -15,6 +15,11 @@
         public string AccessTokenUrl { get; set; }
 
         /// <summary>
+        /// Platform's authorize endpoint
+        /// </summary>
+        public string AuthorizeUrl { get; set; }
+
+        /// <summary>
         /// Platform display name
         /// </summary>
         public string Name { get; set; }

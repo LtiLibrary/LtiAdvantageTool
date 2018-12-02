@@ -131,9 +131,7 @@ namespace AdvantageTool.Pages
                 return Page();
             }
 
-            var platform = await _context.Platforms
-                .Where(p => p.Issuer == Token.Payload.Iss)
-                .SingleOrDefaultAsync();
+            var platform = await _context.GetPlatformByIssuerAsync(Token.Payload.Iss);
             if (platform == null)
             {
                 Error = "Unknown issuer.";

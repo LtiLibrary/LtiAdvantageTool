@@ -32,6 +32,7 @@ namespace AdvantageTool.Pages.Platforms
             }
 
             Platform = new PlatformModel(platform);
+            Platform.LaunchUrl = Url.Page("/OidcLogin", null, Platform.Id, Request.Scheme);
 
             return Page();
         }

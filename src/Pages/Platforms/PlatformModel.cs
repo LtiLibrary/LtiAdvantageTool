@@ -18,6 +18,7 @@ namespace AdvantageTool.Pages.Platforms
         {
             Id = platform.Id;
             AccessTokenUrl = platform.AccessTokenUrl;
+            AuthorizeUrl = platform.AuthorizeUrl;
             Issuer = platform.Issuer;
             JwkSetUrl = platform.JwkSetUrl;
             Name = platform.Name;
@@ -35,13 +36,18 @@ namespace AdvantageTool.Pages.Platforms
         [Display(Name = "Access Token URL", Description = "The tool can request an access token using this endpoint (for example to use the Names and Role Service).")]
         public string AccessTokenUrl { get; set; }
 
+        [LocalhostUrl]
+        [Required]
+        [Display(Name = "Authorization URL", Description = "The tool requests the identity token from this endpoint.")]
+        public string AuthorizeUrl { get; set; }
+
         [Required]
         [Display(Name = "Issuer", Description = "This is the Issuer for all messages that originate from the Platform.")]
         public string Issuer { get; set; }
 
         [LocalhostUrl]
         [Required]
-        [Display(Name = "JWK Set Url", Description = "The tool can retrieve the platform's public keys using this endpoint.")]
+        [Display(Name = "JWK Set URL", Description = "The tool can retrieve the platform's public keys using this endpoint.")]
         public string JwkSetUrl { get; set; }
 
         [Required]
@@ -58,6 +64,9 @@ namespace AdvantageTool.Pages.Platforms
         [Required]
         [Display(Name = "Client ID")]
         public string ClientId { get; set; }
+
+        [Display(Name = "Launch URL")]
+        public string LaunchUrl { get; set; }
 
         /// <summary>
         /// Tool's private key in PEM format
@@ -83,6 +92,7 @@ namespace AdvantageTool.Pages.Platforms
                 if (!disco.IsError)
                 {
                     AccessTokenUrl = disco.TokenEndpoint;
+                    AuthorizeUrl = disco.AuthorizeEndpoint;
                     JwkSetUrl = disco.JwksUri;
                 }
                 else if (JwkSetUrl.IsPresent())
@@ -91,6 +101,7 @@ namespace AdvantageTool.Pages.Platforms
                     if (!disco.IsError)
                     {
                         AccessTokenUrl = disco.TokenEndpoint;
+                        AuthorizeUrl = disco.AuthorizeEndpoint;
                         JwkSetUrl = disco.JwksUri;
                     }
                 }
@@ -100,6 +111,7 @@ namespace AdvantageTool.Pages.Platforms
         public void UpdateEntity(Platform platform)
         {
             platform.AccessTokenUrl = AccessTokenUrl;
+            platform.AuthorizeUrl = AuthorizeUrl;
             platform.Name = Name;
             platform.Issuer = Issuer;
             platform.JwkSetUrl = JwkSetUrl;

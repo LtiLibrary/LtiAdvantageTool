@@ -32,7 +32,12 @@
                             @Html.DisplayNameFor(m => m.Platform.AccessTokenUrl)
                             <tooltip asp-for="Platform.AccessTokenUrl"></tooltip>
                         </dt>
-                        <dd>@(Model.Platform.AccessTokenUrl ?? "[Not Set]")</dd>
+                        <dd>@(Model.Platform.AuthorizeUrl ?? "[Not Set]")</dd>
+                        <dt>
+                            @Html.DisplayNameFor(m => m.Platform.AuthorizeUrl)
+                            <tooltip asp-for="Platform.AuthorizeUrl"></tooltip>
+                        </dt>
+                        <dd>@(Model.Platform.AuthorizeUrl ?? "[Not Set]")</dd>
                     </dl>
                 </div>
             </div>
@@ -44,6 +49,8 @@
                 </h5>
                 <div class="card-body">
                     <dl>
+                        <dt>@Html.DisplayNameFor(m => m.Platform.LaunchUrl)</dt>
+                        <dd>@Model.Platform.LaunchUrl</dd>
                         <dt>@Html.DisplayNameFor(m => m.Platform.ClientId)</dt>
                         <dd>@Model.Platform.ClientId</dd>
                         <dt>

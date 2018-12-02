@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -58,6 +59,13 @@ namespace AdvantageTool.Data
                 throw new ArgumentNullException(nameof(principal));
             }
             return principal.FindFirstValue(ClaimTypes.NameIdentifier);
+        }
+
+        public async Task<Platform> GetPlatformByIssuerAsync(string issuer)
+        {
+            return await Platforms
+                .Where(p => p.Issuer == issuer)
+                .SingleOrDefaultAsync();
         }
     }
 }

@@ -21,9 +21,11 @@
                         <dt>@Html.DisplayNameFor(model => model.Platform.Issuer)</dt>
                         <dd>@Html.DisplayFor(model => model.Platform.Issuer)</dd>
                         <dt>@Html.DisplayNameFor(model => model.Platform.JwkSetUrl)</dt>
-                        <dd>@(Model.Platform.JwkSetUrl??"[Not Set]")</dd>
+                        <dd>@(Model.Platform.JwkSetUrl ?? "[Not Set]")</dd>
                         <dt>@Html.DisplayNameFor(model => model.Platform.AccessTokenUrl)</dt>
-                        <dd>@(Model.Platform.AccessTokenUrl??"[Not SEt]")</dd>
+                        <dd>@(Model.Platform.AccessTokenUrl ?? "[Not Set]")</dd>
+                        <dt>@Html.DisplayNameFor(model => model.Platform.AuthorizeUrl)</dt>
+                        <dd>@(Model.Platform.AuthorizeUrl ?? "[Not Set]")</dd>
                     </dl>
                 </div>
             </div>
