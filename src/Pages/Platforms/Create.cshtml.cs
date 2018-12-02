@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Threading.Tasks;
 using AdvantageTool.Data;
 using Microsoft.AspNetCore.Mvc;
