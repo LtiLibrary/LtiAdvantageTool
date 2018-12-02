@@ -9,7 +9,7 @@
 <html lang="en">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
-    <title>Launch</title>
+    <title>@Model.LtiRequest.ResourceLink.Title</title>
     <environment include="Development">
         <link rel="stylesheet" href="~/lib/bootstrap/css/bootstrap.css" />
         <link rel="stylesheet" href="~/css/site.css" />
@@ -110,21 +110,18 @@
                             <div class="row">
                                 <div class="col-4">
                                     <div class="row">
-                                        <dl class="col-sm-auto">
-                                            <dt>@Html.DisplayNameFor(m => m.LtiRequest.Platform.Name)</dt>
-                                            <dd>
-                                                <div>
-                                                    @(Model.LtiRequest.Platform.Name ?? "(no name)")
-                                                </div>
-                                                <div>
-                                                    @(Model.LtiRequest.Platform.Description ?? "(no description)")
-                                                </div>
-                                                <div>
-                                                    @(Model.LtiRequest.Platform.ProductFamilyCode ?? "(no family code)")
-                                                    @(Model.LtiRequest.Platform.Version ?? "(no version)")
-                                                </div>
-                                            </dd>
-                                        </dl>
+                                        <div class="col-sm-auto mb-3">
+                                            <div>
+                                                @(Model.LtiRequest.Platform.Name ?? "(no name)")
+                                            </div>
+                                            <div>
+                                                @(Model.LtiRequest.Platform.Description ?? "(no description)")
+                                            </div>
+                                            <div>
+                                                @(Model.LtiRequest.Platform.ProductFamilyCode ?? "(no family code)")
+                                                @(Model.LtiRequest.Platform.Version ?? "(no version)")
+                                            </div>
+                                        </div>
                                     </div>
                                     @if (Model.LtiRequest.Context == null)
                                     {
@@ -172,20 +169,17 @@
                                             </h4>
                                             <div class="card-body">
                                                 <div class="row">
-                                                    <dl class="col-sm-auto">
-                                                        <dt>@Html.DisplayNameFor(m => m.LtiRequest.Context.Title)</dt>
-                                                        <dd>
-                                                            <div>
-                                                                @(Model.LtiRequest.Context.Title ?? "(no title)")
-                                                            </div>
-                                                            <div>
-                                                                @(Model.LtiRequest.Context.Label ?? "(no label)")
-                                                            </div>
-                                                            <div>
-                                                                @(Model.LtiRequest.Lis?.CourseSectionSourcedId ?? "(no sis id)")
-                                                            </div>
-                                                        </dd>
-                                                    </dl>
+                                                    <div class="col-sm-auto mb-3">
+                                                        <div>
+                                                            @(Model.LtiRequest.Context.Title ?? "(no title)")
+                                                        </div>
+                                                        <div>
+                                                            @(Model.LtiRequest.Context.Label ?? "(no label)")
+                                                        </div>
+                                                        <div>
+                                                            @(Model.LtiRequest.Lis?.CourseSectionSourcedId ?? "(no sis id)")
+                                                        </div>
+                                                    </div>
                                                 </div>
                                                 <div class="row">
                                                     <dl class="col-sm-auto">

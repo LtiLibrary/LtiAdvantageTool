@@ -21,7 +21,8 @@ using JwtRegisteredClaimNames = System.IdentityModel.Tokens.Jwt.JwtRegisteredCla
 
 namespace AdvantageTool.Pages
 {
-    // Tool launches typically come from outside this app. Order will not be required starting with AspNetCore 2.2.
+    // Tool launches typically come from outside this app and from unknown places, so
+    // I disable the anti-forgery token. Order will not be required starting with AspNetCore 2.2.
     // See https://github.com/aspnet/Mvc/issues/7795#issuecomment-397071059
     [IgnoreAntiforgeryToken(Order = 1001)]
     public class ToolModel : PageModel
