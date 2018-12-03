@@ -23,6 +23,7 @@ namespace AdvantageTool.Pages.Platforms
 
         public IActionResult OnGet()
         {
+            Platform = new PlatformModel(Request, Url);
             return Page();
         }
 

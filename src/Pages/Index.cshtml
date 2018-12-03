@@ -41,6 +41,11 @@
                                 Names and Role Provisioning Services v2.0
                             </a>
                         </li>
+                        <li>
+                            <a href="https://www.imsglobal.org/spec/lti-ags/v2p0" target="_blank">
+                                Assignment and Grade Services v2.0
+                            </a>
+                        </li>
                     </ul>
                 </p>
                 <h4>Getting Started</h4>
@@ -48,15 +53,17 @@
                     To use this Tool with your Platform:
                     <ol>
                         <li>
-                            Configure your Platform to launch this Tool:
-                            <pre class="mt-2 mb-2">@Url.Page("./Tool", null, null, "https")</pre>
-                        </li>
-                        <li>
-                            <a asp-page="./Platforms/Index">Register your Platform</a> to record the
-                            platform's OpenID Connect endpoints, and the client credentials you want
-                            this tool to use.
-                        </li>
-                    </ol>
+                <p>Configure your Platform to launch this Tool...</p>
+                <pre class="mt-2 mb-2">@Url.Page("./Tool", null, null, "https")</pre>
+                <p>...using this OpenID Connect Login Initiation Page</p>
+                <pre class="mt-2 mb-2">@Url.Page("./OidcLogin", null, null, "https")</pre>
+                </li>
+                <li>
+                    <a asp-page="./Platforms/Index">Register your Platform</a> to record the
+                    platform's OpenID Connect endpoints, and the client credentials you want
+                    this tool to use.
+                </li>
+                </ol>
                 </p>
             </div>
             <div class="col-6">

@@ -22,7 +22,7 @@ namespace AdvantageTool.Pages.Platforms
             var user = await _context.GetUserAsync(User);
             Platforms = user.Platforms
                 .OrderBy(p => p.Name)
-                .Select(p => new PlatformModel(p))
+                .Select(p => new PlatformModel(Request, Url, p))
                 .ToList();
         }
     }

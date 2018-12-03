@@ -42,7 +42,7 @@ namespace AdvantageTool.Pages.Platforms
                 return NotFound();
             }
 
-            Platform = new PlatformModel(platform);
+            Platform = new PlatformModel(Request, Url, platform);
 
             return Page();
         }

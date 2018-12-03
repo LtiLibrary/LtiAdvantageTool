@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using AdvantageTool.Data;
 using AdvantageTool.Utility;
 using IdentityModel.Client;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
 namespace AdvantageTool.Pages.Platforms
 {
@@ -14,7 +16,13 @@ namespace AdvantageTool.Pages.Platforms
     {
         public PlatformModel() { }
 
-        public PlatformModel(Platform platform)
+        public PlatformModel(HttpRequest request, IUrlHelper url)
+        {
+            LaunchUrl = url.Page("/Tool", null, null, request.Scheme);
+            LoginUrl = url.Page("/OidcLogin", null, null, request.Scheme);
+        }
+
+        public PlatformModel(HttpRequest request, IUrlHelper url, Platform platform) :this(request, url)
         {
             Id = platform.Id;
             AccessTokenUrl = platform.AccessTokenUrl;
@@ -67,6 +75,12 @@ namespace AdvantageTool.Pages.Platforms
 
         [Display(Name = "Launch URL")]
         public string LaunchUrl { get; set; }
+
+        /// <summary>
+        /// OIDC login initiation url.
+        /// </summary>
+        [Display(Name = "Login URL", Description = "The endpoint URL to initiate OpenID Connect authorization.")]
+        public string LoginUrl { get; set; }
 
         /// <summary>
         /// Tool's private key in PEM format
