@@ -14,7 +14,6 @@ using LtiAdvantage;
 using LtiAdvantage.AssignmentGradeServices;
 using LtiAdvantage.Lti;
 using LtiAdvantage.NamesRoleProvisioningService;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.IdentityModel.Tokens;
@@ -32,7 +31,7 @@ namespace AdvantageTool.Pages
         private readonly ApplicationDbContext _context;
         private readonly IHttpClientFactory _httpClientFactory;
 
-        public ToolModel(ApplicationDbContext context, 
+        public ToolModel(ApplicationDbContext context,
             IHttpClientFactory httpClientFactory)
         {
             _context = context;
@@ -271,7 +270,7 @@ namespace AdvantageTool.Pages
                     }
                     else
                     {
-                        MembershipStatus = !string.IsNullOrEmpty(content) 
+                        MembershipStatus = !string.IsNullOrEmpty(content)
                             ? content
                             : response.ReasonPhrase;
                     }
@@ -318,7 +317,7 @@ namespace AdvantageTool.Pages
 
                     if (!response.IsSuccessStatusCode)
                     {
-                        AgsStatus = response.ReasonPhrase; 
+                        AgsStatus = response.ReasonPhrase;
                     }
                 }
             }
@@ -363,7 +362,7 @@ namespace AdvantageTool.Pages
 
                     if (!response.IsSuccessStatusCode)
                     {
-                        AgsStatus = response.ReasonPhrase; 
+                        AgsStatus = response.ReasonPhrase;
                     }
                 }
             }
@@ -374,7 +373,7 @@ namespace AdvantageTool.Pages
 
             return await OnPostAsync();
         }
-        
+
         /// <summary>
         /// Handler for requesting results.
         /// </summary>
@@ -408,7 +407,7 @@ namespace AdvantageTool.Pages
 
                     if (!response.IsSuccessStatusCode)
                     {
-                        AgsStatus = response.ReasonPhrase; 
+                        AgsStatus = response.ReasonPhrase;
                     }
                 }
             }
@@ -419,7 +418,7 @@ namespace AdvantageTool.Pages
 
             return await OnPostAsync();
         }
-        
+
         /// <summary>
         /// Handler for posting a score.
         /// </summary>
@@ -444,20 +443,23 @@ namespace AdvantageTool.Pages
                 var handler = new JwtSecurityTokenHandler();
                 Token = handler.ReadJwtToken(IdToken);
                 LtiRequest = new LtiResourceLinkRequest(Token.Payload);
-                
+
                 var score = new Score
                 {
                     ActivityProgress = ActivityProgress.Completed,
-                    Comment = "Good job!",
                     GradingProgress = GradingProgess.FullyGraded,
-                    ScoreGiven = 75,
+                    ScoreGiven = new Random().NextDouble() * 100,
                     ScoreMaximum = 100,
                     TimeStamp = DateTime.UtcNow,
-                    UserId = "1"
+                    UserId = LtiRequest.UserId
                 };
+                if (score.ScoreGiven > 75)
+                {
+                    score.Comment = "Good job!";
+                }
 
                 using (var response = await httpClient.PostAsync(
-                        LtiRequest.AssignmentGradeServices.LineItem + "/scores", 
+                        LtiRequest.AssignmentGradeServices.LineItem + "/scores",
                         new StringContent(JsonConvert.SerializeObject(score), Encoding.UTF8, "application/json"))
                     .ConfigureAwait(false))
                 {
@@ -466,7 +468,7 @@ namespace AdvantageTool.Pages
 
                     if (!response.IsSuccessStatusCode)
                     {
-                        AgsStatus = response.ReasonPhrase; 
+                        AgsStatus = response.ReasonPhrase;
                     }
                 }
             }
