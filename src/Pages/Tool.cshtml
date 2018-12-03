@@ -92,19 +92,27 @@
                     }
                     else
                     {
-                        <form method="post" asp-page-handler="GetLineItem" class="w-50 d-inline">
+                        <form method="post" asp-page-handler="GetLineItems" class="w-50 d-flex mb-1">
+                            <input type="hidden" name="id_token" id="id_token" value="@Model.IdToken" />
+                            <input type="hidden" name="context_id" id="context_id" value="@Model.LtiRequest.Context?.Id" />
+                            <input type="hidden" asp-for="PlatformId" />
+                            <input type="submit" value="Get Line Items" class="btn btn-secondary" />
+                        </form>
+
+                        <form method="post" asp-page-handler="GetLineItem" class="w-50 d-flex mb-1">
                             <input type="hidden" name="id_token" id="id_token" value="@Model.IdToken" />
                             <input type="hidden" name="context_id" id="context_id" value="@Model.LtiRequest.Context?.Id" />
                             <input type="hidden" asp-for="PlatformId" />
                             <input type="submit" value="Get Line Item" class="btn btn-secondary" />
                         </form>
 
-                        <form method="post" asp-page-handler="GetLineItems" class="w-50 d-inline">
+                        <form method="post" asp-page-handler="GetResults" class="w-50 d-flex mb-1">
                             <input type="hidden" name="id_token" id="id_token" value="@Model.IdToken" />
                             <input type="hidden" name="context_id" id="context_id" value="@Model.LtiRequest.Context?.Id" />
                             <input type="hidden" asp-for="PlatformId" />
-                            <input type="submit" value="Get Line Items" class="btn btn-secondary" />
+                            <input type="submit" value="Get Results" class="btn btn-secondary" />
                         </form>
+
                         @Model.AgsStatus
                     }
                 </div>
@@ -297,6 +305,16 @@
                             <pre class="card-body">@JsonConvert.SerializeObject(Model.LineItems, Formatting.Indented, new JsonSerializerSettings {NullValueHandling = NullValueHandling.Ignore })</pre>
                         </div>
                     }
+                    @if (Model.Results != null)
+                    {
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                Results Container
+                            </div>
+                            <pre class="card-body">@JsonConvert.SerializeObject(Model.Results, Formatting.Indented, new JsonSerializerSettings {NullValueHandling = NullValueHandling.Ignore })</pre>
+                        </div>
+                    }
+
                 </div>
                 <div class="col-md-5">
                     <div class="card">

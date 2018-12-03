@@ -48,12 +48,12 @@ namespace AdvantageTool.Pages
         [BindProperty(Name = "id_token")]
         public string IdToken { get; set; }
 
-        public LineItem LineItem { get; set; }
-
         /// <summary>
         /// Results from AssignmentGradeServices.
         /// </summary>
+        public LineItem LineItem { get; set; }
         public LineItemContainer LineItems { get; set; }
+        public ResultContainer Results { get; set; }
         public string AgsStatus { get; set; }
 
         /// <summary>
@@ -357,6 +357,51 @@ namespace AdvantageTool.Pages
                 {
                     var content = await response.Content.ReadAsStringAsync();
                     LineItems = JsonConvert.DeserializeObject<LineItemContainer>(content);
+
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        AgsStatus = response.ReasonPhrase; 
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                AgsStatus = e.Message;
+            }
+
+            return await OnPostAsync();
+        }
+        
+        /// <summary>
+        /// Handler for requesting results.
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<IActionResult> OnPostGetResultsAsync()
+        {
+            var tokenResponse = await GetToken(Constants.LtiScopes.AgsResultReadonly);
+
+            // The IMS reference implementation returns "Created" with success. 
+            if (tokenResponse.IsError && tokenResponse.Error != "Created")
+            {
+                AgsStatus = tokenResponse.Error;
+                return await OnPostAsync();
+            }
+
+            var httpClient = _httpClientFactory.CreateClient();
+            httpClient.SetBearerToken(tokenResponse.AccessToken);
+
+            try
+            {
+                var handler = new JwtSecurityTokenHandler();
+                Token = handler.ReadJwtToken(IdToken);
+                LtiRequest = new LtiResourceLinkRequest(Token.Payload);
+
+                using (var response = await httpClient.GetAsync(LtiRequest.AssignmentGradeServices.LineItem + "/results")
+                    .ConfigureAwait(false))
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    Results = JsonConvert.DeserializeObject<ResultContainer>(content);
 
                     if (!response.IsSuccessStatusCode)
                     {
