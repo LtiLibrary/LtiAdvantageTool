@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Security.Claims;
 using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 using AdvantageTool.Data;
 using AdvantageTool.Utility;
@@ -13,6 +14,7 @@ using LtiAdvantage;
 using LtiAdvantage.AssignmentGradeServices;
 using LtiAdvantage.Lti;
 using LtiAdvantage.NamesRoleProvisioningService;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.IdentityModel.Tokens;
@@ -54,6 +56,7 @@ namespace AdvantageTool.Pages
         public LineItem LineItem { get; set; }
         public LineItemContainer LineItems { get; set; }
         public ResultContainer Results { get; set; }
+        public Score Score { get; set; }
         public string AgsStatus { get; set; }
 
         /// <summary>
@@ -402,6 +405,64 @@ namespace AdvantageTool.Pages
                 {
                     var content = await response.Content.ReadAsStringAsync();
                     Results = JsonConvert.DeserializeObject<ResultContainer>(content);
+
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        AgsStatus = response.ReasonPhrase; 
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                AgsStatus = e.Message;
+            }
+
+            return await OnPostAsync();
+        }
+        
+        /// <summary>
+        /// Handler for posting a score.
+        /// </summary>
+        /// <returns>The posted score.</returns>
+        [HttpPost]
+        public async Task<IActionResult> OnPostPostScoreAsync()
+        {
+            var tokenResponse = await GetToken(Constants.LtiScopes.AgsScoreWriteonly);
+
+            // The IMS reference implementation returns "Created" with success. 
+            if (tokenResponse.IsError && tokenResponse.Error != "Created")
+            {
+                AgsStatus = tokenResponse.Error;
+                return await OnPostAsync();
+            }
+
+            var httpClient = _httpClientFactory.CreateClient();
+            httpClient.SetBearerToken(tokenResponse.AccessToken);
+
+            try
+            {
+                var handler = new JwtSecurityTokenHandler();
+                Token = handler.ReadJwtToken(IdToken);
+                LtiRequest = new LtiResourceLinkRequest(Token.Payload);
+                
+                var score = new Score
+                {
+                    ActivityProgress = ActivityProgress.Completed,
+                    Comment = "Good job!",
+                    GradingProgress = GradingProgess.FullyGraded,
+                    ScoreGiven = 75,
+                    ScoreMaximum = 100,
+                    TimeStamp = DateTime.UtcNow,
+                    UserId = "1"
+                };
+
+                using (var response = await httpClient.PostAsync(
+                        LtiRequest.AssignmentGradeServices.LineItem + "/scores", 
+                        new StringContent(JsonConvert.SerializeObject(score), Encoding.UTF8, "application/json"))
+                    .ConfigureAwait(false))
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    Score = JsonConvert.DeserializeObject<Score>(content);
 
                     if (!response.IsSuccessStatusCode)
                     {
