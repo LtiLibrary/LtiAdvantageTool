@@ -92,7 +92,14 @@
                     }
                     else
                     {
-                        <form method="post" asp-page-handler="GetLineItems">
+                        <form method="post" asp-page-handler="GetLineItem" class="w-50 d-inline">
+                            <input type="hidden" name="id_token" id="id_token" value="@Model.IdToken" />
+                            <input type="hidden" name="context_id" id="context_id" value="@Model.LtiRequest.Context?.Id" />
+                            <input type="hidden" asp-for="PlatformId" />
+                            <input type="submit" value="Get Line Item" class="btn btn-secondary" />
+                        </form>
+
+                        <form method="post" asp-page-handler="GetLineItems" class="w-50 d-inline">
                             <input type="hidden" name="id_token" id="id_token" value="@Model.IdToken" />
                             <input type="hidden" name="context_id" id="context_id" value="@Model.LtiRequest.Context?.Id" />
                             <input type="hidden" asp-for="PlatformId" />
@@ -270,6 +277,15 @@
                                 Membership Container
                             </div>
                             <pre class="card-body">@JsonConvert.SerializeObject(Model.Membership, Formatting.Indented)</pre>
+                        </div>
+                    }
+                    @if (Model.LineItem != null)
+                    {
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                Line Item
+                            </div>
+                            <pre class="card-body">@JsonConvert.SerializeObject(Model.LineItem, Formatting.Indented, new JsonSerializerSettings {NullValueHandling = NullValueHandling.Ignore })</pre>
                         </div>
                     }
                     @if (Model.LineItems != null)

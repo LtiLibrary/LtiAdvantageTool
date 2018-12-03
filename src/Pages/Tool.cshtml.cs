@@ -48,6 +48,8 @@ namespace AdvantageTool.Pages
         [BindProperty(Name = "id_token")]
         public string IdToken { get; set; }
 
+        public LineItem LineItem { get; set; }
+
         /// <summary>
         /// Results from AssignmentGradeServices.
         /// </summary>
@@ -275,6 +277,51 @@ namespace AdvantageTool.Pages
             catch (Exception e)
             {
                 MembershipStatus = e.Message;
+            }
+
+            return await OnPostAsync();
+        }
+
+        /// <summary>
+        /// Handler for requesting the line item for this resource link.
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<IActionResult> OnPostGetLineItemAsync()
+        {
+            var tokenResponse = await GetToken(Constants.LtiScopes.AgsLineItem);
+
+            // The IMS reference implementation returns "Created" with success. 
+            if (tokenResponse.IsError && tokenResponse.Error != "Created")
+            {
+                AgsStatus = tokenResponse.Error;
+                return await OnPostAsync();
+            }
+
+            var httpClient = _httpClientFactory.CreateClient();
+            httpClient.SetBearerToken(tokenResponse.AccessToken);
+
+            try
+            {
+                var handler = new JwtSecurityTokenHandler();
+                Token = handler.ReadJwtToken(IdToken);
+                LtiRequest = new LtiResourceLinkRequest(Token.Payload);
+
+                using (var response = await httpClient.GetAsync(LtiRequest.AssignmentGradeServices.LineItem)
+                    .ConfigureAwait(false))
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    LineItem = JsonConvert.DeserializeObject<LineItem>(content);
+
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        AgsStatus = response.ReasonPhrase; 
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                AgsStatus = e.Message;
             }
 
             return await OnPostAsync();
