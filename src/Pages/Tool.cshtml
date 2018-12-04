@@ -279,12 +279,6 @@
             </div>
             <div class="row mt-3">
                 <div class="offset-md-3 col-md-4">
-                    <div class="card mb-3">
-                        <div class="card-header">
-                            JWT Header
-                        </div>
-                        <pre class="card-body">@Model.Token.Header.ToJsonString()</pre>
-                    </div>
                     @if (Model.Membership != null)
                     {
                         <div class="card mb-3">
@@ -332,6 +326,12 @@
                     }
                 </div>
                 <div class="col-md-5">
+                    <div class="card">
+                        <div class="card-header">
+                            JWT Header
+                        </div>
+                        <pre class="card-body">@Model.Token.Header.ToJsonString()</pre>
+                    </div>
                     <div class="card">
                         <div class="card-header">
                             JWT Payload
