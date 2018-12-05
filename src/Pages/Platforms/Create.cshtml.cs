@@ -1,8 +1,10 @@
-﻿using System.Net.Http;
+﻿using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using AdvantageTool.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace AdvantageTool.Pages.Platforms
 {
@@ -29,6 +31,12 @@ namespace AdvantageTool.Pages.Platforms
 
         public async Task<IActionResult> OnPostAsync()
         {
+            if (_context.Platforms.Any(p => p.Issuer == Platform.Issuer))
+            {
+                ModelState.AddModelError($"{nameof(Platform)}.{nameof(Platform.Issuer)}", 
+                    $"This {nameof(Platform.Issuer)} is already registered.");
+            }
+
             if (!ModelState.IsValid)
             {
                 return Page();

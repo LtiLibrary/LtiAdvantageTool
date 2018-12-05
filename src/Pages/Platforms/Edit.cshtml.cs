@@ -49,6 +49,12 @@ namespace AdvantageTool.Pages.Platforms
 
         public async Task<IActionResult> OnPostAsync()
         {
+            if (_context.Platforms.Any(p => p.Issuer == Platform.Issuer && p.Id != Platform.Id))
+            {
+                ModelState.AddModelError($"{nameof(Platform)}.{nameof(Platform.Issuer)}", 
+                    $"This {nameof(Platform.Issuer)} is already registered.");
+            }
+
             if (!ModelState.IsValid)
             {
                 return Page();

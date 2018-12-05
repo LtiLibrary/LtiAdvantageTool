@@ -78,19 +78,14 @@ namespace AdvantageTool.Data
             return await Platforms.SingleOrDefaultAsync(p => p.Issuer == issuer && audience.Any(a => a == p.ClientId));
         }
 
-        public async Task<Platform> GetPlatformByIssuerAndAudienceAsync(string issuer, string audience)
+        public async Task<Platform> GetPlatformByIssuerAsync(string issuer)
         {
             if (issuer.IsMissing())
             {
                 throw new ArgumentNullException(nameof(issuer));
             }
 
-            if (audience.IsMissing())
-            {
-                throw new ArgumentNullException(nameof(audience));
-            }
-
-            return await GetPlatformByIssuerAndAudienceAsync(issuer, new List<string> {audience});
+            return await Platforms.SingleOrDefaultAsync(p => p.Issuer == issuer);
         }
     }
 }

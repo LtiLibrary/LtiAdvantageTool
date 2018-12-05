@@ -1,3 +1,4 @@
+using System;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -50,6 +51,9 @@ namespace AdvantageTool
             // within an iframe on the platform
             services.AddAntiforgery(options => options.SuppressXFrameOptionsHeader = true);
 
+            // Enable short term session store to verify state is tampered with during OIDC login
+            services.AddDistributedMemoryCache();
+
             services.AddMvc()
                 .AddRazorPagesOptions(options => options.Conventions.AuthorizeFolder("/Platforms"))
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
@@ -75,9 +79,7 @@ namespace AdvantageTool
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
-
             app.UseAuthentication();
-
             app.UseMvc();
         }
     }
