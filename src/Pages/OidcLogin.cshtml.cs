@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 
 namespace AdvantageTool.Pages
 {
+    [IgnoreAntiforgeryToken(Order = 1001)]
     public class OidcLoginModel : PageModel
     {
         private readonly ApplicationDbContext _context;
@@ -33,6 +34,16 @@ namespace AdvantageTool.Pages
         public string TargetLinkUri { get; set; }
 
         public async Task<IActionResult> OnGet()
+        {
+            return await OnGetOrPost();
+        }
+
+        public async Task<IActionResult> OnPost()
+        {
+            return await OnGetOrPost();
+        }
+
+        public async Task<IActionResult> OnGetOrPost()
         {
             if (string.IsNullOrWhiteSpace(Issuer))
             {
