@@ -27,7 +27,6 @@ namespace AdvantageTool.Pages
     // I disable the anti-forgery token. Order will not be required starting with AspNetCore 2.2.
     // See https://github.com/aspnet/Mvc/issues/7795#issuecomment-397071059
     [IgnoreAntiforgeryToken(Order = 1001)]
-    [Route("tool", Name = "Tool")]
     public class ToolModel : PageModel
     {
         private readonly ApplicationDbContext _context;
