@@ -51,27 +51,7 @@
         @if (Model.Error.IsMissing())
         {
             <div class="row">
-                <div class="col-2">
-                    <p>
-                        On the right a representation of the data in the launch request.
-                    </p>
-                    @if (Model.LtiRequest.Context == null)
-                    {
-                        <p>
-                            The request does not include a course context. It likely came from an
-                            admin interface.
-                        </p>
-                    }
-                    else
-                    {
-                        <p>
-                            This tool uses the platform's Names and Role Provisioning Service to
-                            get the current course members, and the Assignments and Grade Services
-                            to display the current gradebook state.
-                        </p>
-                    }
-                </div>
-                <div class="col-10">
+                <div class="col">
                     <div class="card text-white bg-info">
                         <h4 class="card-header">
                             Platform
