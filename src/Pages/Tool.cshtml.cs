@@ -286,7 +286,9 @@ namespace AdvantageTool.Pages
             Token = handler.ReadJwtToken(IdToken);
             LtiRequest = new LtiResourceLinkRequest(Token.Payload);
 
-            var tokenResponse = await _accessTokenService.GetAccessTokenAsync(Token, Constants.LtiScopes.AgsScoreWriteonly);
+            var tokenResponse = await _accessTokenService.GetAccessTokenAsync(
+                Token.Payload.Iss, 
+                Constants.LtiScopes.AgsScoreWriteonly);
 
             // The IMS reference implementation returns "Created" with success. 
             if (tokenResponse.IsError && tokenResponse.Error != "Created")

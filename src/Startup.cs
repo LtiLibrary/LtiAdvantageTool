@@ -60,6 +60,7 @@ namespace AdvantageTool
 
             services.AddHttpClient();
 
+            // Make AccessTokenService available for dependency injection.
             services.AddTransient<AccessTokenService>();
         }
 

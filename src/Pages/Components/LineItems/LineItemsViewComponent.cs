@@ -48,7 +48,8 @@ namespace AdvantageTool.Pages.Components.LineItems
             }
             model.LineItemUrl = model.LtiRequest.AssignmentGradeServices.LineItemUrl;
 
-            var tokenResponse = await _accessTokenService.GetAccessTokenAsync(ltiToken, 
+            var tokenResponse = await _accessTokenService.GetAccessTokenAsync(
+                ltiToken.Payload.Iss, 
                 string.Join(" ", 
                     Constants.LtiScopes.AgsLineItem, 
                     Constants.LtiScopes.AgsResultReadonly,

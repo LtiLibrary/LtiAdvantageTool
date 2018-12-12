@@ -11,20 +11,44 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace AdvantageTool.Utility
 {
+    /// <summary>
+    /// Service available via dependency injection to get an access token from the issuer.
+    /// </summary>
     public class AccessTokenService
     {
         private readonly ApplicationDbContext _context;
         private readonly IHttpClientFactory _httpClientFactory;
 
+        /// <summary>
+        /// Create an instance of the AccessTokenService.
+        /// </summary>
+        /// <param name="context">The application database context to look up the issuer's token endpoint.</param>
+        /// <param name="httpClientFactory">The HttpClient factory.</param>
         public AccessTokenService(ApplicationDbContext context, IHttpClientFactory httpClientFactory)
         {
             _context = context;
             _httpClientFactory = httpClientFactory;
         }
 
-        public async Task<TokenResponse> GetAccessTokenAsync(JwtSecurityToken securityToken, string scope)
+        /// <summary>
+        /// Get an access token from the issuer.
+        /// </summary>
+        /// <param name="issuer">The issuer.</param>
+        /// <param name="scope">The scope to request.</param>
+        /// <returns>The token response.</returns>
+        public async Task<TokenResponse> GetAccessTokenAsync(string issuer, string scope)
         {
-            var platform = await _context.GetPlatformByIssuerAsync(securityToken.Payload.Iss);
+            if (issuer.IsMissing())
+            {
+                return new TokenResponse(new ArgumentNullException(nameof(issuer)));
+            }
+
+            if (scope.IsMissing())
+            {
+                return new TokenResponse(new ArgumentNullException(nameof(scope)));
+            }
+
+            var platform = await _context.GetPlatformByIssuerAsync(issuer);
             if (platform == null)
             {
                 return new TokenResponse(new Exception("Cannot find platform registration."));
@@ -61,11 +85,9 @@ namespace AdvantageTool.Utility
             payload.AddClaim(new Claim(JwtRegisteredClaimNames.Exp, EpochTime.GetIntDate(DateTime.UtcNow.AddMinutes(5)).ToString()));
             payload.AddClaim(new Claim(JwtRegisteredClaimNames.Jti, LtiResourceLinkRequest.GenerateCryptographicNonce()));
 
-            var credentials = PemHelper.SigningCredentialsFromPemString(platform.PrivateKey);
-            var header = new JwtHeader(credentials);
-            var token = new JwtSecurityToken(header, payload);
             var handler = new JwtSecurityTokenHandler();
-            var jwt = handler.WriteToken(token);
+            var credentials = PemHelper.SigningCredentialsFromPemString(platform.PrivateKey);
+            var jwt = handler.WriteToken(new JwtSecurityToken(new JwtHeader(credentials), payload));
 
             return await httpClient.RequestClientCredentialsTokenWithJwtAsync(
                     new JwtClientCredentialsTokenRequest
