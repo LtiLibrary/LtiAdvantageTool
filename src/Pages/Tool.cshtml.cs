@@ -203,64 +203,69 @@ namespace AdvantageTool.Pages
             return Page();
         }
 
-        ///// <summary>
-        ///// Handler for posting a line item.
-        ///// </summary>
-        ///// <returns>The posted score.</returns>
-        //[HttpPost]
-        //public async Task<IActionResult> OnPostPostLineItemAsync()
-        //{
-        //    var handler = new JwtSecurityTokenHandler();
-        //    Token = handler.ReadJwtToken(IdToken);
-        //    LtiRequest = new LtiResourceLinkRequest(Token.Payload);
+        /// <summary>
+        /// Handler for creating a line item.
+        /// </summary>
+        /// <returns>The result.</returns>
+        [HttpPost]
+        public async Task<IActionResult> OnPostCreateLineItemAsync(string idToken)
+        {
+            if (idToken.IsMissing())
+            {
+                Error = $"{nameof(idToken)} is missing.";
+                return await OnPostAsync();
+            }
+            IdToken = idToken;
 
-        //    var tokenResponse = await GetToken(Constants.LtiScopes.AgsLineItem);
+            var handler = new JwtSecurityTokenHandler();
+            Token = handler.ReadJwtToken(IdToken);
+            LtiRequest = new LtiResourceLinkRequest(Token.Payload);
 
-        //    // The IMS reference implementation returns "Created" with success. 
-        //    if (tokenResponse.IsError && tokenResponse.Error != "Created")
-        //    {
-        //        Error = tokenResponse.Error;
-        //        return await OnPostAsync();
-        //    }
+            var tokenResponse = await _accessTokenService.GetAccessTokenAsync(
+                Token.Payload.Iss, 
+                Constants.LtiScopes.AgsLineItem);
 
-        //    var httpClient = _httpClientFactory.CreateClient();
-        //    httpClient.SetBearerToken(tokenResponse.AccessToken);
-        //    httpClient.DefaultRequestHeaders.Accept
-        //        .Add(new MediaTypeWithQualityHeaderValue(Constants.MediaTypes.LineItem));
+            // The IMS reference implementation returns "Created" with success. 
+            if (tokenResponse.IsError && tokenResponse.Error != "Created")
+            {
+                Error = tokenResponse.Error;
+                return await OnPostAsync();
+            }
 
-        //    try
-        //    {
-        //        var lineItem = new LineItem
-        //        {
-        //            EndDateTime = DateTime.UtcNow.AddMonths(3),
-        //            Label = LtiRequest.Context.Label,
-        //            ResourceLinkId = LtiRequest.ResourceLink.Id,
-        //            ScoreMaximum = 100,
-        //            StartDateTime = DateTime.UtcNow,
-        //            Tag = LtiRequest.ResourceLink.Title
-        //        };
+            var httpClient = _httpClientFactory.CreateClient();
+            httpClient.SetBearerToken(tokenResponse.AccessToken);
+            httpClient.DefaultRequestHeaders.Accept
+                .Add(new MediaTypeWithQualityHeaderValue(Constants.MediaTypes.LineItem));
 
-        //        using (var response = await httpClient.PostAsync(
-        //                LtiRequest.AssignmentGradeServices.LineItemsUrl,
-        //                new StringContent(JsonConvert.SerializeObject(lineItem), Encoding.UTF8, Constants.MediaTypes.LineItem))
-        //            .ConfigureAwait(false))
-        //        {
-        //            var content = await response.Content.ReadAsStringAsync();
-        //            LineItem = JsonConvert.DeserializeObject<LineItem>(content);
+            try
+            {
+                var lineItem = new LineItem
+                {
+                    EndDateTime = DateTime.UtcNow.AddMonths(3),
+                    Label = LtiRequest.ResourceLink.Title,
+                    ResourceLinkId = LtiRequest.ResourceLink.Id,
+                    ScoreMaximum = 100,
+                    StartDateTime = DateTime.UtcNow
+                };
 
-        //            if (!response.IsSuccessStatusCode)
-        //            {
-        //                Error = response.ReasonPhrase;
-        //            }
-        //        }
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        Error = e.Message;
-        //    }
+                using (var response = await httpClient.PostAsync(
+                        LtiRequest.AssignmentGradeServices.LineItemsUrl,
+                        new StringContent(JsonConvert.SerializeObject(lineItem), Encoding.UTF8, Constants.MediaTypes.LineItem))
+                    .ConfigureAwait(false))
+                {
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        Error = response.ReasonPhrase;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Error = e.Message;
+            }
 
-        //    return await OnPostAsync();
-        //}
+            return await OnPostAsync();
+        }
 
         /// <summary>
         /// Handler for posting a score.
