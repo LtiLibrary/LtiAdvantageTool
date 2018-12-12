@@ -2,24 +2,20 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net.Http;
-using System.Security.Claims;
+using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using AdvantageTool.Data;
 using AdvantageTool.Utility;
 using IdentityModel.Client;
-using LtiAdvantage.IdentityModel.Client;
 using LtiAdvantage;
 using LtiAdvantage.AssignmentGradeServices;
 using LtiAdvantage.Lti;
-using LtiAdvantage.NamesRoleProvisioningService;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
-using JwtRegisteredClaimNames = System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames;
 
 namespace AdvantageTool.Pages
 {
@@ -30,12 +26,16 @@ namespace AdvantageTool.Pages
     public class ToolModel : PageModel
     {
         private readonly ApplicationDbContext _context;
+        private readonly AccessTokenService _accessTokenService;
         private readonly IHttpClientFactory _httpClientFactory;
 
-        public ToolModel(ApplicationDbContext context,
+        public ToolModel(
+            ApplicationDbContext context,
+            AccessTokenService accessTokenService,
             IHttpClientFactory httpClientFactory)
         {
             _context = context;
+            _accessTokenService = accessTokenService;
             _httpClientFactory = httpClientFactory;
         }
 
@@ -51,30 +51,9 @@ namespace AdvantageTool.Pages
         public string IdToken { get; set; }
 
         /// <summary>
-        /// Results from AssignmentGradeServices.
-        /// </summary>
-        public LineItem LineItem { get; set; }
-        public LineItemContainer LineItems { get; set; }
-        public ResultContainer Results { get; set; }
-        public Score Score { get; set; }
-        public string AgsStatus { get; set; }
-
-        /// <summary>
-        /// The platform's id.
-        /// </summary>
-        [BindProperty]
-        public int PlatformId { get; set; }
-
-        /// <summary>
         /// Wrapper around the request payload.
         /// </summary>
         public LtiResourceLinkRequest LtiRequest { get; set; }
-
-        /// <summary>
-        /// Results from NameRoleService.
-        /// </summary>
-        public MembershipContainer Membership { get; set; }
-        public string MembershipStatus { get; set; }
 
         /// <summary>
         /// Get or set the JwtSecurityToken (id_token) in the request.
@@ -110,6 +89,7 @@ namespace AdvantageTool.Pages
             }
 
             Token = handler.ReadJwtToken(IdToken);
+            LtiRequest = new LtiResourceLinkRequest(Token.Payload);
 
             // Authentication Response Validation
             // See https://www.imsglobal.org/spec/security/v1p0/#authentication-response-validation
@@ -122,13 +102,6 @@ namespace AdvantageTool.Pages
                 return Page();
             }
 
-            // The Token must include a Payload
-            if (Token.Payload == null)
-            {
-                Error = "Payload is missing.";
-                return Page();
-            }
-
             // The Audience must match a Client ID exactly.
             var platform = await _context.GetPlatformByIssuerAndAudienceAsync(Token.Payload.Iss, Token.Payload.Aud);
             if (platform == null)
@@ -136,8 +109,6 @@ namespace AdvantageTool.Pages
                 Error = "Unknown issuer/audience.";
                 return Page();
             }
-
-            PlatformId = platform.Id;
 
             // Using the JwtSecurityTokenHandler.ValidateToken method, validate four things:
             //
@@ -228,223 +199,109 @@ namespace AdvantageTool.Pages
                 return Page();
             }
 
-            // Wrap the JwtPayload in an LtiResourceLinkRequest.
-            LtiRequest = new LtiResourceLinkRequest(Token.Payload);
-
             // Show something interesting
             return Page();
         }
 
-        /// <summary>
-        /// Handler for requesting course members.
-        /// </summary>
-        /// <returns></returns>
-        [HttpPost]
-        public async Task<IActionResult> OnPostGetMembershipAsync()
-        {
-            var tokenResponse = await GetToken(Constants.LtiScopes.NrpsMembershipReadonly);
+        ///// <summary>
+        ///// Handler for posting a line item.
+        ///// </summary>
+        ///// <returns>The posted score.</returns>
+        //[HttpPost]
+        //public async Task<IActionResult> OnPostPostLineItemAsync()
+        //{
+        //    var handler = new JwtSecurityTokenHandler();
+        //    Token = handler.ReadJwtToken(IdToken);
+        //    LtiRequest = new LtiResourceLinkRequest(Token.Payload);
 
-            // The IMS reference implementation returns "Created" with success. 
-            if (tokenResponse.IsError && tokenResponse.Error != "Created")
-            {
-                MembershipStatus = tokenResponse.Error;
-                return await OnPostAsync();
-            }
+        //    var tokenResponse = await GetToken(Constants.LtiScopes.AgsLineItem);
 
-            var httpClient = _httpClientFactory.CreateClient();
-            httpClient.SetBearerToken(tokenResponse.AccessToken);
+        //    // The IMS reference implementation returns "Created" with success. 
+        //    if (tokenResponse.IsError && tokenResponse.Error != "Created")
+        //    {
+        //        Error = tokenResponse.Error;
+        //        return await OnPostAsync();
+        //    }
 
-            try
-            {
-                var handler = new JwtSecurityTokenHandler();
-                Token = handler.ReadJwtToken(IdToken);
-                LtiRequest = new LtiResourceLinkRequest(Token.Payload);
+        //    var httpClient = _httpClientFactory.CreateClient();
+        //    httpClient.SetBearerToken(tokenResponse.AccessToken);
+        //    httpClient.DefaultRequestHeaders.Accept
+        //        .Add(new MediaTypeWithQualityHeaderValue(Constants.MediaTypes.LineItem));
 
-                using (var response = await httpClient.GetAsync(LtiRequest.NamesRoleService.ContextMembershipUrl)
-                    .ConfigureAwait(false))
-                {
-                    var content = await response.Content.ReadAsStringAsync();
+        //    try
+        //    {
+        //        var lineItem = new LineItem
+        //        {
+        //            EndDateTime = DateTime.UtcNow.AddMonths(3),
+        //            Label = LtiRequest.Context.Label,
+        //            ResourceLinkId = LtiRequest.ResourceLink.Id,
+        //            ScoreMaximum = 100,
+        //            StartDateTime = DateTime.UtcNow,
+        //            Tag = LtiRequest.ResourceLink.Title
+        //        };
 
-                    if (response.IsSuccessStatusCode)
-                    {
-                        Membership = JsonConvert.DeserializeObject<MembershipContainer>(content);
-                    }
-                    else
-                    {
-                        MembershipStatus = !string.IsNullOrEmpty(content)
-                            ? content
-                            : response.ReasonPhrase;
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                MembershipStatus = e.Message;
-            }
+        //        using (var response = await httpClient.PostAsync(
+        //                LtiRequest.AssignmentGradeServices.LineItemsUrl,
+        //                new StringContent(JsonConvert.SerializeObject(lineItem), Encoding.UTF8, Constants.MediaTypes.LineItem))
+        //            .ConfigureAwait(false))
+        //        {
+        //            var content = await response.Content.ReadAsStringAsync();
+        //            LineItem = JsonConvert.DeserializeObject<LineItem>(content);
 
-            return await OnPostAsync();
-        }
+        //            if (!response.IsSuccessStatusCode)
+        //            {
+        //                Error = response.ReasonPhrase;
+        //            }
+        //        }
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Error = e.Message;
+        //    }
 
-        /// <summary>
-        /// Handler for requesting the line item for this resource link.
-        /// </summary>
-        /// <returns></returns>
-        [HttpPost]
-        public async Task<IActionResult> OnPostGetLineItemAsync()
-        {
-            var tokenResponse = await GetToken(Constants.LtiScopes.AgsLineItem);
-
-            // The IMS reference implementation returns "Created" with success. 
-            if (tokenResponse.IsError && tokenResponse.Error != "Created")
-            {
-                AgsStatus = tokenResponse.Error;
-                return await OnPostAsync();
-            }
-
-            var httpClient = _httpClientFactory.CreateClient();
-            httpClient.SetBearerToken(tokenResponse.AccessToken);
-
-            try
-            {
-                var handler = new JwtSecurityTokenHandler();
-                Token = handler.ReadJwtToken(IdToken);
-                LtiRequest = new LtiResourceLinkRequest(Token.Payload);
-
-                using (var response = await httpClient.GetAsync(LtiRequest.AssignmentGradeServices.LineItem)
-                    .ConfigureAwait(false))
-                {
-                    var content = await response.Content.ReadAsStringAsync();
-                    LineItem = JsonConvert.DeserializeObject<LineItem>(content);
-
-                    if (!response.IsSuccessStatusCode)
-                    {
-                        AgsStatus = response.ReasonPhrase;
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                AgsStatus = e.Message;
-            }
-
-            return await OnPostAsync();
-        }
-
-        /// <summary>
-        /// Handler for requesting line items.
-        /// </summary>
-        /// <returns></returns>
-        [HttpPost]
-        public async Task<IActionResult> OnPostGetLineItemsAsync()
-        {
-            var tokenResponse = await GetToken(Constants.LtiScopes.AgsLineItem);
-
-            // The IMS reference implementation returns "Created" with success. 
-            if (tokenResponse.IsError && tokenResponse.Error != "Created")
-            {
-                AgsStatus = tokenResponse.Error;
-                return await OnPostAsync();
-            }
-
-            var httpClient = _httpClientFactory.CreateClient();
-            httpClient.SetBearerToken(tokenResponse.AccessToken);
-
-            try
-            {
-                var handler = new JwtSecurityTokenHandler();
-                Token = handler.ReadJwtToken(IdToken);
-                LtiRequest = new LtiResourceLinkRequest(Token.Payload);
-
-                using (var response = await httpClient.GetAsync(LtiRequest.AssignmentGradeServices.LineItems)
-                    .ConfigureAwait(false))
-                {
-                    var content = await response.Content.ReadAsStringAsync();
-                    LineItems = JsonConvert.DeserializeObject<LineItemContainer>(content);
-
-                    if (!response.IsSuccessStatusCode)
-                    {
-                        AgsStatus = response.ReasonPhrase;
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                AgsStatus = e.Message;
-            }
-
-            return await OnPostAsync();
-        }
-
-        /// <summary>
-        /// Handler for requesting results.
-        /// </summary>
-        /// <returns></returns>
-        [HttpPost]
-        public async Task<IActionResult> OnPostGetResultsAsync()
-        {
-            var tokenResponse = await GetToken(Constants.LtiScopes.AgsResultReadonly);
-
-            // The IMS reference implementation returns "Created" with success. 
-            if (tokenResponse.IsError && tokenResponse.Error != "Created")
-            {
-                AgsStatus = tokenResponse.Error;
-                return await OnPostAsync();
-            }
-
-            var httpClient = _httpClientFactory.CreateClient();
-            httpClient.SetBearerToken(tokenResponse.AccessToken);
-
-            try
-            {
-                var handler = new JwtSecurityTokenHandler();
-                Token = handler.ReadJwtToken(IdToken);
-                LtiRequest = new LtiResourceLinkRequest(Token.Payload);
-
-                using (var response = await httpClient.GetAsync(LtiRequest.AssignmentGradeServices.LineItem + "/results")
-                    .ConfigureAwait(false))
-                {
-                    var content = await response.Content.ReadAsStringAsync();
-                    Results = JsonConvert.DeserializeObject<ResultContainer>(content);
-
-                    if (!response.IsSuccessStatusCode)
-                    {
-                        AgsStatus = response.ReasonPhrase;
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                AgsStatus = e.Message;
-            }
-
-            return await OnPostAsync();
-        }
+        //    return await OnPostAsync();
+        //}
 
         /// <summary>
         /// Handler for posting a score.
         /// </summary>
         /// <returns>The posted score.</returns>
         [HttpPost]
-        public async Task<IActionResult> OnPostPostScoreAsync()
+        public async Task<IActionResult> OnPostPostScoreAsync(string idToken, string lineItemUrl)
         {
-            var tokenResponse = await GetToken(Constants.LtiScopes.AgsScoreWriteonly);
+            if (idToken.IsMissing())
+            {
+                Error = $"{nameof(idToken)} is missing.";
+                return await OnPostAsync();
+            }
+            IdToken = idToken;
+
+            if (lineItemUrl.IsMissing())
+            {
+                Error = $"{nameof(lineItemUrl)} is missing.";
+                return await OnPostAsync();
+            }
+
+            var handler = new JwtSecurityTokenHandler();
+            Token = handler.ReadJwtToken(IdToken);
+            LtiRequest = new LtiResourceLinkRequest(Token.Payload);
+
+            var tokenResponse = await _accessTokenService.GetAccessTokenAsync(Token, Constants.LtiScopes.AgsScoreWriteonly);
 
             // The IMS reference implementation returns "Created" with success. 
             if (tokenResponse.IsError && tokenResponse.Error != "Created")
             {
-                AgsStatus = tokenResponse.Error;
+                Error = tokenResponse.Error;
                 return await OnPostAsync();
             }
 
             var httpClient = _httpClientFactory.CreateClient();
             httpClient.SetBearerToken(tokenResponse.AccessToken);
+            httpClient.DefaultRequestHeaders.Accept
+                .Add(new MediaTypeWithQualityHeaderValue(Constants.MediaTypes.Score));
 
             try
             {
-                var handler = new JwtSecurityTokenHandler();
-                Token = handler.ReadJwtToken(IdToken);
-                LtiRequest = new LtiResourceLinkRequest(Token.Payload);
-
                 var score = new Score
                 {
                     ActivityProgress = ActivityProgress.Completed,
@@ -460,80 +317,22 @@ namespace AdvantageTool.Pages
                 }
 
                 using (var response = await httpClient.PostAsync(
-                        LtiRequest.AssignmentGradeServices.LineItem + "/scores",
-                        new StringContent(JsonConvert.SerializeObject(score), Encoding.UTF8, "application/json"))
+                        lineItemUrl.EnsureTrailingSlash() + "scores",
+                        new StringContent(JsonConvert.SerializeObject(score), Encoding.UTF8, Constants.MediaTypes.Score))
                     .ConfigureAwait(false))
                 {
-                    var content = await response.Content.ReadAsStringAsync();
-                    Score = JsonConvert.DeserializeObject<Score>(content);
-
                     if (!response.IsSuccessStatusCode)
                     {
-                        AgsStatus = response.ReasonPhrase;
+                        Error = response.ReasonPhrase;
                     }
                 }
             }
             catch (Exception e)
             {
-                AgsStatus = e.Message;
+                Error = e.Message;
             }
 
             return await OnPostAsync();
-        }
-
-        private async Task<TokenResponse> GetToken(string scope)
-        {
-            var platform = await _context.Platforms.FindAsync(PlatformId);
-            if (platform == null)
-            {
-                return new TokenResponse(new Exception("Cannot find platform registration."));
-            }
-
-            var httpClient = _httpClientFactory.CreateClient();
-            var tokenEndPoint = platform.AccessTokenUrl;
-
-            if (tokenEndPoint.IsMissing())
-            {
-                var disco = await httpClient.GetDiscoveryDocumentAsync(new DiscoveryDocumentRequest
-                {
-                    Address = platform.Issuer,
-                    Policy =
-                    {
-                        Authority = platform.Issuer
-                    }
-                });
-                if (disco.IsError)
-                {
-                    return new TokenResponse(new Exception(disco.Error));
-                }
-
-                tokenEndPoint = disco.TokenEndpoint;
-            }
-
-            // Use a signed JWT as client credentials.
-            var payload = new JwtPayload();
-            payload.AddClaim(new Claim(JwtRegisteredClaimNames.Iss, platform.ClientId));
-            payload.AddClaim(new Claim(JwtRegisteredClaimNames.Sub, platform.ClientId));
-            payload.AddClaim(new Claim(JwtRegisteredClaimNames.Aud, tokenEndPoint));
-            payload.AddClaim(new Claim(JwtRegisteredClaimNames.Iat, EpochTime.GetIntDate(DateTime.UtcNow).ToString()));
-            payload.AddClaim(new Claim(JwtRegisteredClaimNames.Nbf, EpochTime.GetIntDate(DateTime.UtcNow.AddSeconds(-5)).ToString()));
-            payload.AddClaim(new Claim(JwtRegisteredClaimNames.Exp, EpochTime.GetIntDate(DateTime.UtcNow.AddMinutes(5)).ToString()));
-            payload.AddClaim(new Claim(JwtRegisteredClaimNames.Jti, LtiResourceLinkRequest.GenerateCryptographicNonce()));
-
-            var credentials = PemHelper.SigningCredentialsFromPemString(platform.PrivateKey);
-            var header = new JwtHeader(credentials);
-            var token = new JwtSecurityToken(header, payload);
-            var handler = new JwtSecurityTokenHandler();
-            var jwt = handler.WriteToken(token);
-
-            return await httpClient.RequestClientCredentialsTokenWithJwtAsync(
-                    new JwtClientCredentialsTokenRequest
-                    {
-                        Address = tokenEndPoint,
-                        Jwt = jwt,
-                        Scope = scope
-                    });
-
         }
     }
 }

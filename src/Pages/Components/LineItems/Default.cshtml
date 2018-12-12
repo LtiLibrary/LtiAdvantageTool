@@ -1,0 +1,76 @@
+﻿@using AdvantageTool.Utility
+@using Microsoft.Net.Http.Headers
+@model LineItemsModel
+
+@if (Model != null)
+{
+    <form method="post">
+        <input type="hidden" asp-for="IdToken" />
+        <h5 class="mt-3">Course Gradebook</h5>
+        @Model.Status
+        @if (Model.LineItemUrl.IsPresent())
+        {
+            <p>This platform has exactly one line item for each resource link.</p>
+        }
+        else
+        {
+            <input type="submit" value="Create Line Item" class="btn btn-light mb-2" asp-page-handler="CreateLineItem"/>
+        }
+        @if (Model.LineItems == null)
+        {
+            <p>
+                This course does not have any line items yet.
+            </p>
+        }
+        else
+        {
+            <div class="row">
+                <div class="col">
+                    <table class="table table-bordered table-sm border-0">
+                        <thead>
+                        <tr>
+                            <th scope="col" class="border-left-0 border-top-0"></th>
+                            @foreach (var lineItem in Model.LineItems)
+                            {
+                                <th scope="col" class="text-center">@lineItem.Header</th>
+                            }
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var userId in Model.Members.Keys)
+                        {
+                            <tr>
+                                <th scope="row">@Model.Members[userId]</th>
+                                @foreach (var lineItem in Model.LineItems)
+                                {
+                                    <td class="text-center">
+                                        @{ var result = lineItem.Results?.LastOrDefault(r => r.UserId == userId); }
+                                        @if (result == null)
+                                        {
+                                            <span title="No scores submitted.">--</span>
+                                        }
+                                        else
+                                        {
+                                            <span data-toggle="tooltip" data-html="true" title="@result.Comment">
+                                                @result.ResultScore.ToString("N1")
+                                            </span>
+                                        }
+                                        @if (userId == Model.LtiRequest.Sub && lineItem.AgsLineItem.ResourceLinkId == Model.LtiRequest.ResourceLink.Id)
+                                        {
+                                            var routeData = new Dictionary<string, string> {{"lineItemUrl", lineItem.AgsLineItem.Id}};
+                                            <button type="submit" class="btn btn-sm btn-link"
+                                                    data-toggle="tooltip" title="Add a score"
+                                                    asp-page-handler="PostScore"
+                                                    asp-all-route-data="@routeData"><i class="fa fa-plus-square fa-lg text-light"></i></button>
+                                        }
+                                    </td>
+                                }
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+    </form>
+}
