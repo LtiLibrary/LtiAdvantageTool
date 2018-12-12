@@ -71,6 +71,7 @@ namespace AdvantageTool.Utility
                     new JwtClientCredentialsTokenRequest
                     {
                         Address = tokenEndPoint,
+                        ClientId = platform.ClientId,
                         Jwt = jwt,
                         Scope = scope
                     });
