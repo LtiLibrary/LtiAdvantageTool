@@ -64,7 +64,6 @@ namespace AdvantageTool.Pages
         /// Handle the LTI POST request to launch the tool. 
         /// </summary>
         /// <returns></returns>
-        [HttpPost]
         public async Task<IActionResult> OnPostAsync()
         {
             // Authenticate the request starting at step 5 in the OpenId Implicit Flow
@@ -207,7 +206,6 @@ namespace AdvantageTool.Pages
         /// Handler for creating a line item.
         /// </summary>
         /// <returns>The result.</returns>
-        [HttpPost]
         public async Task<IActionResult> OnPostCreateLineItemAsync(string idToken)
         {
             if (idToken.IsMissing())
@@ -271,7 +269,6 @@ namespace AdvantageTool.Pages
         /// Handler for posting a score.
         /// </summary>
         /// <returns>The posted score.</returns>
-        [HttpPost]
         public async Task<IActionResult> OnPostPostScoreAsync(string idToken, string lineItemUrl)
         {
             if (idToken.IsMissing())

@@ -1,6 +1,5 @@
-@using AdvantageTool.Data
-@inject SignInManager<AdvantageToolUser> SignInManager
-@inject UserManager<AdvantageToolUser> UserManager
+@inject SignInManager<AdvantageTool.Data.AdvantageToolUser> SignInManager
+@inject UserManager<AdvantageTool.Data.AdvantageToolUser> UserManager
 
 @if (SignInManager.IsSignedIn(User))
 {
