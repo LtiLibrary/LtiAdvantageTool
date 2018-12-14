@@ -56,7 +56,7 @@ namespace AdvantageTool
 
             services.AddMvc()
                 .AddRazorPagesOptions(options => options.Conventions.AuthorizeFolder("/Platforms"))
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             services.AddHttpClient();
 
