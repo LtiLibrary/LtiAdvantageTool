@@ -40,7 +40,7 @@
                                         @{ var result = lineItem.Results?.LastOrDefault(r => r.UserId == userId); }
                                         @if (result == null)
                                         {
-                                            <span title="No scores submitted.">--</span>
+                                            <span data-toggle="tooltip" title="No scores submitted.">--</span>
                                         }
                                         else
                                         {
