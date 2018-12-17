@@ -3,11 +3,14 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <UserSecretsId>aspnet-AdvantageTool-BDEADEA1-8829-4850-A527-CD895CA0BCC1</UserSecretsId>
+    <ApplicationInsightsResourceId>/subscriptions/8f07513f-af9b-45df-8f7e-a791be4685d3/resourcegroups/LTI/providers/microsoft.insights/components/AdvantageTool</ApplicationInsightsResourceId>
+    <ApplicationInsightsAnnotationResourceId>/subscriptions/8f07513f-af9b-45df-8f7e-a791be4685d3/resourcegroups/LTI/providers/microsoft.insights/components/AdvantageTool</ApplicationInsightsAnnotationResourceId>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="BuildBundlerMinifier" Version="2.8.391" />
     <PackageReference Include="IdentityModel" Version="3.10.4" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.5.1" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
@@ -19,6 +22,10 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\LTI\LtiAdvantage\src\LtiAdvantage.IdentityModel\LtiAdvantage.IdentityModel.csproj" />
     <ProjectReference Include="..\..\..\LTI\LtiAdvantage\src\LtiAdvantage\LtiAdvantage.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services" />
   </ItemGroup>
 
 </Project>
