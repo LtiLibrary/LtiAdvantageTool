@@ -1,0 +1,244 @@
+﻿@page
+@using AdvantageTool.Utility
+@model CatalogModel
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
+    <title>Catalog</title>
+    <environment include="Development">
+        <link rel="stylesheet" href="~/lib/bootstrap/css/bootstrap.css" />
+        <link rel="stylesheet" href="~/lib/fontawesome/css/all.css" />
+        <link rel="stylesheet" href="~/css/site.css" />
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+              integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+              crossorigin="anonymous"
+              asp-fallback-href="~/lib/bootstrap/css/bootstrap.min.css"
+              asp-fallback-test-class="sr-only"
+              asp-fallback-test-property="position"
+              asp-fallback-test-value="absolute" />
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css"
+              integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU"
+              crossorigin="anonymous">
+        <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
+    </environment>
+    <style type="text/css">
+        body {
+            overflow-x: hidden;
+            margin-bottom: 15px;
+        }
+
+        body > .container-fluid {
+            padding-top: 15px;
+        }
+    </style>
+    <script type="text/javascript">
+        // ReSharper disable All
+        var appInsights=window.appInsights||function(a){
+            function b(a){c[a]=function(){var b=arguments;c.queue.push(function(){c[a].apply(c,b)})}}var c={config:a},d=document,e=window;setTimeout(function(){var b=d.createElement("script");b.src=a.url||"https://az416426.vo.msecnd.net/scripts/a/ai.0.js",d.getElementsByTagName("script")[0].parentNode.appendChild(b)});try{c.cookie=d.cookie}catch(a){}c.queue=[];for(var f=["Event","Exception","Metric","PageView","Trace","Dependency"];f.length;)b("track"+f.pop());if(b("setAuthenticatedUserContext"),b("clearAuthenticatedUserContext"),b("startTrackEvent"),b("stopTrackEvent"),b("startTrackPage"),b("stopTrackPage"),b("flush"),!a.disableExceptionTracking){f="onerror",b("_"+f);var g=e[f];e[f]=function(a,b,d,e,h){var i=g&&g(a,b,d,e,h);return!0!==i&&c["_"+f](a,b,d,e,h),i}}return c
+        }({
+            instrumentationKey:"8e55c623-b099-4f54-a25a-46d655ba2878"
+        });
+
+        window.appInsights=appInsights,appInsights.queue&&0===appInsights.queue.length&&appInsights.trackPageView();
+        // ReSharper restore All
+    </script>
+</head>
+<body class="bg-warning">
+    <div class="container-fluid bg-warning">
+        <div class="row">
+            <div class="col">
+                @if (Model.Error.IsPresent())
+                {
+                    <div class="alert alert-danger">@Model.Error</div>
+                }
+            </div>
+        </div>
+        @if (Model.Error.IsMissing())
+        {
+            <div class="row">
+                <div class="col">
+                    <div class="card text-white bg-info">
+                        <h4 class="card-header">
+                            Platform
+                        </h4>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-3">
+                                    <div class="row">
+                                        <div class="col-sm-auto mb-3">
+                                            <h5>Platform Details</h5>
+                                            <div>
+                                                @(Model.LtiRequest.Platform.Name ?? "(no name)")
+                                            </div>
+                                            <div>
+                                                @(Model.LtiRequest.Platform.Description ?? "(no description)")
+                                            </div>
+                                            <div>
+                                                @(Model.LtiRequest.Platform.ProductFamilyCode ?? "(no family code)")
+                                                @(Model.LtiRequest.Platform.Version ?? "(no version)")
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @if (Model.LtiRequest.Context == null)
+                                    {
+                                        <div class="row">
+                                            <dl class="col-sm-auto">
+                                                <dt>Launching User</dt>
+                                                <dd>
+                                                    <div>
+                                                        @(Model.LtiRequest.GivenName ?? "(no first name)")
+                                                        @(Model.LtiRequest.FamilyName ?? "(no last name)")
+                                                    </div>
+                                                    <div>
+                                                        @(Model.LtiRequest.Email ?? "(no email)")
+                                                    </div>
+                                                    <div>
+                                                        @(string.Join(", ", Model.LtiRequest.Roles))
+                                                    </div>
+                                                    <div>
+                                                        @(Model.LtiRequest.Lis?.PersonSourcedId ?? "(no sis id)")
+                                                    </div>
+                                                </dd>
+                                            </dl>
+                                        </div>
+                                    }
+                                </div>
+                                @if (Model.LtiRequest.Context != null)
+                                {
+                                    <div class="col-9">
+                                        <div class="card bg-secondary">
+                                            <h4 class="card-header">
+                                                Course
+                                            </h4>
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <div class="col-sm-auto">
+                                                        <h5>Course Details</h5>
+                                                        <div>
+                                                            @(Model.LtiRequest.Context.Title ?? "(no title)")
+                                                        </div>
+                                                        <div>
+                                                            @(Model.LtiRequest.Context.Label ?? "(no label)")
+                                                        </div>
+                                                        <div>
+                                                            @(Model.LtiRequest.Lis?.CourseSectionSourcedId ?? "(no sis id)")
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-auto">
+                                                        <h5>Launching Member</h5>
+                                                        <div>
+                                                            @(Model.LtiRequest.GivenName ?? "(no first name)")
+                                                            @(Model.LtiRequest.FamilyName ?? "(no last name)")
+                                                        </div>
+                                                        <div>
+                                                            @(Model.LtiRequest.Email ?? "(no email)")
+                                                        </div>
+                                                        <div>
+                                                            @(string.Join(", ", Model.LtiRequest.Roles))
+                                                        </div>
+                                                        <div>
+                                                            @(Model.LtiRequest.Lis?.PersonSourcedId ?? "(no sis id)")
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        <form method="post" asp-page-handler="AssignActivities">
+            <input type="hidden" asp-for="IdToken" />
+            <div class="row mt-3">
+                <div class="col">
+                    <div class="card bg-success text-light">
+                        <div class="card-header">
+                            <span class="h4">Catalog of Available Activities</span>
+                            <div class="form-group float-right">
+                                <input type="submit" value="Assign Activities" class="btn btn-light"
+                                       asp-page-handler="AssignActivities"/>
+                            </div>
+
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                @for (var index = 0; index < Model.Activities.Count; index++)
+                                {
+                                    <input type="hidden" asp-for="Activities[index].Id"/>
+                                    <input type="hidden" asp-for="Activities[index].Title"/>
+                                    <input type="hidden" asp-for="Activities[index].Description"/>
+                                    <div class="col-auto">
+                                        <div class="card bg-light text-dark mb-3" style="max-width: 12em">
+                                            <h5 class="card-header">
+                                                @Model.Activities[index].Title
+                                                <span class="float-right">
+                                                    <input type="checkbox" asp-for="Activities[index].Selected"/>
+                                                </span>
+                                            </h5>
+                                            <div class="card-body">
+                                                @Model.Activities[index].Description
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div class="row mt-3">
+            <div class="col-6">
+                <div class="card">
+                    <div class="card-header">
+                        JWT Header
+                    </div>
+                    <pre class="card-body">@Model.Token.Header.ToJsonString()</pre>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="card">
+                    <div class="card-header">
+                        JWT Payload
+                    </div>
+                    <pre class="card-body">@Model.LtiRequest.ToJsonString()</pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <environment include="Development">
+        <script src="~/lib/jquery/jquery.js"></script>
+        <script src="~/lib/bootstrap/js/bootstrap.bundle.js"></script>
+        <script src="~/js/site.js" asp-append-version="true"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+                asp-fallback-src="~/lib/jquery/jquery.min.js"
+                asp-fallback-test="window.jQuery"
+                integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+                crossorigin="anonymous">
+        </script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+                integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+                crossorigin="anonymous">
+        </script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
+                integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+                crossorigin="anonymous">
+        </script>
+
+        <script src="~/js/site.min.js" asp-append-version="true"></script>
+    </environment>
+</body>
+</html>

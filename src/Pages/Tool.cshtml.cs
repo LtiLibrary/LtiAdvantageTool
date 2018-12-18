@@ -88,7 +88,13 @@ namespace AdvantageTool.Pages
             }
 
             Token = handler.ReadJwtToken(IdToken);
-            LtiRequest = new LtiResourceLinkRequest(Token.Payload);
+
+            var messageType = Token.Claims.SingleOrDefault(c => c.Type == Constants.LtiClaims.MessageType)?.Value;
+            if (messageType.IsMissing())
+            {
+                Error = $"{Constants.LtiClaims.MessageType} claim is missing.";
+                return Page();
+            }
 
             // Authentication Response Validation
             // See https://www.imsglobal.org/spec/security/v1p0/#authentication-response-validation
@@ -198,7 +204,13 @@ namespace AdvantageTool.Pages
                 return Page();
             }
 
-            // Show something interesting
+            if (messageType == Constants.Lti.LtiDeepLinkingRequestMessageType)
+            {
+                return RedirectToPage("./Catalog", new { IdToken });
+            }
+
+            LtiRequest = new LtiResourceLinkRequest(Token.Payload);
+
             return Page();
         }
 
