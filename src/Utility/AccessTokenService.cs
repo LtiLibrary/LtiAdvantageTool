@@ -83,7 +83,7 @@ namespace AdvantageTool.Utility
             payload.AddClaim(new Claim(JwtRegisteredClaimNames.Iat, EpochTime.GetIntDate(DateTime.UtcNow).ToString()));
             payload.AddClaim(new Claim(JwtRegisteredClaimNames.Nbf, EpochTime.GetIntDate(DateTime.UtcNow.AddSeconds(-5)).ToString()));
             payload.AddClaim(new Claim(JwtRegisteredClaimNames.Exp, EpochTime.GetIntDate(DateTime.UtcNow.AddMinutes(5)).ToString()));
-            payload.AddClaim(new Claim(JwtRegisteredClaimNames.Jti, LtiResourceLinkRequest.GenerateCryptographicNonce()));
+            payload.AddClaim(new Claim(JwtRegisteredClaimNames.Jti, LtiRequest.GenerateCryptographicNonce()));
 
             var handler = new JwtSecurityTokenHandler();
             var credentials = PemHelper.SigningCredentialsFromPemString(platform.PrivateKey);
