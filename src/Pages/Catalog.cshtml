@@ -65,11 +65,11 @@
                 <div class="col">
                     <div class="card text-white bg-info">
                         <h4 class="card-header">
-                            Platform
+                            Deep Linking Request Details
                         </h4>
                         <div class="card-body">
                             <div class="row">
-                                <div class="col-3">
+                                <div class="col-auto">
                                     <div class="row">
                                         <div class="col-sm-auto mb-3">
                                             <h5>Platform Details</h5>
@@ -111,14 +111,14 @@
                                 </div>
                                 @if (Model.LtiRequest.Context != null)
                                 {
-                                    <div class="col-9">
+                                    <div class="col-auto">
                                         <div class="card bg-secondary">
                                             <h4 class="card-header">
                                                 Course
                                             </h4>
                                             <div class="card-body">
                                                 <div class="row">
-                                                    <div class="col-sm-auto">
+                                                    <div class="col-sm-auto mb-3">
                                                         <h5>Course Details</h5>
                                                         <div>
                                                             @(Model.LtiRequest.Context.Title ?? "(no title)")
@@ -174,15 +174,15 @@
                             <div class="row">
                                 @for (var index = 0; index < Model.Activities.Count; index++)
                                 {
-                                    <input type="hidden" asp-for="Activities[index].Id"/>
-                                    <input type="hidden" asp-for="Activities[index].Title"/>
-                                    <input type="hidden" asp-for="Activities[index].Description"/>
+                                    <input type="hidden" asp-for="Activities[index].Id" />
+                                    <input type="hidden" asp-for="Activities[index].Title" />
+                                    <input type="hidden" asp-for="Activities[index].Description" />
                                     <div class="col-auto">
                                         <div class="card bg-light text-dark mb-3" style="max-width: 12em">
                                             <h5 class="card-header">
                                                 @Model.Activities[index].Title
                                                 <span class="float-right">
-                                                    <input type="checkbox" asp-for="Activities[index].Selected"/>
+                                                    <input type="checkbox" asp-for="Activities[index].Selected" />
                                                 </span>
                                             </h5>
                                             <div class="card-body">

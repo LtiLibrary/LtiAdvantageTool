@@ -132,7 +132,7 @@
                                             <div class="card-body">
                                                 <div class="row">
                                                     <div class="col-sm-auto">
-                                                        <h5>Course Details</h5>
+                                                        <h5>Details</h5>
                                                         <div>
                                                             @(Model.LtiRequest.Context.Title ?? "(no title)")
                                                         </div>
@@ -144,7 +144,7 @@
                                                         </div>
                                                     </div>
                                                     <div class="col-sm-auto">
-                                                        <h5>Launching Member</h5>
+                                                        <h5>Member</h5>
                                                         <div>
                                                             @(Model.LtiRequest.GivenName ?? "(no first name)")
                                                             @(Model.LtiRequest.FamilyName ?? "(no last name)")
@@ -160,7 +160,7 @@
                                                         </div>
                                                     </div>
                                                     <div class="col-sm-auto">
-                                                        <h5>Launching Resource Link</h5>
+                                                        <h5>Resource Link</h5>
                                                         <div>
                                                             @(Model.LtiRequest.ResourceLink?.Title ?? "(no title)")
                                                         </div>
