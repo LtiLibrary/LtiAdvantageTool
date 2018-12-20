@@ -69,7 +69,23 @@ namespace AdvantageTool.Pages
             LtiRequest = new LtiDeepLinkingRequest(Token.Payload);
 
             // Fill the catalog with choices
-            Activities = GenerateActivities(12);
+            if (LtiRequest.Context == null)
+            {
+                Activities = new List<Activity>
+                {
+                    new Activity
+                    {
+                        Id = 1,
+                        Title = "Reports",
+                        Description = "Reporting tool for admins.",
+                        Selected = false
+                    }
+                };
+            }
+            else
+            {
+                Activities = GenerateActivities(12);
+            }
 
             return Page();
         }
