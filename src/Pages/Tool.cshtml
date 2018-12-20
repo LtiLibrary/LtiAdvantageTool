@@ -69,7 +69,7 @@
                         </h4>
                         <div class="card-body">
                             <div class="row">
-                                <div class="col-auto">
+                                <div class="col-3 mb-3">
                                     <div class="card bg-transparent">
                                         <h5 class="card-header">Platform Details</h5>
                                         <div class="card-body">
@@ -88,7 +88,7 @@
                                 </div>
                                 @if (Model.LtiRequest.Context == null)
                                 {
-                                    <div class="col-auto">
+                                    <div class="col-3">
                                         <div class="card bg-transparent">
                                             <h5 class="card-header">User</h5>
                                             <div class="card-body">
@@ -108,7 +108,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-auto">
+                                    <div class="col-3">
                                         <div class="card bg-transparent">
                                             <h5 class="card-header">Resource Link</h5>
                                             <div class="card-body">
@@ -121,7 +121,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-auto">
+                                    <div class="col-3">
                                         <div class="card bg-secondary">
                                             <h5 class="card-header">Context</h5>
                                             <div class="card-body">No context in this request.</div>
@@ -130,12 +130,12 @@
                                 }
                                 @if (Model.LtiRequest.Context != null)
                                 {
-                                    <div class="col-auto">
+                                    <div class="col-9">
                                         <div class="card bg-secondary">
                                             <h4 class="card-header">Context</h4>
                                             <div class="card-body">
                                                 <div class="row">
-                                                    <div class="col-auto mb-3">
+                                                    <div class="col-4 mb-3">
                                                         <div class="card bg-transparent">
                                                             <h5 class="card-header">Context Details</h5>
                                                             <div class="card-body">
@@ -151,7 +151,7 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div class="col-auto mb-3">
+                                                    <div class="col-4 mb-3">
                                                         <div class="card bg-transparent">
                                                             <h5 class="card-header">Member</h5>
                                                             <div class="card-body">
@@ -171,11 +171,11 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div class="col-auto mb-3">
+                                                    <div class="col-4 mb-3">
                                                         <div class="card bg-transparent">
                                                             <h5 class="card-header">Resource Link</h5>
                                                             <div class="card-body">
-                                                                <div>
+                                                                <div class="card-title">
                                                                     @(Model.LtiRequest.ResourceLink?.Title ?? "(no title)")
                                                                 </div>
                                                                 <div>

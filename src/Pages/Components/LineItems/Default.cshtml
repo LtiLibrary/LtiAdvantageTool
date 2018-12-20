@@ -3,16 +3,18 @@
 @if (Model != null)
 {
     <div class="row">
-        <div class="col-auto">
+        <div class="col-12">
             <div class="card bg-transparent">
-                <h5 class="card-header">Gradebook</h5>
+                <h5 class="card-header">
+                    Gradebook
+                    <button type="submit" class="btn btn-light btn-sm float-right" asp-page-handler="CreateLineItem">
+                        Add a line item for <span class="font-italic">@Model.LtiRequest.ResourceLink.Title</span>
+                    </button>
+                </h5>
                 <div class="card-body">
                     <form method="post">
                         <input type="hidden" asp-for="IdToken" />
                         @Model.Status
-                        <button type="submit" class="btn btn-light btn-sm mb-2" asp-page-handler="CreateLineItem">
-                            Add a line item for <span class="font-italic">@Model.LtiRequest.ResourceLink.Title</span>
-                        </button>
                         @if (Model.LineItems == null)
                         {
                             <p>
@@ -21,7 +23,7 @@
                         }
                         else
                         {
-                            <table class="table table-bordered table-sm border-0">
+                            <table class="table table-bordered table-responsive-sm border-0">
                                 <thead>
                                     <tr>
                                         <th scope="col" class="border-left-0 border-top-0"></th>

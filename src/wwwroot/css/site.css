@@ -48,3 +48,9 @@ pre.security-key {
 a.fa-edit {
     margin-top: -6px;
 }
+
+@media (max-width: 800px) {
+    html {
+        font-size: small;
+    }
+}
