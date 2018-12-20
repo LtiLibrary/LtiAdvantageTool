@@ -7,17 +7,17 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-namespace AdvantageTool.Migrations
+namespace AdvantageTool.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20181122214532_RenameJwkSetUrl")]
-    partial class RenameJwkSetUrl
+    [Migration("20181220203529_InitialSchema")]
+    partial class InitialSchema
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.1.4-rtm-31024")
+                .HasAnnotation("ProductVersion", "2.2.0-rtm-35687")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -72,34 +72,6 @@ namespace AdvantageTool.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
-            modelBuilder.Entity("AdvantageTool.Data.Client", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("ClientId")
-                        .IsRequired();
-
-                    b.Property<string>("KeyId");
-
-                    b.Property<string>("PrivateKey")
-                        .IsRequired();
-
-                    b.Property<string>("PublicKey")
-                        .IsRequired();
-
-                    b.Property<string>("UserId");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId")
-                        .IsUnique()
-                        .HasFilter("[UserId] IS NOT NULL");
-
-                    b.ToTable("Clients");
-                });
-
             modelBuilder.Entity("AdvantageTool.Data.Platform", b =>
                 {
                     b.Property<int>("Id")
@@ -108,11 +80,19 @@ namespace AdvantageTool.Migrations
 
                     b.Property<string>("AccessTokenUrl");
 
+                    b.Property<string>("AuthorizeUrl");
+
+                    b.Property<string>("ClientId");
+
                     b.Property<string>("Issuer");
 
                     b.Property<string>("JwkSetUrl");
 
+                    b.Property<string>("KeyId");
+
                     b.Property<string>("Name");
+
+                    b.Property<string>("PrivateKey");
 
                     b.Property<string>("UserId");
 
@@ -235,13 +215,6 @@ namespace AdvantageTool.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens");
-                });
-
-            modelBuilder.Entity("AdvantageTool.Data.Client", b =>
-                {
-                    b.HasOne("AdvantageTool.Data.AdvantageToolUser", "User")
-                        .WithOne("Client")
-                        .HasForeignKey("AdvantageTool.Data.Client", "UserId");
                 });
 
             modelBuilder.Entity("AdvantageTool.Data.Platform", b =>

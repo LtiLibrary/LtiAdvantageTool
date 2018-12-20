@@ -2,9 +2,9 @@
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace AdvantageTool.Migrations
+namespace AdvantageTool.Data.Migrations
 {
-    public partial class CreateInitialDatabase : Migration
+    public partial class InitialSchema : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -154,38 +154,19 @@ namespace AdvantageTool.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Clients",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    ClientId = table.Column<string>(nullable: false),
-                    KeyId = table.Column<string>(nullable: true),
-                    PrivateKey = table.Column<string>(nullable: false),
-                    PublicKey = table.Column<string>(nullable: false),
-                    UserId = table.Column<string>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Clients", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Clients_AspNetUsers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Platforms",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     AccessTokenUrl = table.Column<string>(nullable: true),
+                    AuthorizeUrl = table.Column<string>(nullable: true),
                     Name = table.Column<string>(nullable: true),
                     Issuer = table.Column<string>(nullable: true),
-                    JsonWebKeySetUrl = table.Column<string>(nullable: true),
+                    JwkSetUrl = table.Column<string>(nullable: true),
+                    ClientId = table.Column<string>(nullable: true),
+                    KeyId = table.Column<string>(nullable: true),
+                    PrivateKey = table.Column<string>(nullable: true),
                     UserId = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
@@ -239,13 +220,6 @@ namespace AdvantageTool.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Clients_UserId",
-                table: "Clients",
-                column: "UserId",
-                unique: true,
-                filter: "[UserId] IS NOT NULL");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Platforms_UserId",
                 table: "Platforms",
                 column: "UserId");
@@ -267,9 +241,6 @@ namespace AdvantageTool.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUserTokens");
-
-            migrationBuilder.DropTable(
-                name: "Clients");
 
             migrationBuilder.DropTable(
                 name: "Platforms");
