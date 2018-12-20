@@ -1,6 +1,5 @@
 ﻿@page
 @using AdvantageTool.Utility
-@using LtiAdvantage.Lti
 @model CatalogModel
 @{
     Layout = null;
@@ -189,6 +188,7 @@
                         </div>
                         <div class="card-body">
                             <div class="row">
+                                @* ReSharper disable once ForCanBeConvertedToForeach *@
                                 @for (var index = 0; index < Model.Activities.Count; index++)
                                 {
                                     <input type="hidden" asp-for="Activities[index].Id"/>
