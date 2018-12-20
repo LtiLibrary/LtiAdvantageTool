@@ -33,20 +33,20 @@
             margin-bottom: 15px;
         }
 
-        body > .container-fluid {
-            padding-top: 15px;
-        }
+            body > .container-fluid {
+                padding-top: 15px;
+            }
     </style>
     <script type="text/javascript">
         // ReSharper disable All
-        var appInsights=window.appInsights||function(a){
-            function b(a){c[a]=function(){var b=arguments;c.queue.push(function(){c[a].apply(c,b)})}}var c={config:a},d=document,e=window;setTimeout(function(){var b=d.createElement("script");b.src=a.url||"https://az416426.vo.msecnd.net/scripts/a/ai.0.js",d.getElementsByTagName("script")[0].parentNode.appendChild(b)});try{c.cookie=d.cookie}catch(a){}c.queue=[];for(var f=["Event","Exception","Metric","PageView","Trace","Dependency"];f.length;)b("track"+f.pop());if(b("setAuthenticatedUserContext"),b("clearAuthenticatedUserContext"),b("startTrackEvent"),b("stopTrackEvent"),b("startTrackPage"),b("stopTrackPage"),b("flush"),!a.disableExceptionTracking){f="onerror",b("_"+f);var g=e[f];e[f]=function(a,b,d,e,h){var i=g&&g(a,b,d,e,h);return!0!==i&&c["_"+f](a,b,d,e,h),i}}return c
+        var appInsights = window.appInsights || function (a) {
+            function b(a) { c[a] = function () { var b = arguments; c.queue.push(function () { c[a].apply(c, b) }) } } var c = { config: a }, d = document, e = window; setTimeout(function () { var b = d.createElement("script"); b.src = a.url || "https://az416426.vo.msecnd.net/scripts/a/ai.0.js", d.getElementsByTagName("script")[0].parentNode.appendChild(b) }); try { c.cookie = d.cookie } catch (a) { } c.queue = []; for (var f = ["Event", "Exception", "Metric", "PageView", "Trace", "Dependency"]; f.length;)b("track" + f.pop()); if (b("setAuthenticatedUserContext"), b("clearAuthenticatedUserContext"), b("startTrackEvent"), b("stopTrackEvent"), b("startTrackPage"), b("stopTrackPage"), b("flush"), !a.disableExceptionTracking) { f = "onerror", b("_" + f); var g = e[f]; e[f] = function (a, b, d, e, h) { var i = g && g(a, b, d, e, h); return !0 !== i && c["_" + f](a, b, d, e, h), i } } return c
         }({
-            instrumentationKey:"8e55c623-b099-4f54-a25a-46d655ba2878"
+            instrumentationKey: "8e55c623-b099-4f54-a25a-46d655ba2878"
         });
 
-        window.appInsights=appInsights,appInsights.queue&&0===appInsights.queue.length&&appInsights.trackPageView();
-        // ReSharper restore All
+        window.appInsights = appInsights, appInsights.queue && 0 === appInsights.queue.length && appInsights.trackPageView();
+                // ReSharper restore All
     </script>
 </head>
 <body class="bg-warning">
@@ -64,15 +64,13 @@
             <div class="row">
                 <div class="col">
                     <div class="card text-white bg-info">
-                        <h4 class="card-header">
-                            Platform
-                        </h4>
+                        <h4 class="card-header">Platform</h4>
                         <div class="card-body">
                             <div class="row">
-                                <div class="col-3">
-                                    <div class="row">
-                                        <div class="col-sm-auto mb-3">
-                                            <h5>Platform Details</h5>
+                                <div class="col-auto">
+                                    <div class="card bg-transparent">
+                                        <h5 class="card-header">Platform Details</h5>
+                                        <div class="card-body">
                                             <div>
                                                 @(Model.LtiRequest.Platform.Name ?? "(no name)")
                                             </div>
@@ -85,87 +83,103 @@
                                             </div>
                                         </div>
                                     </div>
-                                    @if (Model.LtiRequest.Context == null)
-                                    {
-                                        <div class="row">
-                                            <dl class="col-sm-auto">
-                                                <dt>Launching User</dt>
-                                                <dd>
-                                                    <div>
-                                                        @(Model.LtiRequest.GivenName ?? "(no first name)")
-                                                        @(Model.LtiRequest.FamilyName ?? "(no last name)")
-                                                    </div>
-                                                    <div>
-                                                        @(Model.LtiRequest.Email ?? "(no email)")
-                                                    </div>
-                                                    <div>
-                                                        @(string.Join(", ", Model.LtiRequest.Roles))
-                                                    </div>
-                                                    <div>
-                                                        @(Model.LtiRequest.Lis?.PersonSourcedId ?? "(no sis id)")
-                                                    </div>
-                                                </dd>
-                                            </dl>
-                                        </div>
-                                        <div class="row">
-                                            <dl class="col-sm-auto">
-                                                <dt>Resource Link</dt>
-                                                <dd>
-                                                    <div>
-                                                        @(Model.LtiRequest.ResourceLink?.Title ?? "(no title)")
-                                                    </div>
-                                                    <div>
-                                                        @(Model.LtiRequest.ResourceLink?.Description ?? "(no description)")
-                                                    </div>
-                                                </dd>
-                                            </dl>
-                                        </div>
-                                    }
                                 </div>
+                                @if (Model.LtiRequest.Context == null)
+                                {
+                                    <div class="col-auto">
+                                        <div class="card bg-transparent">
+                                            <h5 class="card-header">User</h5>
+                                            <div class="card-body">
+                                                <div>
+                                                    @(Model.LtiRequest.GivenName ?? "(no first name)")
+                                                    @(Model.LtiRequest.FamilyName ?? "(no last name)")
+                                                </div>
+                                                <div>
+                                                    @(Model.LtiRequest.Email ?? "(no email)")
+                                                </div>
+                                                <div>
+                                                    @(string.Join(", ", Model.LtiRequest.Roles))
+                                                </div>
+                                                <div>
+                                                    @(Model.LtiRequest.Lis?.PersonSourcedId ?? "(no sis id)")
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="card bg-transparent">
+                                            <h5 class="card-header">Resource Link</h5>
+                                            <div class="card-body">
+                                                <div>
+                                                    @(Model.LtiRequest.ResourceLink?.Title ?? "(no title)")
+                                                </div>
+                                                <div>
+                                                    @(Model.LtiRequest.ResourceLink?.Description ?? "(no description)")
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="card bg-secondary">
+                                            <h5 class="card-header">Context</h5>
+                                            <div class="card-body">No context in this request.</div>
+                                        </div>
+                                    </div>
+                                }
                                 @if (Model.LtiRequest.Context != null)
                                 {
-                                    <div class="col-9">
+                                    <div class="col-auto">
                                         <div class="card bg-secondary">
-                                            <h4 class="card-header">
-                                                Course
-                                            </h4>
+                                            <h4 class="card-header">Context</h4>
                                             <div class="card-body">
                                                 <div class="row">
-                                                    <div class="col-sm-auto">
-                                                        <h5>Details</h5>
-                                                        <div>
-                                                            @(Model.LtiRequest.Context.Title ?? "(no title)")
-                                                        </div>
-                                                        <div>
-                                                            @(Model.LtiRequest.Context.Label ?? "(no label)")
-                                                        </div>
-                                                        <div>
-                                                            @(Model.LtiRequest.Lis?.CourseSectionSourcedId ?? "(no sis id)")
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-sm-auto">
-                                                        <h5>Member</h5>
-                                                        <div>
-                                                            @(Model.LtiRequest.GivenName ?? "(no first name)")
-                                                            @(Model.LtiRequest.FamilyName ?? "(no last name)")
-                                                        </div>
-                                                        <div>
-                                                            @(Model.LtiRequest.Email ?? "(no email)")
-                                                        </div>
-                                                        <div>
-                                                            @(string.Join(", ", Model.LtiRequest.Roles))
-                                                        </div>
-                                                        <div>
-                                                            @(Model.LtiRequest.Lis?.PersonSourcedId ?? "(no sis id)")
+                                                    <div class="col-auto mb-3">
+                                                        <div class="card bg-transparent">
+                                                            <h5 class="card-header">Context Details</h5>
+                                                            <div class="card-body">
+                                                                <div>
+                                                                    @(Model.LtiRequest.Context.Title ?? "(no title)")
+                                                                </div>
+                                                                <div>
+                                                                    @(Model.LtiRequest.Context.Label ?? "(no label)")
+                                                                </div>
+                                                                <div>
+                                                                    @(Model.LtiRequest.Lis?.CourseSectionSourcedId ?? "(no sis id)")
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                    <div class="col-sm-auto">
-                                                        <h5>Resource Link</h5>
-                                                        <div>
-                                                            @(Model.LtiRequest.ResourceLink?.Title ?? "(no title)")
+                                                    <div class="col-auto mb-3">
+                                                        <div class="card bg-transparent">
+                                                            <h5 class="card-header">Member</h5>
+                                                            <div class="card-body">
+                                                                <div>
+                                                                    @(Model.LtiRequest.GivenName ?? "(no first name)")
+                                                                    @(Model.LtiRequest.FamilyName ?? "(no last name)")
+                                                                </div>
+                                                                <div>
+                                                                    @(Model.LtiRequest.Email ?? "(no email)")
+                                                                </div>
+                                                                <div>
+                                                                    @(string.Join(", ", Model.LtiRequest.Roles))
+                                                                </div>
+                                                                <div>
+                                                                    @(Model.LtiRequest.Lis?.PersonSourcedId ?? "(no sis id)")
+                                                                </div>
+                                                            </div>
                                                         </div>
-                                                        <div>
-                                                            @(Model.LtiRequest.ResourceLink?.Description ?? "(no description)")
+                                                    </div>
+                                                    <div class="col-auto mb-3">
+                                                        <div class="card bg-transparent">
+                                                            <h5 class="card-header">Resource Link</h5>
+                                                            <div class="card-body">
+                                                                <div>
+                                                                    @(Model.LtiRequest.ResourceLink?.Title ?? "(no title)")
+                                                                </div>
+                                                                <div>
+                                                                    @(Model.LtiRequest.ResourceLink?.Description ?? "(no description)")
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
