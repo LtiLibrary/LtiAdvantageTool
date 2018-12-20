@@ -1,4 +1,5 @@
 ﻿@page
+@using AdvantageTool.Utility
 @model DetailsModel
 
 @{
@@ -17,27 +18,27 @@
                 <div class="card-body">
                     <dl>
                         <dt>@Html.DisplayNameFor(m => m.Platform.Name)</dt>
-                        <dd>@Model.Platform.Name</dd>
+                        <dd>@Model.Platform.Name.IfMissingThen()</dd>
                         <dt>
                             @Html.DisplayNameFor(m => m.Platform.Issuer)
                             <tooltip asp-for="Platform.Issuer"></tooltip>
                         </dt>
-                        <dd>@Html.DisplayFor(m => m.Platform.Issuer)</dd>
+                        <dd>@Model.Platform.Issuer.IfMissingThen()</dd>
                         <dt>
                             @Html.DisplayNameFor(m => m.Platform.JwkSetUrl)
                             <tooltip asp-for="Platform.JwkSetUrl"></tooltip>
                         </dt>
-                        <dd>@(Model.Platform.JwkSetUrl ?? "[Not Set]")</dd>
+                        <dd>@Model.Platform.JwkSetUrl.IfMissingThen()</dd>
                         <dt>
                             @Html.DisplayNameFor(m => m.Platform.AccessTokenUrl)
                             <tooltip asp-for="Platform.AccessTokenUrl"></tooltip>
                         </dt>
-                        <dd>@(Model.Platform.AccessTokenUrl ?? "[Not Set]")</dd>
+                        <dd>@Model.Platform.AccessTokenUrl.IfMissingThen()</dd>
                         <dt>
                             @Html.DisplayNameFor(m => m.Platform.AuthorizeUrl)
                             <tooltip asp-for="Platform.AuthorizeUrl"></tooltip>
                         </dt>
-                        <dd>@(Model.Platform.AuthorizeUrl ?? "[Not Set]")</dd>
+                        <dd>@Model.Platform.AuthorizeUrl.IfMissingThen()</dd>
                     </dl>
                 </div>
             </div>
@@ -49,17 +50,28 @@
                 </h5>
                 <div class="card-body">
                     <dl>
-                        <dt>@Html.DisplayNameFor(m => m.Platform.LaunchUrl)</dt>
-                        <dd>@Model.Platform.LaunchUrl</dd>
-                        <dt>@Html.DisplayNameFor(m => m.Platform.LoginUrl)</dt>
-                        <dd>@Model.Platform.LoginUrl</dd>
+                        <dt>
+                            @Html.DisplayNameFor(m => m.Platform.LoginUrl)
+                            <tooltip asp-for="Platform.LoginUrl"></tooltip>
+                        </dt>
+                        <dd>@Model.Platform.LoginUrl.IfMissingThen()</dd>
+                        <dt>
+                            @Html.DisplayNameFor(m => m.Platform.LaunchUrl)
+                            <tooltip asp-for="Platform.LaunchUrl"></tooltip>
+                        </dt>
+                        <dd>@Model.Platform.LaunchUrl.IfMissingThen()</dd>
+                        <dt>
+                            @Html.DisplayNameFor(m => m.Platform.DeepLinkingLaunchUrl)
+                            <tooltip asp-for="Platform.DeepLinkingLaunchUrl"></tooltip>
+                        </dt>
+                        <dd>@Model.Platform.DeepLinkingLaunchUrl.IfMissingThen()</dd>
                         <dt>@Html.DisplayNameFor(m => m.Platform.ClientId)</dt>
-                        <dd>@Model.Platform.ClientId</dd>
+                        <dd>@Model.Platform.ClientId.IfMissingThen()</dd>
                         <dt>
                             @Html.DisplayNameFor(m => m.Platform.PrivateKey)
                             <tooltip asp-for="Platform.PrivateKey"></tooltip>
                         </dt>
-                        <dd><pre class="security-key">@Model.Platform.PrivateKey</pre></dd>
+                        <dd><pre class="security-key">@Model.Platform.PrivateKey.IfMissingThen()</pre></dd>
                     </dl>
                 </div>
             </div>

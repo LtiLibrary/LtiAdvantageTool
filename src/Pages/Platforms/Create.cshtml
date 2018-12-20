@@ -56,13 +56,19 @@
                     </h5>
                     <div class="card-body">
                         <div class="form-group">
-                            <label asp-for="Platform.LaunchUrl"></label>
-                            <input asp-for="Platform.LaunchUrl" class="form-control" readonly="readonly" />
-                        </div>
-                        <div class="form-group">
                             <label asp-for="Platform.LoginUrl"></label>
                             <tooltip asp-for="Platform.LoginUrl"></tooltip>
                             <input asp-for="Platform.LoginUrl" class="form-control" readonly="readonly" />
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Platform.LaunchUrl"></label>
+                            <tooltip asp-for="Platform.LaunchUrl"></tooltip>
+                            <input asp-for="Platform.LaunchUrl" class="form-control" readonly="readonly" />
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Platform.DeepLinkingLaunchUrl"></label>
+                            <tooltip asp-for="Platform.DeepLinkingLaunchUrl"></tooltip>
+                            <input asp-for="Platform.DeepLinkingLaunchUrl" class="form-control" readonly="readonly" />
                         </div>
                         <div class="form-group">
                             <label asp-for="Platform.ClientId"></label>

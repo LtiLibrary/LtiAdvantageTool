@@ -1,4 +1,5 @@
 ﻿@page
+@using AdvantageTool.Utility
 @model DeleteModel
 
 @{
@@ -17,15 +18,15 @@
                 <div class="card-body">
                     <dl>
                         <dt>@Html.DisplayNameFor(model => model.Platform.Name)</dt>
-                        <dd>@Html.DisplayFor(model => model.Platform.Name)</dd>
+                        <dd>@Model.Platform.Name.IfMissingThen()</dd>
                         <dt>@Html.DisplayNameFor(model => model.Platform.Issuer)</dt>
-                        <dd>@Html.DisplayFor(model => model.Platform.Issuer)</dd>
+                        <dd>@Model.Platform.Issuer.IfMissingThen()</dd>
                         <dt>@Html.DisplayNameFor(model => model.Platform.JwkSetUrl)</dt>
-                        <dd>@(Model.Platform.JwkSetUrl ?? "[Not Set]")</dd>
+                        <dd>@Model.Platform.JwkSetUrl.IfMissingThen()</dd>
                         <dt>@Html.DisplayNameFor(model => model.Platform.AccessTokenUrl)</dt>
-                        <dd>@(Model.Platform.AccessTokenUrl ?? "[Not Set]")</dd>
+                        <dd>@Model.Platform.AccessTokenUrl.IfMissingThen()</dd>
                         <dt>@Html.DisplayNameFor(model => model.Platform.AuthorizeUrl)</dt>
-                        <dd>@(Model.Platform.AuthorizeUrl ?? "[Not Set]")</dd>
+                        <dd>@Model.Platform.AuthorizeUrl.IfMissingThen()</dd>
                     </dl>
                 </div>
             </div>

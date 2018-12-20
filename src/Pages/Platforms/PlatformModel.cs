@@ -18,6 +18,7 @@ namespace AdvantageTool.Pages.Platforms
 
         public PlatformModel(HttpRequest request, IUrlHelper url)
         {
+            DeepLinkingLaunchUrl = url.Page("/Tool", null, null, request.Scheme);
             LaunchUrl = url.Page("/Tool", null, null, request.Scheme);
             LoginUrl = url.Page("/OidcLogin", null, null, request.Scheme);
         }
@@ -35,6 +36,9 @@ namespace AdvantageTool.Pages.Platforms
             PrivateKey = platform.PrivateKey;
         }
 
+        /// <summary>
+        /// Primary key.
+        /// </summary>
         public int Id { get; set; }
 
         #region Platform properties
@@ -72,14 +76,24 @@ namespace AdvantageTool.Pages.Platforms
         [Required]
         [Display(Name = "Client ID")]
         public string ClientId { get; set; }
+                
+        /// <summary>
+        /// Deep linking launch url.
+        /// </summary>
+        [LocalhostUrl]
+        [Display(Name = "Deep Linking Launch URL", Description = "The URL to launch the tool's deep linking experience.")]
+        public string DeepLinkingLaunchUrl { get; set; }
 
-        [Display(Name = "Launch URL")]
+        /// <summary>
+        /// Tool launch url.
+        /// </summary>
+        [Display(Name = "Launch URL", Description = "The URL to launch the tool.")]
         public string LaunchUrl { get; set; }
 
         /// <summary>
         /// OIDC login initiation url.
         /// </summary>
-        [Display(Name = "Login URL", Description = "The endpoint URL to initiate OpenID Connect authorization.")]
+        [Display(Name = "Login URL", Description = "The URL to initiate OpenID Connect authorization.")]
         public string LoginUrl { get; set; }
 
         /// <summary>

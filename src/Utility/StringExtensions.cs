@@ -18,7 +18,19 @@ namespace AdvantageTool.Utility
 
             return url;
         }
-        
+
+        /// <summary>
+        /// Returns "[Not Set]" or replacement if string is missing.
+        /// </summary>
+        /// <param name="value">The string.</param>
+        /// <param name="replacement">The replacement (defaults to "[Not Set]").</param>
+        /// <returns>A string.</returns>
+        [DebuggerStepThrough]
+        public static string IfMissingThen(this string value, string replacement = "[Not Set]")
+        {
+            return string.IsNullOrWhiteSpace(value) ? replacement : value;
+        }
+
         [DebuggerStepThrough]
         public static bool IsMissing(this string value)
         {
