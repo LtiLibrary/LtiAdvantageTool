@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 
 namespace AdvantageTool.Pages
 {
-    [IgnoreAntiforgeryToken(Order = 1001)]
+    [IgnoreAntiforgeryToken]
     public class OidcLoginModel : PageModel
     {
         private readonly ApplicationDbContext _context;
@@ -94,16 +94,27 @@ namespace AdvantageTool.Pages
             (
                 clientId: platform.ClientId,
                 responseType: OidcConstants.ResponseTypes.IdToken,
-                // Consider redirecting to a page (maybe this page?) that verifies state, then onto TargetLinkUri
+
+                // POST the id_token directly to the tool's launch URL
                 redirectUri: TargetLinkUri,
                 responseMode: OidcConstants.ResponseModes.FormPost,
+
+                // Per IMS guidance
                 scope: OidcConstants.StandardScopes.OpenId,
+
                 // Consider checking state after redirect to make sure the state was not tampared with
                 state: CryptoRandom.CreateUniqueId(),
+
+                // The userId
                 loginHint: LoginHint,
+
                 // Consider checking nonce at launch to make sure the id_token came from this flow and not direct
                 nonce: CryptoRandom.CreateUniqueId(),
+
+                // No user interaction
                 prompt: "none",
+
+                // The messagedId (i.e. resource link id or deep link id)
                 extra: new { lti_message_hint = LtiMessageHint }
             );
 
