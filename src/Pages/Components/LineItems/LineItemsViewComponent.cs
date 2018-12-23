@@ -62,17 +62,16 @@ namespace AdvantageTool.Pages.Components.LineItems
                 return View(model);
             }
 
-            var httpClient = _httpClientFactory.CreateClient();
-            httpClient.SetBearerToken(tokenResponse.AccessToken);
-
             // Get all the line items
             try
             {
+                var httpClient = _httpClientFactory.CreateClient();
+                httpClient.SetBearerToken(tokenResponse.AccessToken);
+
                 httpClient.DefaultRequestHeaders.Accept
                     .Add(new MediaTypeWithQualityHeaderValue(Constants.MediaTypes.LineItemContainer));
 
-                using (var response = await httpClient.GetAsync(model.LtiRequest.AssignmentGradeServices?.LineItemsUrl)
-                    .ConfigureAwait(false))
+                using (var response = await httpClient.GetAsync(model.LtiRequest.AssignmentGradeServices?.LineItemsUrl))
                 {
                     if (!response.IsSuccessStatusCode)
                     {
@@ -101,12 +100,14 @@ namespace AdvantageTool.Pages.Components.LineItems
 
             try
             {
+                var httpClient = _httpClientFactory.CreateClient();
+                httpClient.SetBearerToken(tokenResponse.AccessToken);
+
                 httpClient.DefaultRequestHeaders.Accept.Clear();
                 httpClient.DefaultRequestHeaders.Accept
                     .Add(new MediaTypeWithQualityHeaderValue(Constants.MediaTypes.MembershipContainer));
 
-                using (var response = await httpClient.GetAsync(model.LtiRequest.NamesRoleService.ContextMembershipUrl)
-                    .ConfigureAwait(false))
+                using (var response = await httpClient.GetAsync(model.LtiRequest.NamesRoleService.ContextMembershipUrl))
                 {
                     if (!response.IsSuccessStatusCode)
                     {
@@ -134,14 +135,16 @@ namespace AdvantageTool.Pages.Components.LineItems
             // Get all the results
             try
             {
+                var httpClient = _httpClientFactory.CreateClient();
+                httpClient.SetBearerToken(tokenResponse.AccessToken);
+
                 httpClient.DefaultRequestHeaders.Accept.Clear();
                 httpClient.DefaultRequestHeaders.Accept
                     .Add(new MediaTypeWithQualityHeaderValue(Constants.MediaTypes.ResultContainer));
 
                 foreach (var lineItem in model.LineItems)
                 {
-                    using (var response = await httpClient.GetAsync(lineItem.AgsLineItem.Id.EnsureTrailingSlash() + "results")
-                        .ConfigureAwait(false))
+                    using (var response = await httpClient.GetAsync(lineItem.AgsLineItem.Id.EnsureTrailingSlash() + "results"))
                     {
                         if (!response.IsSuccessStatusCode)
                         {
