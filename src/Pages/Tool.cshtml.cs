@@ -260,8 +260,7 @@ namespace AdvantageTool.Pages
 
                 using (var response = await httpClient.PostAsync(
                         LtiRequest.AssignmentGradeServices.LineItemsUrl,
-                        new StringContent(JsonConvert.SerializeObject(lineItem), Encoding.UTF8, Constants.MediaTypes.LineItem))
-                    .ConfigureAwait(false))
+                        new StringContent(JsonConvert.SerializeObject(lineItem), Encoding.UTF8, Constants.MediaTypes.LineItem)))
                 {
                     if (!response.IsSuccessStatusCode)
                     {
@@ -334,8 +333,7 @@ namespace AdvantageTool.Pages
 
                 using (var response = await httpClient.PostAsync(
                         lineItemUrl.EnsureTrailingSlash() + "scores",
-                        new StringContent(JsonConvert.SerializeObject(score), Encoding.UTF8, Constants.MediaTypes.Score))
-                    .ConfigureAwait(false))
+                        new StringContent(JsonConvert.SerializeObject(score), Encoding.UTF8, Constants.MediaTypes.Score)))
                 {
                     if (!response.IsSuccessStatusCode)
                     {
