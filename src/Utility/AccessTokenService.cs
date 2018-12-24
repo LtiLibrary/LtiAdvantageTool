@@ -54,32 +54,11 @@ namespace AdvantageTool.Utility
                 return new TokenResponse(new Exception("Cannot find platform registration."));
             }
 
-            var httpClient = _httpClientFactory.CreateClient();
-            var tokenEndPoint = platform.AccessTokenUrl;
-
-            if (tokenEndPoint.IsMissing())
-            {
-                var disco = await httpClient.GetDiscoveryDocumentAsync(new DiscoveryDocumentRequest
-                {
-                    Address = platform.Issuer,
-                    Policy =
-                    {
-                        Authority = platform.Issuer
-                    }
-                });
-                if (disco.IsError)
-                {
-                    return new TokenResponse(new Exception(disco.Error));
-                }
-
-                tokenEndPoint = disco.TokenEndpoint;
-            }
-
             // Use a signed JWT as client credentials.
             var payload = new JwtPayload();
             payload.AddClaim(new Claim(JwtRegisteredClaimNames.Iss, platform.ClientId));
             payload.AddClaim(new Claim(JwtRegisteredClaimNames.Sub, platform.ClientId));
-            payload.AddClaim(new Claim(JwtRegisteredClaimNames.Aud, tokenEndPoint));
+            payload.AddClaim(new Claim(JwtRegisteredClaimNames.Aud, platform.AccessTokenUrl));
             payload.AddClaim(new Claim(JwtRegisteredClaimNames.Iat, EpochTime.GetIntDate(DateTime.UtcNow).ToString()));
             payload.AddClaim(new Claim(JwtRegisteredClaimNames.Nbf, EpochTime.GetIntDate(DateTime.UtcNow.AddSeconds(-5)).ToString()));
             payload.AddClaim(new Claim(JwtRegisteredClaimNames.Exp, EpochTime.GetIntDate(DateTime.UtcNow.AddMinutes(5)).ToString()));
@@ -89,15 +68,15 @@ namespace AdvantageTool.Utility
             var credentials = PemHelper.SigningCredentialsFromPemString(platform.PrivateKey);
             var jwt = handler.WriteToken(new JwtSecurityToken(new JwtHeader(credentials), payload));
 
+            var httpClient = _httpClientFactory.CreateClient();
             return await httpClient.RequestClientCredentialsTokenWithJwtAsync(
                     new JwtClientCredentialsTokenRequest
                     {
-                        Address = tokenEndPoint,
+                        Address = platform.AccessTokenUrl,
                         ClientId = platform.ClientId,
                         Jwt = jwt,
                         Scope = scope
                     });
         }
-
     }
 }
