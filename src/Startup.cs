@@ -45,14 +45,13 @@ namespace AdvantageTool
                 })
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
+            // Use app specific cookie name so both AdvantagePlatform and AdvantageTool can run
+            // on localhost at the same time.
             services.ConfigureApplicationCookie(options => options.Cookie.Name = "AdvantageTool" );
 
             // Prevent X-Frame-Options header from being sent so that the Tool can appear
             // within an iframe on the platform
             services.AddAntiforgery(options => options.SuppressXFrameOptionsHeader = true);
-
-            // Enable short term session store to verify state is tampered with during OIDC login
-            services.AddDistributedMemoryCache();
 
             services.AddMvc()
                 .AddRazorPagesOptions(options => options.Conventions.AuthorizeFolder("/Platforms"))
