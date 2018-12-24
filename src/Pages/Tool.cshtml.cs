@@ -8,7 +8,6 @@ using System.Text;
 using System.Threading.Tasks;
 using AdvantageTool.Data;
 using AdvantageTool.Utility;
-using IdentityModel.Client;
 using LtiAdvantage;
 using LtiAdvantage.AssignmentGradeServices;
 using LtiAdvantage.Lti;
@@ -133,47 +132,21 @@ namespace AdvantageTool.Pages
 
             try
             {
-                if (!string.IsNullOrEmpty(platform.JwkSetUrl))
+                var httpClient = _httpClientFactory.CreateClient();
+                var keySetJson = await httpClient.GetStringAsync(platform.JwkSetUrl);
+                var keySet = JsonConvert.DeserializeObject<JsonWebKeySet>(keySetJson);
+                var key = keySet.Keys.SingleOrDefault(k => k.Kid == Token.Header.Kid);
+                if (key == null)
                 {
-                    var httpClient = _httpClientFactory.CreateClient();
-                    var keySetJson = await httpClient.GetStringAsync(platform.JwkSetUrl);
-                    var keySet = JsonConvert.DeserializeObject<JsonWebKeySet>(keySetJson);
-                    var key = keySet.Keys.SingleOrDefault(k => k.Kid == Token.Header.Kid);
-                    if (key == null)
-                    {
-                        Error = "No matching key found.";
-                        return Page();
-                    }
-
-                    rsaParameters = new RSAParameters
-                    {
-                        Modulus = Base64UrlEncoder.DecodeBytes(key.N),
-                        Exponent = Base64UrlEncoder.DecodeBytes(key.E)
-                    };
+                    Error = "No matching key found.";
+                    return Page();
                 }
-                else
+
+                rsaParameters = new RSAParameters
                 {
-                    var httpClient = _httpClientFactory.CreateClient();
-                    var disco = await httpClient.GetDiscoveryDocumentAsync(Token.Issuer);
-                    if (disco.IsError)
-                    {
-                        Error = disco.Error;
-                        return Page();
-                    }
-
-                    var key = disco.KeySet.Keys.SingleOrDefault(k => k.Kid == Token.Header.Kid);
-                    if (key == null)
-                    {
-                        Error = "No matching key found.";
-                        return Page();
-                    }
-
-                    rsaParameters = new RSAParameters
-                    {
-                        Modulus = Base64UrlEncoder.DecodeBytes(key.N),
-                        Exponent = Base64UrlEncoder.DecodeBytes(key.E)
-                    };
-                }
+                    Modulus = Base64UrlEncoder.DecodeBytes(key.N),
+                    Exponent = Base64UrlEncoder.DecodeBytes(key.E)
+                };
             }
             catch (Exception e)
             {
