@@ -118,7 +118,7 @@ namespace AdvantageTool.Pages
                 extra: new { lti_message_hint = LtiMessageHint }
             );
 
-            _logger.LogInformation("Requesting authorization.");
+            _logger.LogInformation("Requesting authentication.");
 
             return Redirect(url);
         }
