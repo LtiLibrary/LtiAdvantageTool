@@ -79,6 +79,7 @@
                         <div class="form-group">
                             <label asp-for="Platform.PrivateKey"></label>
                             <tooltip asp-for="Platform.PrivateKey"></tooltip>
+                            For development keys see <a href="https://lti-ri.imsglobal.org/keygen/index" target="_blank">https://lti-ri.imsglobal.org/keygen/index</a>
                             <textarea asp-for="Platform.PrivateKey" class="form-control text-monospace small" rows="5" placeholder="Enter the private key in PEM format."></textarea>
                             <span asp-validation-for="Platform.PrivateKey" class="text-danger"></span>
                         </div>
