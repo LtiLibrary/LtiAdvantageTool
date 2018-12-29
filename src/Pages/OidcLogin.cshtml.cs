@@ -21,15 +21,27 @@ namespace AdvantageTool.Pages
             _logger = logger;
         }
 
+        /// <summary>
+        /// Platform Issuer URL
+        /// </summary>
         [BindProperty(Name = "iss", SupportsGet = true)]
         public string Issuer { get; set; }
 
+        /// <summary>
+        /// Opaque value that helps the platform identify the user
+        /// </summary>
         [BindProperty(Name = "login_hint", SupportsGet = true)]
         public string LoginHint { get; set; }
 
+        /// <summary>
+        /// Opaque value that helps the platform identity the resource link
+        /// </summary>
         [BindProperty(Name = "lti_message_hint", SupportsGet = true)]
         public string LtiMessageHint { get; set; }
 
+        /// <summary>
+        /// Tool's launch URL
+        /// </summary>
         [BindProperty(Name = "target_link_uri", SupportsGet = true)]
         public string TargetLinkUri { get; set; }
 
@@ -69,6 +81,7 @@ namespace AdvantageTool.Pages
                 return BadRequest();
             }
 
+            // Get the platform settings
             var platform = await _context.GetPlatformByIssuerAsync(Issuer);
             if (platform == null)
             {
@@ -76,7 +89,8 @@ namespace AdvantageTool.Pages
                 return BadRequest();
             }
 
-            // 	RPs MUST verify the value of the target_link_uri to prevent being used as an open redirector to external sites.
+            // RPs MUST verify the value of the target_link_uri to prevent being
+            // used as an open redirector to external sites.
             if (!Uri.TryCreate(TargetLinkUri, UriKind.Absolute, out var targetLinkUri))
             {
                 _logger.LogError($"Invalid target_link_uri [{TargetLinkUri}].");
