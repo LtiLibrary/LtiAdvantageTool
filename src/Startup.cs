@@ -35,6 +35,9 @@ namespace AdvantageTool
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
+            services.AddDbContext<StateDbContext>(options =>
+                options.UseInMemoryDatabase("States"));
+
             services.AddDefaultIdentity<AdvantageToolUser>(options =>
                 {
                     options.Password.RequireDigit = false;

@@ -25,15 +25,18 @@ namespace AdvantageTool.Pages
     public class ToolModel : PageModel
     {
         private readonly ApplicationDbContext _context;
+        private readonly StateDbContext _stateContext;
         private readonly AccessTokenService _accessTokenService;
         private readonly IHttpClientFactory _httpClientFactory;
 
         public ToolModel(
             ApplicationDbContext context,
+            StateDbContext stateContext,
             AccessTokenService accessTokenService,
             IHttpClientFactory httpClientFactory)
         {
             _context = context;
+            _stateContext = stateContext;
             _accessTokenService = accessTokenService;
             _httpClientFactory = httpClientFactory;
         }
@@ -103,6 +106,15 @@ namespace AdvantageTool.Pages
             if (string.IsNullOrEmpty(nonce))
             {
                 Error = "Nonce is missing.";
+                return Page();
+            }
+
+            // If the launch was initiated with a 3rd party login, then there will be a state
+            // entry for the nonce.
+            var state = _stateContext.States.Find(nonce);
+            if (state == null)
+            {
+                Error = "Invalid nonce.";
                 return Page();
             }
 

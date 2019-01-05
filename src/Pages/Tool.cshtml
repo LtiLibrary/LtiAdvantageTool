@@ -8,7 +8,7 @@
 <html lang="en">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
-    <title>@Model.LtiRequest.ResourceLink?.Title</title>
+    <title>@Model.LtiRequest?.ResourceLink?.Title</title>
     <environment include="Development">
         <link rel="stylesheet" href="~/lib/bootstrap/css/bootstrap.css" />
         <link rel="stylesheet" href="~/lib/fontawesome/css/all.css" />
@@ -74,36 +74,36 @@
                                         <h5 class="card-header">Platform Details</h5>
                                         <div class="card-body">
                                             <div>
-                                                @(Model.LtiRequest.Platform.Name ?? "(no name)")
+                                                @(Model.LtiRequest?.Platform.Name ?? "(no name)")
                                             </div>
                                             <div>
-                                                @(Model.LtiRequest.Platform.Description ?? "(no description)")
+                                                @(Model.LtiRequest?.Platform.Description ?? "(no description)")
                                             </div>
                                             <div>
-                                                @(Model.LtiRequest.Platform.ProductFamilyCode ?? "(no family code)")
-                                                @(Model.LtiRequest.Platform.Version ?? "(no version)")
+                                                @(Model.LtiRequest?.Platform.ProductFamilyCode ?? "(no family code)")
+                                                @(Model.LtiRequest?.Platform.Version ?? "(no version)")
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                @if (Model.LtiRequest.Context == null)
+                                @if (Model.LtiRequest?.Context == null)
                                 {
                                     <div class="col-3">
                                         <div class="card bg-transparent">
                                             <h5 class="card-header">User</h5>
                                             <div class="card-body">
                                                 <div>
-                                                    @(Model.LtiRequest.GivenName ?? "(no first name)")
-                                                    @(Model.LtiRequest.FamilyName ?? "(no last name)")
+                                                    @(Model.LtiRequest?.GivenName ?? "(no first name)")
+                                                    @(Model.LtiRequest?.FamilyName ?? "(no last name)")
                                                 </div>
                                                 <div>
-                                                    @(Model.LtiRequest.Email ?? "(no email)")
+                                                    @(Model.LtiRequest?.Email ?? "(no email)")
                                                 </div>
                                                 <div>
-                                                    @(string.Join(", ", Model.LtiRequest.Roles))
+                                                    @(string.Join(", ", Model.LtiRequest?.Roles))
                                                 </div>
                                                 <div>
-                                                    @(Model.LtiRequest.Lis?.PersonSourcedId ?? "(no sis id)")
+                                                    @(Model.LtiRequest?.Lis?.PersonSourcedId ?? "(no sis id)")
                                                 </div>
                                             </div>
                                         </div>
@@ -113,10 +113,10 @@
                                             <h5 class="card-header">Resource Link</h5>
                                             <div class="card-body">
                                                 <div>
-                                                    @(Model.LtiRequest.ResourceLink?.Title ?? "(no title)")
+                                                    @(Model.LtiRequest?.ResourceLink?.Title ?? "(no title)")
                                                 </div>
                                                 <div>
-                                                    @(Model.LtiRequest.ResourceLink?.Description ?? "(no description)")
+                                                    @(Model.LtiRequest?.ResourceLink?.Description ?? "(no description)")
                                                 </div>
                                             </div>
                                         </div>
@@ -128,7 +128,7 @@
                                         </div>
                                     </div>
                                 }
-                                @if (Model.LtiRequest.Context != null)
+                                @if (Model.LtiRequest?.Context != null)
                                 {
                                     <div class="col-9">
                                         <div class="card bg-secondary">

@@ -13,11 +13,16 @@ namespace AdvantageTool.Pages
     public class OidcLoginModel : PageModel
     {
         private readonly ApplicationDbContext _context;
+        private readonly StateDbContext _stateContext;
         private readonly ILogger<OidcLoginModel> _logger;
 
-        public OidcLoginModel(ApplicationDbContext context, ILogger<OidcLoginModel> logger)
+        public OidcLoginModel(
+            ApplicationDbContext context, 
+            StateDbContext stateContext,
+            ILogger<OidcLoginModel> logger)
         {
             _context = context;
+            _stateContext = stateContext;
             _logger = logger;
         }
 
@@ -103,6 +108,11 @@ namespace AdvantageTool.Pages
                 return BadRequest();
             }
 
+            // Store nonce and state
+            var nonce = CryptoRandom.CreateUniqueId();
+            var state = CryptoRandom.CreateUniqueId();
+            _stateContext.AddState(nonce, state);
+
             var ru = new RequestUrl(platform.AuthorizeUrl);
             var url = ru.CreateAuthorizeUrl
             (
@@ -117,13 +127,13 @@ namespace AdvantageTool.Pages
                 scope: OidcConstants.StandardScopes.OpenId,
 
                 // Consider checking state after redirect to make sure the state was not tampared with
-                state: CryptoRandom.CreateUniqueId(),
+                state: state,
 
                 // The userId
                 loginHint: LoginHint,
 
-                // Consider checking nonce at launch to make sure the id_token came from this flow and not direct
-                nonce: CryptoRandom.CreateUniqueId(),
+                // Checking nonce at launch to make sure the id_token came from this flow and not direct
+                nonce: nonce,
 
                 // No user interaction
                 prompt: "none",
