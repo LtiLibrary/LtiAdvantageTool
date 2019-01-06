@@ -8,9 +8,11 @@ using System.Text;
 using System.Threading.Tasks;
 using AdvantageTool.Data;
 using AdvantageTool.Utility;
+using IdentityModel.Internal;
 using LtiAdvantage;
 using LtiAdvantage.AssignmentGradeServices;
 using LtiAdvantage.Lti;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.IdentityModel.Tokens;
@@ -19,9 +21,8 @@ using Newtonsoft.Json;
 namespace AdvantageTool.Pages
 {
     // Tool launches typically come from outside this app and from unknown places, so
-    // I disable the anti-forgery token. Order will not be required starting with AspNetCore 2.2.
-    // See https://github.com/aspnet/Mvc/issues/7795#issuecomment-397071059
-    [IgnoreAntiforgeryToken(Order = 1001)]
+    // I disable the anti-forgery token.
+    [IgnoreAntiforgeryToken]
     public class ToolModel : PageModel
     {
         private readonly ApplicationDbContext _context;
@@ -191,7 +192,7 @@ namespace AdvantageTool.Pages
 
             if (messageType == Constants.Lti.LtiDeepLinkingRequestMessageType)
             {
-                return RedirectToPage("./Catalog", new { IdToken });
+                return Post("./Catalog", new { IdToken });
             }
 
             LtiRequest = new LtiResourceLinkRequest(Token.Payload);
@@ -332,6 +333,36 @@ namespace AdvantageTool.Pages
             }
 
             return await OnPostAsync();
+        }
+        
+        /// <summary>
+        /// Return a <see cref="ContentResult"/> that automatically POSTs the values.
+        /// </summary>
+        /// <param name="url">Where to post the values.</param>
+        /// <param name="values">The values to post.</param>
+        /// <returns></returns>
+        private ContentResult Post(string url, object values)
+        {
+            var response = HttpContext.Response;
+            response.Clear();
+
+            var dictionary = ValuesHelper.ObjectToDictionary(values);
+
+            var s = new StringBuilder();
+            s.Append("<html><head><title></title></head>");
+            s.Append("<body onload='document.forms[\"form\"].submit()'>");
+            s.Append($"<form name='form' action='{url}' method='post'>");
+            foreach (var (key, value) in dictionary)
+            {
+                s.Append($"<input type='hidden' name='{key}' value='{value}' />");
+            }
+            s.Append("</form></body></html>");
+            return new ContentResult
+            {
+                Content = s.ToString(), 
+                ContentType = "text/html", 
+                StatusCode = StatusCodes.Status200OK
+            };
         }
     }
 }

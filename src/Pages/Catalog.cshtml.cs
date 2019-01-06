@@ -18,6 +18,7 @@ namespace AdvantageTool.Pages
     /// <summary>
     /// This is the catalog page for the Deep Linking workflow.
     /// </summary>
+    [IgnoreAntiforgeryToken]
     public class CatalogModel : PageModel
     {
         private readonly ApplicationDbContext _context;
@@ -54,15 +55,13 @@ namespace AdvantageTool.Pages
         /// Handle the LTI request to launch deep linking. The token was validated by the Tool page.
         /// </summary>
         /// <returns></returns>
-        public IActionResult OnGet(string idToken)
+        public IActionResult OnPost()
         {
-            if (string.IsNullOrEmpty(idToken))
+            if (string.IsNullOrEmpty(IdToken))
             {
-                Error = $"{nameof(idToken)} is missing or empty";
+                Error = $"{nameof(IdToken)} is missing or empty";
                 return Page();
             }
-
-            IdToken = idToken;
 
             var handler = new JwtSecurityTokenHandler();
             Token = handler.ReadJwtToken(IdToken);
