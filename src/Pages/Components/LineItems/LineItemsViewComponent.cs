@@ -30,7 +30,7 @@ namespace AdvantageTool.Pages.Components.LineItems
 
         public async Task<IViewComponentResult> InvokeAsync(string idToken)
         {
-            var model = new LineItemsModel();
+            var model = new LineItemsModel(idToken);
             if (idToken.IsMissing())
             {
                 model.Status = $"{nameof(idToken)} is missing.";
@@ -38,9 +38,9 @@ namespace AdvantageTool.Pages.Components.LineItems
             }
 
             var handler = new JwtSecurityTokenHandler();
-            model.IdToken = idToken;
-            var ltiToken = handler.ReadJwtToken(model.IdToken);
-            model.LtiRequest = new LtiResourceLinkRequest(ltiToken.Payload);
+            var token = handler.ReadJwtToken(idToken);
+            model.LtiRequest = new LtiResourceLinkRequest(token.Payload);
+
             if (model.LtiRequest.AssignmentGradeServices == null)
             {
                 model.Status = "Assignment and Grade Services not defined.";
@@ -49,7 +49,7 @@ namespace AdvantageTool.Pages.Components.LineItems
             model.LineItemUrl = model.LtiRequest.AssignmentGradeServices.LineItemUrl;
 
             var tokenResponse = await _accessTokenService.GetAccessTokenAsync(
-                ltiToken.Payload.Iss, 
+                model.LtiRequest.Iss, 
                 string.Join(" ", 
                     Constants.LtiScopes.AgsLineItem, 
                     Constants.LtiScopes.AgsResultReadonly,

@@ -110,6 +110,9 @@ namespace AdvantageTool.Pages
 
             // Store nonce and state
             var nonce = CryptoRandom.CreateUniqueId();
+
+            // Consider using a state JWT as described in
+            // https://tools.ietf.org/html/draft-bradley-oauth-jwt-encoded-state-09
             var state = CryptoRandom.CreateUniqueId();
             _stateContext.AddState(nonce, state);
 

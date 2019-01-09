@@ -14,5 +14,17 @@ namespace AdvantageTool.Data
             States.Add(new State {Id = id, Value = value});
             SaveChanges();
         }
+
+        public State GetState(string id)
+        {
+            var state = States.Find(id);
+            if (state != null)
+            {
+                States.Remove(state);
+                SaveChanges();
+            }
+
+            return state;
+        }
     }
 }

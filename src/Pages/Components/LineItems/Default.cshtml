@@ -5,15 +5,15 @@
     <div class="row">
         <div class="col-12">
             <div class="card bg-transparent">
-                <h5 class="card-header">
-                    Gradebook
-                    <button type="submit" class="btn btn-light btn-sm float-right" asp-page-handler="CreateLineItem">
-                        Add a line item for <span class="font-italic">@Model.LtiRequest.ResourceLink.Title</span>
-                    </button>
-                </h5>
-                <div class="card-body">
-                    <form method="post">
-                        <input type="hidden" asp-for="IdToken" />
+                <form method="post">
+                    <input type="hidden" name="id_token" value="@Model.IdToken" />
+                    <h5 class="card-header">
+                        Gradebook
+                        <button type="submit" class="btn btn-light btn-sm float-right" asp-page-handler="CreateLineItem">
+                            Add a line item for <span class="font-italic">@Model.LtiRequest.ResourceLink.Title</span>
+                        </button>
+                    </h5>
+                    <div class="card-body">
                         @Model.Status
                         @if (Model.LineItems == null)
                         {
@@ -69,8 +69,8 @@
                                 </tbody>
                             </table>
                         }
-                    </form>
-                </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

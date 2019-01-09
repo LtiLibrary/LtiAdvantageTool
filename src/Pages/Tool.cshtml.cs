@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AdvantageTool.Data;
 using AdvantageTool.Utility;
+using IdentityModel.Client;
 using IdentityModel.Internal;
 using LtiAdvantage;
 using LtiAdvantage.AssignmentGradeServices;
@@ -48,10 +49,14 @@ namespace AdvantageTool.Pages
         public string Error { get; set; }
 
         /// <summary>
-        /// The id_token posted in the launch request.
+        /// A copy of the id_token for diagnostic purposes.
         /// </summary>
-        [BindProperty(Name = "id_token")]
         public string IdToken { get; set; }
+
+        /// <summary>
+        /// The parsed JWT header from id_token. Null if invalid token.
+        /// </summary>
+        public JwtHeader JwtHeader { get; set; }
 
         /// <summary>
         /// Wrapper around the request payload.
@@ -59,15 +64,14 @@ namespace AdvantageTool.Pages
         public LtiResourceLinkRequest LtiRequest { get; set; }
 
         /// <summary>
-        /// Get or set the JwtSecurityToken (id_token) in the request.
-        /// </summary>
-        public JwtSecurityToken Token { get; set; }
-
-        /// <summary>
-        /// Handle the LTI POST request to launch the tool. 
+        /// Handle the LTI POST request from the Authorization Server. 
         /// </summary>
         /// <returns></returns>
-        public async Task<IActionResult> OnPostAsync()
+        public async Task<IActionResult> OnPostAsync(
+            [FromForm(Name = "id_token")] string idToken, 
+            [FromForm(Name = "scope")] string scope = null, 
+            [FromForm(Name = "state")] string state = null, 
+            [FromForm(Name = "session_state")] string sessionState = null)
         {
             // Authenticate the request starting at step 5 in the OpenId Implicit Flow
             // See https://www.imsglobal.org/spec/security/v1p0/#platform-originating-messages
@@ -77,22 +81,23 @@ namespace AdvantageTool.Pages
             // See https://www.imsglobal.org/spec/security/v1p0/#successful-authentication
             // See http://openid.net/specs/oauth-v2-form-post-response-mode-1_0.html
 
-            if (string.IsNullOrEmpty(IdToken))
+            if (string.IsNullOrEmpty(idToken))
             {
                 Error = "id_token is missing or empty";
                 return Page();
             }
 
             var handler = new JwtSecurityTokenHandler();
-            if (!handler.CanReadToken(IdToken))
+            if (!handler.CanReadToken(idToken))
             {
                 Error = "Cannot read id_token";
                 return Page();
             }
 
-            Token = handler.ReadJwtToken(IdToken);
+            var jwt = handler.ReadJwtToken(idToken);
+            JwtHeader = jwt.Header;
 
-            var messageType = Token.Claims.SingleOrDefault(c => c.Type == Constants.LtiClaims.MessageType)?.Value;
+            var messageType = jwt.Claims.SingleOrDefault(c => c.Type == Constants.LtiClaims.MessageType)?.Value;
             if (messageType.IsMissing())
             {
                 Error = $"{Constants.LtiClaims.MessageType} claim is missing.";
@@ -103,7 +108,7 @@ namespace AdvantageTool.Pages
             // See https://www.imsglobal.org/spec/security/v1p0/#authentication-response-validation
 
             // The ID Token MUST contain a nonce Claim.
-            var nonce = Token.Claims.SingleOrDefault(c => c.Type == "nonce")?.Value;
+            var nonce = jwt.Claims.SingleOrDefault(c => c.Type == "nonce")?.Value;
             if (string.IsNullOrEmpty(nonce))
             {
                 Error = "Nonce is missing.";
@@ -112,15 +117,22 @@ namespace AdvantageTool.Pages
 
             // If the launch was initiated with a 3rd party login, then there will be a state
             // entry for the nonce.
-            var state = _stateContext.States.Find(nonce);
-            if (state == null)
+            var memorizedState = _stateContext.GetState(nonce);
+            if (memorizedState == null)
             {
-                Error = "Invalid nonce.";
+                Error = "Invalid nonce. Cannot replay request.";
+                return Page();
+            }
+
+            // The state should be echoed back by the AS without modification
+            if (memorizedState.Value != state)
+            {
+                Error = "Invalid state.";
                 return Page();
             }
 
             // The Audience must match a Client ID exactly.
-            var platform = await _context.GetPlatformByIssuerAndAudienceAsync(Token.Payload.Iss, Token.Payload.Aud);
+            var platform = await _context.GetPlatformByIssuerAndAudienceAsync(jwt.Payload.Iss, jwt.Payload.Aud);
             if (platform == null)
             {
                 Error = "Unknown issuer/audience.";
@@ -148,7 +160,7 @@ namespace AdvantageTool.Pages
                 var httpClient = _httpClientFactory.CreateClient();
                 var keySetJson = await httpClient.GetStringAsync(platform.JwkSetUrl);
                 var keySet = JsonConvert.DeserializeObject<JsonWebKeySet>(keySetJson);
-                var key = keySet.Keys.SingleOrDefault(k => k.Kid == Token.Header.Kid);
+                var key = keySet.Keys.SingleOrDefault(k => k.Kid == jwt.Header.Kid);
                 if (key == null)
                 {
                     Error = "No matching key found.";
@@ -182,7 +194,7 @@ namespace AdvantageTool.Pages
 
             try
             {
-                handler.ValidateToken(IdToken, validationParameters, out _);
+                handler.ValidateToken(idToken, validationParameters, out _);
             }
             catch (Exception e)
             {
@@ -192,10 +204,11 @@ namespace AdvantageTool.Pages
 
             if (messageType == Constants.Lti.LtiDeepLinkingRequestMessageType)
             {
-                return Post("./Catalog", new { IdToken });
+                return Post("./Catalog", new { idToken });
             }
 
-            LtiRequest = new LtiResourceLinkRequest(Token.Payload);
+            IdToken = idToken;
+            LtiRequest = new LtiResourceLinkRequest(jwt.Payload);
 
             return Page();
         }
@@ -204,28 +217,27 @@ namespace AdvantageTool.Pages
         /// Handler for creating a line item.
         /// </summary>
         /// <returns>The result.</returns>
-        public async Task<IActionResult> OnPostCreateLineItemAsync(string idToken)
+        public async Task<IActionResult> OnPostCreateLineItemAsync([FromForm(Name = "id_token")] string idToken)
         {
             if (idToken.IsMissing())
             {
                 Error = $"{nameof(idToken)} is missing.";
-                return await OnPostAsync();
+                return Page();
             }
-            IdToken = idToken;
 
             var handler = new JwtSecurityTokenHandler();
-            Token = handler.ReadJwtToken(IdToken);
-            LtiRequest = new LtiResourceLinkRequest(Token.Payload);
+            var jwt = handler.ReadJwtToken(idToken);
+            LtiRequest = new LtiResourceLinkRequest(jwt.Payload);
 
             var tokenResponse = await _accessTokenService.GetAccessTokenAsync(
-                Token.Payload.Iss, 
+                LtiRequest.Iss, 
                 Constants.LtiScopes.AgsLineItem);
 
             // The IMS reference implementation returns "Created" with success. 
             if (tokenResponse.IsError && tokenResponse.Error != "Created")
             {
                 Error = tokenResponse.Error;
-                return await OnPostAsync();
+                return Page();
             }
 
             var httpClient = _httpClientFactory.CreateClient();
@@ -251,49 +263,54 @@ namespace AdvantageTool.Pages
                     if (!response.IsSuccessStatusCode)
                     {
                         Error = response.ReasonPhrase;
+                        return Page();
                     }
                 }
             }
             catch (Exception e)
             {
                 Error = e.Message;
+                return Page();
             }
 
-            return await OnPostAsync();
+            return Relaunch(
+                LtiRequest.Iss,
+                LtiRequest.UserId,
+                LtiRequest.ResourceLink.Id,
+                LtiRequest.Context.Id);
         }
 
         /// <summary>
         /// Handler for posting a score.
         /// </summary>
         /// <returns>The posted score.</returns>
-        public async Task<IActionResult> OnPostPostScoreAsync(string idToken, string lineItemUrl)
+        public async Task<IActionResult> OnPostPostScoreAsync([FromForm(Name = "id_token")] string idToken, string lineItemUrl)
         {
             if (idToken.IsMissing())
             {
                 Error = $"{nameof(idToken)} is missing.";
-                return await OnPostAsync();
+                return Page();
             }
-            IdToken = idToken;
 
             if (lineItemUrl.IsMissing())
             {
                 Error = $"{nameof(lineItemUrl)} is missing.";
-                return await OnPostAsync();
+                return Page();
             }
 
             var handler = new JwtSecurityTokenHandler();
-            Token = handler.ReadJwtToken(IdToken);
-            LtiRequest = new LtiResourceLinkRequest(Token.Payload);
+            var jwt = handler.ReadJwtToken(idToken);
+            LtiRequest = new LtiResourceLinkRequest(jwt.Payload);
 
             var tokenResponse = await _accessTokenService.GetAccessTokenAsync(
-                Token.Payload.Iss, 
+                LtiRequest.Iss, 
                 Constants.LtiScopes.AgsScore);
 
             // The IMS reference implementation returns "Created" with success. 
             if (tokenResponse.IsError && tokenResponse.Error != "Created")
             {
                 Error = tokenResponse.Error;
-                return await OnPostAsync();
+                return Page();
             }
 
             var httpClient = _httpClientFactory.CreateClient();
@@ -324,15 +341,48 @@ namespace AdvantageTool.Pages
                     if (!response.IsSuccessStatusCode)
                     {
                         Error = response.ReasonPhrase;
+                        return Page();
                     }
                 }
             }
             catch (Exception e)
             {
                 Error = e.Message;
+                return Page();
             }
 
-            return await OnPostAsync();
+            return Relaunch(
+                LtiRequest.Iss,
+                LtiRequest.UserId,
+                LtiRequest.ResourceLink.Id,
+                LtiRequest.Context.Id);
+        }
+
+        private RedirectResult Relaunch(string iss, string userId, string resourceLinkId, string contextId)
+        {
+            // Send request to tool's endpoint to initiate login
+            var values = new
+            {
+                // The issuer identifier for the platform
+                iss,
+
+                // The platform identifier for the user to login
+                login_hint = userId,
+
+                // The endpoint to be executed at the end of the OIDC authentication flow
+                target_link_uri = Url.Page("./Tool", null, null, Request.Scheme),
+
+                // The identifier of the LtiResourceLink message (or the deep link message, etc)
+                lti_message_hint = JsonConvert.SerializeObject(new
+                {
+                    id = resourceLinkId, 
+                    messageType = Constants.Lti.LtiResourceLinkRequestMessageType, 
+                    courseId = contextId
+                })
+            };
+
+            var url = new RequestUrl(Url.Page("./OidcLogin")).Create(values);
+            return Redirect(url);
         }
         
         /// <summary>

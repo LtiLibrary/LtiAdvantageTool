@@ -12,6 +12,11 @@ namespace AdvantageTool.Pages.Components.LineItems
         public LtiResourceLinkRequest LtiRequest { get; set; }
         public Dictionary<string, string> Members { get; set; }
         public string Status { get; set; }
+
+        public LineItemsModel(string idToken)
+        {
+            IdToken = idToken;
+        }
     }
 
     public class MyLineItem

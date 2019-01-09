@@ -204,7 +204,7 @@
                     <div class="card-header">
                         JWT Header
                     </div>
-                    <pre class="card-body">@Model.Token.Header.ToJsonString()</pre>
+                    <pre class="card-body">@Model.JwtHeader?.ToJsonString()</pre>
                 </div>
             </div>
             <div class="col-6">
@@ -212,7 +212,7 @@
                     <div class="card-header">
                         JWT Payload
                     </div>
-                    <pre class="card-body">@Model.LtiRequest.ToJsonString()</pre>
+                    <pre class="card-body">@Model.LtiRequest?.ToJsonString()</pre>
                 </div>
             </div>
         </div>
