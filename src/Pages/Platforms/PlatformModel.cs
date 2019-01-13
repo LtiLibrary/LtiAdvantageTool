@@ -17,26 +17,29 @@ namespace AdvantageTool.Pages.Platforms
     {
         public PlatformModel() { }
 
-        public PlatformModel(HttpRequest request, IUrlHelper url)
+        public PlatformModel(HttpRequest request, IUrlHelper url, Platform platform = null)
         {
-            PlatformId = CryptoRandom.CreateUniqueId(8);
+            if (platform == null)
+            {
+                PlatformId = CryptoRandom.CreateUniqueId(8);
+            }
+            else
+            {
+                Id = platform.Id;
+                AccessTokenUrl = platform.AccessTokenUrl;
+                AuthorizeUrl = platform.AuthorizeUrl;
+                Issuer = platform.Issuer;
+                JwkSetUrl = platform.JwkSetUrl;
+                Name = platform.Name;
+                PlatformId = platform.PlatformId;
+
+                ClientId = platform.ClientId;
+                PrivateKey = platform.PrivateKey;
+            }
+
             DeepLinkingLaunchUrl = url.Page("/Tool", null, new { platformId = PlatformId }, request.Scheme);
             LaunchUrl = url.Page("/Tool", null, new { platformId = PlatformId }, request.Scheme);
             LoginUrl = url.Page("/OidcLogin", null, null, request.Scheme);
-        }
-
-        public PlatformModel(HttpRequest request, IUrlHelper url, Platform platform) :this(request, url)
-        {
-            Id = platform.Id;
-            AccessTokenUrl = platform.AccessTokenUrl;
-            AuthorizeUrl = platform.AuthorizeUrl;
-            Issuer = platform.Issuer;
-            JwkSetUrl = platform.JwkSetUrl;
-            Name = platform.Name;
-            PlatformId = platform.PlatformId;
-
-            ClientId = platform.ClientId;
-            PrivateKey = platform.PrivateKey;
         }
 
         /// <summary>
@@ -167,6 +170,7 @@ namespace AdvantageTool.Pages.Platforms
             platform.Name = Name;
             platform.Issuer = Issuer;
             platform.JwkSetUrl = JwkSetUrl;
+            platform.PlatformId = PlatformId;
 
             platform.ClientId = ClientId;
             platform.PrivateKey = PrivateKey;

@@ -9,6 +9,7 @@
     <h4>Register Platform</h4>
     <hr />
     <form method="post">
+        <input type="hidden" asp-for="Platform.PlatformId"/>
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <div class="row">
             <div class="col-lg-6 mb-3">
@@ -19,31 +20,31 @@
                     <div class="card-body">
                         <div class="form-group">
                             <label asp-for="Platform.Name"></label>
-                            <input asp-for="Platform.Name" class="form-control" />
+                            <input asp-for="Platform.Name" class="form-control"/>
                             <span asp-validation-for="Platform.Name" class="text-danger"></span>
                         </div>
                         <div class="form-group">
                             <label asp-for="Platform.Issuer"></label>
                             <tooltip asp-for="Platform.Issuer"></tooltip>
-                            <input asp-for="Platform.Issuer" class="form-control" />
+                            <input asp-for="Platform.Issuer" class="form-control"/>
                             <span asp-validation-for="Platform.Issuer" class="text-danger"></span>
                         </div>
                         <div class="form-group">
                             <label asp-for="Platform.JwkSetUrl"></label>
                             <tooltip asp-for="Platform.JwkSetUrl"></tooltip>
-                            <input asp-for="Platform.JwkSetUrl" class="form-control" />
+                            <input asp-for="Platform.JwkSetUrl" class="form-control"/>
                             <span asp-validation-for="Platform.JwkSetUrl" class="text-danger"></span>
                         </div>
                         <div class="form-group">
                             <label asp-for="Platform.AccessTokenUrl"></label>
                             <tooltip asp-for="Platform.AccessTokenUrl"></tooltip>
-                            <input asp-for="Platform.AccessTokenUrl" class="form-control" />
+                            <input asp-for="Platform.AccessTokenUrl" class="form-control"/>
                             <span asp-validation-for="Platform.AccessTokenUrl" class="text-danger"></span>
                         </div>
                         <div class="form-group">
                             <label asp-for="Platform.AuthorizeUrl"></label>
                             <tooltip asp-for="Platform.AuthorizeUrl"></tooltip>
-                            <input asp-for="Platform.AuthorizeUrl" class="form-control" />
+                            <input asp-for="Platform.AuthorizeUrl" class="form-control"/>
                             <span asp-validation-for="Platform.AuthorizeUrl" class="text-danger"></span>
                         </div>
                     </div>
@@ -58,21 +59,21 @@
                         <div class="form-group">
                             <label asp-for="Platform.LoginUrl"></label>
                             <tooltip asp-for="Platform.LoginUrl"></tooltip>
-                            <input asp-for="Platform.LoginUrl" class="form-control" readonly="readonly" />
+                            <input asp-for="Platform.LoginUrl" class="form-control" readonly="readonly"/>
                         </div>
                         <div class="form-group">
                             <label asp-for="Platform.LaunchUrl"></label>
                             <tooltip asp-for="Platform.LaunchUrl"></tooltip>
-                            <input asp-for="Platform.LaunchUrl" class="form-control" readonly="readonly" />
+                            <input asp-for="Platform.LaunchUrl" class="form-control" readonly="readonly"/>
                         </div>
                         <div class="form-group">
                             <label asp-for="Platform.DeepLinkingLaunchUrl"></label>
                             <tooltip asp-for="Platform.DeepLinkingLaunchUrl"></tooltip>
-                            <input asp-for="Platform.DeepLinkingLaunchUrl" class="form-control" readonly="readonly" />
+                            <input asp-for="Platform.DeepLinkingLaunchUrl" class="form-control" readonly="readonly"/>
                         </div>
                         <div class="form-group">
                             <label asp-for="Platform.ClientId"></label>
-                            <input asp-for="Platform.ClientId" class="form-control" />
+                            <input asp-for="Platform.ClientId" class="form-control"/>
                             <span asp-validation-for="Platform.ClientId" class="text-danger"></span>
                         </div>
                         <div class="form-group">
@@ -80,14 +81,14 @@
                             <tooltip asp-for="Platform.PrivateKey"></tooltip>
                             (for development keys see <a href="https://lti-ri.imsglobal.org/keygen/index" target="_blank">https://lti-ri.imsglobal.org/keygen/index</a>)
                             <textarea asp-for="Platform.PrivateKey" class="form-control text-monospace small" rows="5" placeholder="Enter the private key in PEM format."></textarea>
-                            <span asp-validation-for="Platform.ClientId" class="text-danger"></span>
+                            <span asp-validation-for="Platform.PrivateKey" class="text-danger"></span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         <div class="form-group">
-            <input type="submit" value="Create" class="btn btn-secondary" />
+            <input type="submit" value="Create" class="btn btn-secondary"/>
         </div>
     </form>
 
