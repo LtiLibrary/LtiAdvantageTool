@@ -63,21 +63,6 @@ namespace AdvantageTool.Data
             return principal.FindFirstValue(ClaimTypes.NameIdentifier);
         }
 
-        public async Task<Platform> GetPlatformByIssuerAndAudienceAsync(string issuer, IList<string> audience)
-        {
-            if (issuer.IsMissing())
-            {
-                throw new ArgumentNullException(nameof(issuer));
-            }
-
-            if (audience == null || audience.Count == 0)
-            {
-                throw new ArgumentException($"{nameof(audience)} is null or empty.");
-            }
-
-            return await Platforms.SingleOrDefaultAsync(p => p.Issuer == issuer && audience.Any(a => a == p.ClientId));
-        }
-
         public async Task<Platform> GetPlatformByIssuerAsync(string issuer)
         {
             if (issuer.IsMissing())
@@ -86,6 +71,16 @@ namespace AdvantageTool.Data
             }
 
             return await Platforms.SingleOrDefaultAsync(p => p.Issuer == issuer);
+        }
+
+        public async Task<Platform> GetPlatformByPlatformId(string platformId)
+        {
+            if (platformId.IsMissing())
+            {
+                throw new ArgumentNullException(nameof(platformId));
+            }
+
+            return await Platforms.SingleOrDefaultAsync(p => p.PlatformId == platformId);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Security.Cryptography;
+using IdentityModel;
 using Microsoft.IdentityModel.Tokens;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Generators;
@@ -24,7 +25,7 @@ namespace AdvantageTool.Utility
         {
             public RsaKeyPair()
             {
-                KeyId = CryptoRandom.GenerateRandomKeyId();
+                KeyId = CryptoRandom.CreateRandomKeyString(8);
             }
 
             /// <summary>

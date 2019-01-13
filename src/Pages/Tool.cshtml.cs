@@ -68,6 +68,7 @@ namespace AdvantageTool.Pages
         /// </summary>
         /// <returns></returns>
         public async Task<IActionResult> OnPostAsync(
+            string platformId,
             [FromForm(Name = "id_token")] string idToken, 
             [FromForm(Name = "scope")] string scope = null, 
             [FromForm(Name = "state")] string state = null, 
@@ -131,11 +132,11 @@ namespace AdvantageTool.Pages
                 return Page();
             }
 
-            // The Audience must match a Client ID exactly.
-            var platform = await _context.GetPlatformByIssuerAndAudienceAsync(jwt.Payload.Iss, jwt.Payload.Aud);
+            // Look for the platform with platformId in the redirect URI
+            var platform = await _context.GetPlatformByPlatformId(platformId);
             if (platform == null)
             {
-                Error = "Unknown issuer/audience.";
+                Error = "Unknown platform.";
                 return Page();
             }
 
@@ -182,10 +183,13 @@ namespace AdvantageTool.Pages
             var validationParameters = new TokenValidationParameters
             {
                 ValidateTokenReplay = true,
-                ValidateAudience = false, // Validated above
-                ValidateIssuer = false, // Validated above
+                ValidateAudience = true,
+                ValidateIssuer = true,
                 RequireSignedTokens = true,
                 ValidateIssuerSigningKey = true,
+
+                ValidAudience = platform.ClientId,
+                ValidIssuer = platform.Issuer,
                 IssuerSigningKey = new RsaSecurityKey(rsaParameters),
 
                 ValidateLifetime = true,

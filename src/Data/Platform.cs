@@ -34,6 +34,14 @@
         /// </summary>
         public string JwkSetUrl { get; set; }
 
+        /// <summary>
+        /// Unique identifier for the platform / authorization server.
+        /// Used to create AS-specific redirect URIs as a means to
+        /// identify the AS a particular response came from. See BCP
+        /// Protecting Redirect-Based Flows.
+        /// </summary>
+        public string PlatformId { get; set; }
+
         #endregion
 
         #region Tool Properties

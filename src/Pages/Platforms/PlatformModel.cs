@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using AdvantageTool.Data;
 using AdvantageTool.Utility;
+using IdentityModel;
 using IdentityModel.Client;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -18,8 +19,9 @@ namespace AdvantageTool.Pages.Platforms
 
         public PlatformModel(HttpRequest request, IUrlHelper url)
         {
-            DeepLinkingLaunchUrl = url.Page("/Tool", null, null, request.Scheme);
-            LaunchUrl = url.Page("/Tool", null, null, request.Scheme);
+            PlatformId = CryptoRandom.CreateUniqueId(8);
+            DeepLinkingLaunchUrl = url.Page("/Tool", null, new { platformId = PlatformId }, request.Scheme);
+            LaunchUrl = url.Page("/Tool", null, new { platformId = PlatformId }, request.Scheme);
             LoginUrl = url.Page("/OidcLogin", null, null, request.Scheme);
         }
 
@@ -31,6 +33,7 @@ namespace AdvantageTool.Pages.Platforms
             Issuer = platform.Issuer;
             JwkSetUrl = platform.JwkSetUrl;
             Name = platform.Name;
+            PlatformId = platform.PlatformId;
 
             ClientId = platform.ClientId;
             PrivateKey = platform.PrivateKey;
@@ -66,6 +69,16 @@ namespace AdvantageTool.Pages.Platforms
         [Display(Name = "Display Name")]
         public string Name { get; set; }
 
+        /// <summary>
+        /// Not displayed.
+        /// 
+        /// Unique identifier for the platform / authorization server.
+        /// Used to create AS-specific redirect URIs as a means to
+        /// identify the AS a particular response came from. See BCP
+        /// Protecting Redirect-Based Flows.
+        /// </summary>
+        public string PlatformId { get; set; }
+
         #endregion
 
         #region Tool properties
@@ -87,13 +100,13 @@ namespace AdvantageTool.Pages.Platforms
         /// <summary>
         /// Tool launch url.
         /// </summary>
-        [Display(Name = "Launch URL", Description = "The URL to launch the tool.")]
+        [Display(Name = "Launch URL", Description = "The URL to launch the tool's resource link experience.")]
         public string LaunchUrl { get; set; }
 
         /// <summary>
         /// OIDC login initiation url.
         /// </summary>
-        [Display(Name = "Login URL", Description = "The URL to initiate OpenID Connect authorization.")]
+        [Display(Name = "Login URL", Description = "The URL to initiate the tool's OpenID Connect third party login.")]
         public string LoginUrl { get; set; }
 
         /// <summary>
