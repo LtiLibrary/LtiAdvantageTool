@@ -76,13 +76,13 @@ namespace AdvantageTool.Pages
 
             if (string.IsNullOrWhiteSpace(LtiMessageHint))
             {
-                _logger.LogError(new ArgumentNullException(nameof(LoginHint)), $"{nameof(LtiMessageHint)} is missing.");
+                _logger.LogError(new ArgumentNullException(nameof(LtiMessageHint)), $"{nameof(LtiMessageHint)} is missing.");
                 return BadRequest();
             }
 
             if (string.IsNullOrWhiteSpace(TargetLinkUri))
             {
-                _logger.LogError(new ArgumentNullException(nameof(LoginHint)), $"{nameof(TargetLinkUri)} is missing.");
+                _logger.LogError(new ArgumentNullException(nameof(TargetLinkUri)), $"{nameof(TargetLinkUri)} is missing.");
                 return BadRequest();
             }
 
@@ -108,12 +108,15 @@ namespace AdvantageTool.Pages
                 return BadRequest();
             }
 
-            // Store nonce and state
+            // Create a unique nonce for this flow
             var nonce = CryptoRandom.CreateUniqueId();
 
             // Consider using a state JWT as described in
             // https://tools.ietf.org/html/draft-bradley-oauth-jwt-encoded-state-09
             var state = CryptoRandom.CreateUniqueId();
+
+            // Store the nonce and flow so they can be validated when the id_token
+            // is posted back to the tool by the Authorization Server.
             _stateContext.AddState(nonce, state);
 
             var ru = new RequestUrl(platform.AuthorizeUrl);
@@ -123,8 +126,8 @@ namespace AdvantageTool.Pages
                 responseType: OidcConstants.ResponseTypes.IdToken,
 
                 // POST the id_token directly to the tool's launch URL
-                redirectUri: TargetLinkUri,
                 responseMode: OidcConstants.ResponseModes.FormPost,
+                redirectUri: TargetLinkUri,
 
                 // Per IMS guidance
                 scope: OidcConstants.StandardScopes.OpenId,
@@ -145,7 +148,7 @@ namespace AdvantageTool.Pages
                 extra: new { lti_message_hint = LtiMessageHint }
             );
 
-            _logger.LogInformation("Requesting authentication.");
+            _logger.LogInformation("Requesting id_token.");
 
             return Redirect(url);
         }
