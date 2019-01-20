@@ -112,7 +112,7 @@ namespace AdvantageTool.Pages
             var nonce = jwt.Claims.SingleOrDefault(c => c.Type == "nonce")?.Value;
             if (string.IsNullOrEmpty(nonce))
             {
-                Error = "Nonce is missing.";
+                Error = "Nonce is missing from request.";
                 return Page();
             }
 
