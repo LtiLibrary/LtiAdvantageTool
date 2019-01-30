@@ -235,7 +235,7 @@ namespace AdvantageTool.Pages
 
             var tokenResponse = await _accessTokenService.GetAccessTokenAsync(
                 LtiRequest.Iss, 
-                Constants.LtiScopes.AgsLineItem);
+                Constants.LtiScopes.Ags.LineItem);
 
             // The IMS reference implementation returns "Created" with success. 
             if (tokenResponse.IsError && tokenResponse.Error != "Created")
@@ -308,7 +308,7 @@ namespace AdvantageTool.Pages
 
             var tokenResponse = await _accessTokenService.GetAccessTokenAsync(
                 LtiRequest.Iss, 
-                Constants.LtiScopes.AgsScore);
+                Constants.LtiScopes.Ags.Score);
 
             // The IMS reference implementation returns "Created" with success. 
             if (tokenResponse.IsError && tokenResponse.Error != "Created")
