@@ -141,7 +141,7 @@ namespace AdvantageTool.Pages
             response.AddClaim(new Claim(JwtRegisteredClaimNames.Iat, EpochTime.GetIntDate(DateTime.UtcNow).ToString()));
             response.AddClaim(new Claim(JwtRegisteredClaimNames.Nbf, EpochTime.GetIntDate(DateTime.UtcNow.AddSeconds(-5)).ToString()));
             response.AddClaim(new Claim(JwtRegisteredClaimNames.Exp, EpochTime.GetIntDate(DateTime.UtcNow.AddMinutes(5)).ToString()));
-            response.AddClaim(new Claim(JwtRegisteredClaimNames.Nonce, LtiAdvantage.Lti.LtiRequest.GenerateCryptographicNonce()));
+            response.AddClaim(new Claim(JwtRegisteredClaimNames.Nonce, IdentityModel.CryptoRandom.CreateRandomKeyString(8)));
 
             var platform = await _context.GetPlatformByIssuerAsync(LtiRequest.Iss);
             var credentials = PemHelper.SigningCredentialsFromPemString(platform.PrivateKey);

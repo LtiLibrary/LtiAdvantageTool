@@ -4,9 +4,9 @@ using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AdvantageTool.Data;
+using IdentityModel;
 using IdentityModel.Client;
 using LtiAdvantage.IdentityModel.Client;
-using LtiAdvantage.Lti;
 using Microsoft.IdentityModel.Tokens;
 
 namespace AdvantageTool.Utility
@@ -62,7 +62,7 @@ namespace AdvantageTool.Utility
             payload.AddClaim(new Claim(JwtRegisteredClaimNames.Iat, EpochTime.GetIntDate(DateTime.UtcNow).ToString()));
             payload.AddClaim(new Claim(JwtRegisteredClaimNames.Nbf, EpochTime.GetIntDate(DateTime.UtcNow.AddSeconds(-5)).ToString()));
             payload.AddClaim(new Claim(JwtRegisteredClaimNames.Exp, EpochTime.GetIntDate(DateTime.UtcNow.AddMinutes(5)).ToString()));
-            payload.AddClaim(new Claim(JwtRegisteredClaimNames.Jti, LtiRequest.GenerateCryptographicNonce()));
+            payload.AddClaim(new Claim(JwtRegisteredClaimNames.Jti, CryptoRandom.CreateRandomKeyString(32)));
 
             var handler = new JwtSecurityTokenHandler();
             var credentials = PemHelper.SigningCredentialsFromPemString(platform.PrivateKey);

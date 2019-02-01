@@ -139,7 +139,7 @@ namespace AdvantageTool.Pages
                 loginHint: LoginHint,
 
                 // Checking nonce at launch to make sure the id_token came from this flow and not direct
-                nonce: nonce,
+                nonce: nonce+"a",
 
                 // No user interaction
                 prompt: "none",

@@ -51,9 +51,9 @@ namespace AdvantageTool.Pages.Components.LineItems
             var tokenResponse = await _accessTokenService.GetAccessTokenAsync(
                 model.LtiRequest.Iss, 
                 string.Join(" ", 
-                    Constants.LtiScopes.AgsLineItem, 
-                    Constants.LtiScopes.AgsResultReadonly,
-                    Constants.LtiScopes.NrpsMembershipReadonly));
+                    Constants.LtiScopes.Ags.LineItem, 
+                    Constants.LtiScopes.Ags.ResultReadonly,
+                    Constants.LtiScopes.Nrps.MembershipReadonly));
 
             // The IMS reference implementation returns "Created" with success. 
             if (tokenResponse.IsError && tokenResponse.Error != "Created")

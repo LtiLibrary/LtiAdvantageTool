@@ -121,7 +121,7 @@ namespace AdvantageTool.Pages
             var memorizedState = _stateContext.GetState(nonce);
             if (memorizedState == null)
             {
-                Error = "Invalid nonce. Cannot replay request.";
+                Error = "Invalid nonce. Possible request replay.";
                 return Page();
             }
 
