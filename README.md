@@ -1,3 +1,5 @@
+**This code is out of date***
+
 # LTI Advantage Tool
 
 Sample LTI Advantage Tool for .NET Core. See https://advantagetool.azurewebsites.net/
