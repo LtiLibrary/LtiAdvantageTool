@@ -10,6 +10,8 @@
   <ItemGroup>
     <PackageReference Include="BuildBundlerMinifier" Version="2.8.391" />
     <PackageReference Include="IdentityModel" Version="3.10.5" />
+    <PackageReference Include="LtiAdvantage" Version="0.1.1-alpha.0" />
+    <PackageReference Include="LtiAdvantage.IdentityModel" Version="0.1.1-alpha.0" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.5.1" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="RandomNameGeneratorLibrary" Version="1.2.2" />
@@ -18,11 +20,6 @@
   <ItemGroup>
     <Folder Include="Areas\Identity\Services\" />
     <Folder Include="wwwroot\lib\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\LTI\LtiAdvantage\src\LtiAdvantage.IdentityModel\LtiAdvantage.IdentityModel.csproj" />
-    <ProjectReference Include="..\..\..\LTI\LtiAdvantage\src\LtiAdvantage\LtiAdvantage.csproj" />
   </ItemGroup>
 
   <ItemGroup>
