@@ -144,7 +144,9 @@ namespace AdvantageTool.Pages.Components.LineItems
 
                 foreach (var lineItem in model.LineItems)
                 {
-                    using (var response = await httpClient.GetAsync(lineItem.AgsLineItem.Id.EnsureTrailingSlash() + "results"))
+                    var lineItemUri = new Uri(lineItem.AgsLineItem.Id);
+                    var resultsUrl = $"{lineItemUri.GetLeftPart(UriPartial.Path)}/results{lineItemUri.Query}";
+                    using (var response = await httpClient.GetAsync(resultsUrl))
                     {
                         if (!response.IsSuccessStatusCode)
                         {
