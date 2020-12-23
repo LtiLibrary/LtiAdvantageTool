@@ -8,7 +8,6 @@ using System.Text;
 using System.Threading.Tasks;
 using AdvantageTool.Data;
 using AdvantageTool.Utility;
-using IdentityModel.Client;
 using IdentityModel.Internal;
 using LtiAdvantage;
 using LtiAdvantage.AssignmentGradeServices;
@@ -277,11 +276,9 @@ namespace AdvantageTool.Pages
                 return Page();
             }
 
-            return Relaunch(
-                LtiRequest.Iss,
-                LtiRequest.UserId,
-                LtiRequest.ResourceLink.Id,
-                LtiRequest.Context.Id);
+            IdToken = idToken;
+
+            return Page();
         }
 
         /// <summary>
@@ -355,40 +352,11 @@ namespace AdvantageTool.Pages
                 return Page();
             }
 
-            return Relaunch(
-                LtiRequest.Iss,
-                LtiRequest.UserId,
-                LtiRequest.ResourceLink.Id,
-                LtiRequest.Context.Id);
+            IdToken = idToken;
+
+            return Page();
         }
 
-        private RedirectResult Relaunch(string iss, string userId, string resourceLinkId, string contextId)
-        {
-            // Send request to tool's endpoint to initiate login
-            var values = new
-            {
-                // The issuer identifier for the platform
-                iss,
-
-                // The platform identifier for the user to login
-                login_hint = userId,
-
-                // The endpoint to be executed at the end of the OIDC authentication flow
-                target_link_uri = Url.Page("./Tool", null, null, Request.Scheme),
-
-                // The identifier of the LtiResourceLink message (or the deep link message, etc)
-                lti_message_hint = JsonConvert.SerializeObject(new
-                {
-                    id = resourceLinkId, 
-                    messageType = Constants.Lti.LtiResourceLinkRequestMessageType, 
-                    courseId = contextId
-                })
-            };
-
-            var url = new RequestUrl(Url.Page("./OidcLogin")).Create(values);
-            return Redirect(url);
-        }
-        
         /// <summary>
         /// Return a <see cref="ContentResult"/> that automatically POSTs the values.
         /// </summary>
