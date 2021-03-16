@@ -74,14 +74,14 @@
                                         <h5 class="card-header">Platform Details</h5>
                                         <div class="card-body">
                                             <div>
-                                                @(Model.LtiRequest?.Platform.Name ?? "(no name)")
+                                                @(Model.LtiRequest?.Platform?.Name ?? "(no name)")
                                             </div>
                                             <div>
-                                                @(Model.LtiRequest?.Platform.Description ?? "(no description)")
+                                                @(Model.LtiRequest?.Platform?.Description ?? "(no description)")
                                             </div>
                                             <div>
-                                                @(Model.LtiRequest?.Platform.ProductFamilyCode ?? "(no family code)")
-                                                @(Model.LtiRequest?.Platform.Version ?? "(no version)")
+                                                @(Model.LtiRequest?.Platform?.ProductFamilyCode ?? "(no family code)")
+                                                @(Model.LtiRequest?.Platform?.Version ?? "(no version)")
                                             </div>
                                         </div>
                                     </div>
@@ -100,7 +100,7 @@
                                                     @(Model.LtiRequest?.Email ?? "(no email)")
                                                 </div>
                                                 <div>
-                                                    @(string.Join(", ", Model.LtiRequest?.Roles))
+                                                    @(Model.LtiRequest?.Roles != null ? string.Join(", ", Model.LtiRequest?.Roles) : "(no roles)")
                                                 </div>
                                                 <div>
                                                     @(Model.LtiRequest?.Lis?.PersonSourcedId ?? "(no sis id)")
