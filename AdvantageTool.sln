@@ -10,9 +10,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AdvantageTool", "src\AdvantageTool.csproj", "{4EBF015D-9B8C-4A2E-8A72-658F931718C0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LtiAdvantage", "..\LtiAdvantage\src\LtiAdvantage\LtiAdvantage.csproj", "{52E66378-7670-4E6E-978C-D3B16883506C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LtiAdvantage", "shared\LtiAdvantage\src\LtiAdvantage\LtiAdvantage.csproj", "{52E66378-7670-4E6E-978C-D3B16883506C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LtiAdvantage.IdentityModel", "..\LtiAdvantage\src\LtiAdvantage.IdentityModel\LtiAdvantage.IdentityModel.csproj", "{B04A07BC-C551-478E-8B6C-377D219EC8FF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LtiAdvantage.IdentityModel", "shared\LtiAdvantage\src\LtiAdvantage.IdentityModel\LtiAdvantage.IdentityModel.csproj", "{B04A07BC-C551-478E-8B6C-377D219EC8FF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,0 +1,3 @@
+[submodule "shared/LtiAdvantage"]
+	path = shared/LtiAdvantage
+	url = https://github.com/learningcom/LtiAdvantage
