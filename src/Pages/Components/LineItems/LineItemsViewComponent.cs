@@ -92,7 +92,7 @@ namespace AdvantageTool.Pages.Components.LineItems
             catch (Exception e)
             {
                 model.Status = e.Message;
-                return View();
+                return View(model);
             }
 
             // Get all the members of the course

@@ -186,6 +186,39 @@
                                                     </div>
                                                 </div>
 
+                                                @if (!string.IsNullOrEmpty(Model.LtiRequest.AssignmentGradeServices.LineItemUrl))
+                                                {
+                                                    <div class="row">
+                                                        <div class="col-8 mb-3">
+                                                            <div class="card bg-transparent">
+                                                                <h5 class="card-header">Line Item</h5>
+                                                                <div class="card-body">
+                                                                    <div>
+                                                                        <div>
+                                                                            Line Item Url
+                                                                        </div>
+                                                                        <div>
+                                                                            @(Model.LtiRequest.AssignmentGradeServices.LineItemUrl)
+                                                                        </div>
+                                                                        <div class="mt-4">
+                                                                            <form method="post">
+                                                                                <input type="hidden" name="id_token" value="@Model.IdToken" />
+                                                                                <button type="submit" class="btn btn-light btn-sm"
+                                                                                        data-toggle="tooltip" title="Add a score"
+                                                                                        asp-page-handler="PostScore"
+                                                                                        asp-all-route-data="@(new Dictionary<string, string>{ {"lineItemUrl", Model.LtiRequest.AssignmentGradeServices.LineItemUrl } })">
+                                                                                    Submit a Score
+                                                                                </button>
+                                                                            </form>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                }
+
+
                                                 @await Component.InvokeAsync("LineItems", Model.IdToken)
 
                                             </div>
