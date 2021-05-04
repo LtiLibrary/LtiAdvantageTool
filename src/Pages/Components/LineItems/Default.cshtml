@@ -3,7 +3,7 @@
 @if (Model != null)
 {
     <div class="row">
-        <div class="col-12">
+        <div class="col-12 mb-3">
             <div class="card bg-transparent">
                 <form method="post">
                     <input type="hidden" name="id_token" value="@Model.IdToken" />
@@ -74,4 +74,41 @@
             </div>
         </div>
     </div>
-}
+    <div class="row">
+        <div class="col-4 mb-3">
+            <div class="card bg-transparent">
+                <h5 class="card-header">
+                    Members
+                </h5>
+                <div class="card-body">
+                    @if (Model.Members == null)
+                    {
+                        <p>
+                            This context does not have any members.
+                        </p>
+                    }
+                    else
+                    {
+                        <table class="table table-bordered table-responsive-sm border-0">
+                            <thead>
+                                <tr>
+                                    <th scope="col" class="text-center">UserId</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var member in Model.Members)
+                                {
+                                    <tr>
+                                        <td>
+                                            @member.Key
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+ }
