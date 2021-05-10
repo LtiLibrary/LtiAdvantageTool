@@ -63,6 +63,8 @@ namespace AdvantageTool.Pages
         /// </summary>
         public LtiResourceLinkRequest LtiRequest { get; set; }
 
+        public ResultContainer Results { get; set; }
+
         /// <summary>
         /// Handle the LTI POST request from the Authorization Server. 
         /// </summary>
@@ -213,6 +215,21 @@ namespace AdvantageTool.Pages
 
             IdToken = idToken;
             LtiRequest = new LtiResourceLinkRequest(jwt.Payload);
+
+            var tokenResponse = await _accessTokenService.GetAccessTokenAsync(
+                LtiRequest.Iss, 
+                Constants.LtiScopes.Ags.LineItem);
+
+            var resultsClient = _httpClientFactory.CreateClient();
+            resultsClient.SetBearerToken(tokenResponse.AccessToken);
+            resultsClient.DefaultRequestHeaders.Accept
+                .Add(new MediaTypeWithQualityHeaderValue(Constants.MediaTypes.LineItem));
+
+            var resultsUrl = $"{LtiRequest.AssignmentGradeServices.LineItemUrl}/{Constants.ServiceEndpoints.Ags.ResultsService}";
+            var response = await resultsClient.GetAsync(resultsUrl);
+            var content = await response.Content.ReadAsStringAsync();
+            var results = JsonConvert.DeserializeObject<ResultContainer>(content);
+            Results = results;
 
             return Page();
         }
