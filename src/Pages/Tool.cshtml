@@ -189,7 +189,7 @@
                                                 @if (!string.IsNullOrEmpty(Model.LtiRequest.AssignmentGradeServices.LineItemUrl))
                                                 {
                                                     <div class="row">
-                                                        <div class="col-8 mb-3">
+                                                        <div class="col-12 mb-3">
                                                             <div class="card bg-transparent">
                                                                 <h5 class="card-header">Line Item</h5>
                                                                 <div class="card-body">
@@ -199,6 +199,34 @@
                                                                         </div>
                                                                         <div>
                                                                             @(Model.LtiRequest.AssignmentGradeServices.LineItemUrl)
+                                                                        </div>
+                                                                        <div>
+                                                                            Results
+                                                                        </div>
+                                                                        <div>
+                                                                            <table class="table table-bordered table-responsive-sm border-0">
+                                                                                <thead>
+                                                                                    <tr>
+                                                                                        <th>Id</th>
+                                                                                        <th>UserId</th>
+                                                                                        <th>ResultScore</th>
+                                                                                        <th>ResultMaximum</th>
+                                                                                        <th>ScoreOf</th>
+                                                                                    </tr>
+                                                                                </thead>
+                                                                                <tbody>
+                                                                                    @foreach (var result in Model.Results)
+                                                                                    {
+                                                                                    <tr>
+                                                                                        <td>@result.Id</td>
+                                                                                        <td>@result.UserId</td>
+                                                                                        <td>@result.ResultScore</td>
+                                                                                        <td>@result.ResultMaximum</td>
+                                                                                        <td>@result.ScoreOf</td>
+                                                                                    </tr>
+                                                                                    }
+                                                                                </tbody>
+                                                                            </table>
                                                                         </div>
                                                                         <div class="mt-4">
                                                                             <form method="post">
