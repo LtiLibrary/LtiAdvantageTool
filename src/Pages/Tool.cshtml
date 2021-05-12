@@ -195,13 +195,22 @@
                                                                 <div class="card-body">
                                                                     <div>
                                                                         <div>
-                                                                            Line Item Url
+                                                                            <strong>ID: </strong>@(Model.LineItem.Id)
                                                                         </div>
                                                                         <div>
-                                                                            @(Model.LtiRequest.AssignmentGradeServices.LineItemUrl)
+                                                                            <strong>Label: </strong>@(Model.LineItem.Label ?? "(no label)")
                                                                         </div>
                                                                         <div>
-                                                                            Results
+                                                                            <strong>Resource Id: </strong>@(Model.LineItem.ResourceId ?? "(no resource id)")
+                                                                        </div>
+                                                                        <div>
+                                                                            <strong>ResourceLink Id: </strong>@(Model.LineItem.ResourceLinkId ?? "(no resourcelink id)")
+                                                                        </div>
+                                                                        <div>
+                                                                            <strong>ScoreMaximum: </strong>@(Model.LineItem.ScoreMaximum)
+                                                                        </div>
+                                                                        <div>
+                                                                            <strong>Results</strong>
                                                                         </div>
                                                                         <div>
                                                                             <table class="table table-bordered table-responsive-sm border-0">
@@ -217,13 +226,13 @@
                                                                                 <tbody>
                                                                                     @foreach (var result in Model.Results)
                                                                                     {
-                                                                                    <tr>
-                                                                                        <td>@result.Id</td>
-                                                                                        <td>@result.UserId</td>
-                                                                                        <td>@result.ResultScore</td>
-                                                                                        <td>@result.ResultMaximum</td>
-                                                                                        <td>@result.ScoreOf</td>
-                                                                                    </tr>
+                                                                                        <tr>
+                                                                                            <td>@result.Id</td>
+                                                                                            <td>@result.UserId</td>
+                                                                                            <td>@result.ResultScore</td>
+                                                                                            <td>@result.ResultMaximum</td>
+                                                                                            <td>@result.ScoreOf</td>
+                                                                                        </tr>
                                                                                     }
                                                                                 </tbody>
                                                                             </table>
