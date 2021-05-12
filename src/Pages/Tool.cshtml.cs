@@ -65,6 +65,8 @@ namespace AdvantageTool.Pages
 
         public ResultContainer Results { get; set; }
 
+        public LineItem LineItem { get; set; }
+
         /// <summary>
         /// Handle the LTI POST request from the Authorization Server. 
         /// </summary>
@@ -220,16 +222,21 @@ namespace AdvantageTool.Pages
                 LtiRequest.Iss, 
                 Constants.LtiScopes.Ags.LineItem);
 
-            var resultsClient = _httpClientFactory.CreateClient();
-            resultsClient.SetBearerToken(tokenResponse.AccessToken);
-            resultsClient.DefaultRequestHeaders.Accept
+            var lineItemClient = _httpClientFactory.CreateClient();
+            lineItemClient.SetBearerToken(tokenResponse.AccessToken);
+            lineItemClient.DefaultRequestHeaders.Accept
                 .Add(new MediaTypeWithQualityHeaderValue(Constants.MediaTypes.LineItem));
 
             var resultsUrl = $"{LtiRequest.AssignmentGradeServices.LineItemUrl}/{Constants.ServiceEndpoints.Ags.ResultsService}";
-            var response = await resultsClient.GetAsync(resultsUrl);
-            var content = await response.Content.ReadAsStringAsync();
-            var results = JsonConvert.DeserializeObject<ResultContainer>(content);
+            var resultsResponse = await lineItemClient.GetAsync(resultsUrl);
+            var resultsContent = await resultsResponse.Content.ReadAsStringAsync();
+            var results = JsonConvert.DeserializeObject<ResultContainer>(resultsContent);
             Results = results;
+
+            var lineItemResponse = await lineItemClient.GetAsync(LtiRequest.AssignmentGradeServices.LineItemUrl);
+            var lineItemContent = await lineItemResponse.Content.ReadAsStringAsync();
+            var lineItem = JsonConvert.DeserializeObject<LineItem>(lineItemContent);
+            LineItem = lineItem;
 
             return Page();
         }
