@@ -245,7 +245,7 @@ namespace AdvantageTool.Pages
         /// Handler for creating a line item.
         /// </summary>
         /// <returns>The result.</returns>
-        public async Task<IActionResult> OnPostCreateLineItemAsync([FromForm(Name = "id_token")] string idToken)
+        public async Task<IActionResult> OnPostCreateLineItemAsync([FromForm(Name = "id_token")] string idToken, [FromForm(Name = "resource_link_id")] string resourceLinkId)
         {
             if (idToken.IsMissing())
             {
@@ -275,11 +275,12 @@ namespace AdvantageTool.Pages
 
             try
             {
+                
                 var lineItem = new LineItem
                 {
                     EndDateTime = DateTime.UtcNow.AddMonths(3),
                     Label = LtiRequest.ResourceLink.Title,
-                    ResourceLinkId = LtiRequest.ResourceLink.Id,
+                    ResourceLinkId = string.IsNullOrEmpty(resourceLinkId) ? LtiRequest.ResourceLink.Id : resourceLinkId,
                     ScoreMaximum = 100,
                     StartDateTime = DateTime.UtcNow
                 };

@@ -9,11 +9,16 @@
                     <input type="hidden" name="id_token" value="@Model.IdToken" />
                     <h5 class="card-header">
                         Gradebook
-                        <button type="submit" class="btn btn-light btn-sm float-right" asp-page-handler="CreateLineItem">
-                            Add a line item for <span class="font-italic">@Model.LtiRequest.ResourceLink.Title</span>
-                        </button>
                     </h5>
+                    
                     <div class="card-body">
+                        <div class="form-group">
+                            <label>Resource Link ID</label>
+                            <input type="text" name="resource_link_id" value="@Model.LtiRequest.ResourceLink.Title" class="form-control mb-3 w-25"/>
+                            <button type="submit" class="btn btn-light btn-sm form-control w-25" asp-page-handler="CreateLineItem">
+                                Add a line item
+                            </button>
+                        </div>
                         @Model.Status
                         @if (Model.LineItems == null)
                         {
