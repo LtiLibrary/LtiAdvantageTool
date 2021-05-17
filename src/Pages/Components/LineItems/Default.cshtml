@@ -34,7 +34,16 @@
                                         <th scope="col" class="border-left-0 border-top-0"></th>
                                         @foreach (var lineItem in Model.LineItems.OrderBy(l => l.Header))
                                         {
-                                            <th scope="col" class="text-center">@lineItem.Header</th>
+                                            <th scope="col" class="text-center">
+                                                @lineItem.Header
+                                                @{var deleteRouteData = new Dictionary<string, string> { { "lineItemUrl", lineItem.AgsLineItem.Id } };}
+                                                <button type="submit" class="btn btn-sm btn-link"
+                                                        data-toggle="tooltip" title="Delete line item"
+                                                        asp-page-handler="DeleteLineItem"
+                                                        asp-all-route-data="@deleteRouteData">
+                                                    <i class="fa fa-minus-square fa-lg text-light"></i>
+                                                </button>
+                                            </th>
                                         }
                                     </tr>
                                 </thead>
