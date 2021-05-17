@@ -309,6 +309,62 @@ namespace AdvantageTool.Pages
                 LtiRequest.Context.Id);
         }
 
+                /// <summary>
+        /// Handler for creating a line item.
+        /// </summary>
+        /// <returns>The result.</returns>
+        public async Task<IActionResult> OnPostDeleteLineItemAsync([FromForm(Name = "id_token")] string idToken, string lineItemUrl)
+        {
+            if (idToken.IsMissing())
+            {
+                Error = $"{nameof(idToken)} is missing.";
+                return Page();
+            }
+
+            var handler = new JwtSecurityTokenHandler();
+            var jwt = handler.ReadJwtToken(idToken);
+            LtiRequest = new LtiResourceLinkRequest(jwt.Payload);
+
+            var tokenResponse = await _accessTokenService.GetAccessTokenAsync(
+                LtiRequest.Iss, 
+                Constants.LtiScopes.Ags.LineItem);
+
+            // The IMS reference implementation returns "Created" with success. 
+            if (tokenResponse.IsError && tokenResponse.Error != "Created")
+            {
+                Error = tokenResponse.Error;
+                return Page();
+            }
+
+            var httpClient = _httpClientFactory.CreateClient();
+            httpClient.SetBearerToken(tokenResponse.AccessToken);
+            httpClient.DefaultRequestHeaders.Accept
+                .Add(new MediaTypeWithQualityHeaderValue(Constants.MediaTypes.LineItem));
+
+            try
+            {
+                using (var response = await httpClient.DeleteAsync(lineItemUrl))
+                {
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        Error = response.ReasonPhrase;
+                        return Page();
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Error = e.Message;
+                return Page();
+            }
+
+            return Relaunch(
+                LtiRequest.Iss,
+                LtiRequest.UserId,
+                LtiRequest.ResourceLink.Id,
+                LtiRequest.Context.Id);
+        }
+
         /// <summary>
         /// Handler for posting a score.
         /// </summary>
