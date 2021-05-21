@@ -212,7 +212,7 @@ namespace AdvantageTool.Pages
 
             if (messageType == Constants.Lti.LtiDeepLinkingRequestMessageType)
             {
-                return Post("./Catalog", new { idToken });
+                return Post("/Catalog", new { idToken });
             }
 
             IdToken = idToken;
