@@ -147,7 +147,7 @@ namespace AdvantageTool.Pages
             var credentials = PemHelper.SigningCredentialsFromPemString(platform.PrivateKey);
             var jwt = handler.WriteToken(new JwtSecurityToken(new JwtHeader(credentials), response));
 
-            return Post("id_token", jwt, LtiRequest.DeepLinkingSettings.DeepLinkReturnUrl);
+            return Post("JWT", jwt, LtiRequest.DeepLinkingSettings.DeepLinkReturnUrl);
         }
 
         /// <summary>
