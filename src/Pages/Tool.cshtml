@@ -135,7 +135,7 @@
                                             <h4 class="card-header">Context</h4>
                                             <div class="card-body">
                                                 <div class="row">
-                                                    <div class="col-4 mb-3">
+                                                    <div class="col-3 mb-3">
                                                         <div class="card bg-transparent">
                                                             <h5 class="card-header">Context Details</h5>
                                                             <div class="card-body">
@@ -151,7 +151,7 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div class="col-4 mb-3">
+                                                    <div class="col-3 mb-3">
                                                         <div class="card bg-transparent">
                                                             <h5 class="card-header">Member</h5>
                                                             <div class="card-body">
@@ -171,7 +171,7 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div class="col-4 mb-3">
+                                                    <div class="col-3 mb-3">
                                                         <div class="card bg-transparent">
                                                             <h5 class="card-header">Resource Link</h5>
                                                             <div class="card-body">
@@ -180,6 +180,16 @@
                                                                 </div>
                                                                 <div>
                                                                     @(Model.LtiRequest.ResourceLink?.Description ?? "(no description)")
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-3 mb-3">
+                                                        <div class="card bg-transparent">
+                                                            <h5 class="card-header">Custom</h5>
+                                                            <div class="card-body">
+                                                                <div>
+                                                                    @(Model.LtiRequest.Custom == null ? "" : string.Join(",", Model.LtiRequest.Custom.OrderBy(kv => kv.Key)))
                                                                 </div>
                                                             </div>
                                                         </div>
