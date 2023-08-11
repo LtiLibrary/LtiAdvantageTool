@@ -107,15 +107,18 @@ namespace AdvantageTool.Pages
 
             var contentItems = new List<ContentItem>();
             var customParameters = LtiRequest.Custom;
+            var platform = await _context.GetPlatformByIssuerAsync(LtiRequest.Iss);
+
             foreach (var activity in Activities)
             {
                 if (activity.Selected)
                 {
+                    var url = Url.Page("/Tool", null, new { platformId = platform.PlatformId }, Request.Scheme);
                     var contentItem = new LtiLinkItem
                     {
                         Title = activity.Title,
                         Text = activity.Description,
-                        Url = Url.Page("./Tool", null, null, Request.Scheme),
+                        Url = url,
                         Custom = new Dictionary<string, string>
                         {
                             { "activity_id", activity.Id.ToString() }
@@ -143,11 +146,10 @@ namespace AdvantageTool.Pages
             response.AddClaim(new Claim(JwtRegisteredClaimNames.Exp, EpochTime.GetIntDate(DateTime.UtcNow.AddMinutes(5)).ToString()));
             response.AddClaim(new Claim(JwtRegisteredClaimNames.Nonce, IdentityModel.CryptoRandom.CreateRandomKeyString(8)));
 
-            var platform = await _context.GetPlatformByIssuerAsync(LtiRequest.Iss);
             var credentials = PemHelper.SigningCredentialsFromPemString(platform.PrivateKey);
             var jwt = handler.WriteToken(new JwtSecurityToken(new JwtHeader(credentials), response));
 
-            return Post("id_token", jwt, LtiRequest.DeepLinkingSettings.DeepLinkReturnUrl);
+            return Post("JWT", jwt, LtiRequest.DeepLinkingSettings.DeepLinkReturnUrl);
         }
 
         /// <summary>

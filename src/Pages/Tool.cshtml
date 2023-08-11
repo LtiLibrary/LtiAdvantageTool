@@ -74,14 +74,14 @@
                                         <h5 class="card-header">Platform Details</h5>
                                         <div class="card-body">
                                             <div>
-                                                @(Model.LtiRequest?.Platform.Name ?? "(no name)")
+                                                @(Model.LtiRequest?.Platform?.Name ?? "(no name)")
                                             </div>
                                             <div>
-                                                @(Model.LtiRequest?.Platform.Description ?? "(no description)")
+                                                @(Model.LtiRequest?.Platform?.Description ?? "(no description)")
                                             </div>
                                             <div>
-                                                @(Model.LtiRequest?.Platform.ProductFamilyCode ?? "(no family code)")
-                                                @(Model.LtiRequest?.Platform.Version ?? "(no version)")
+                                                @(Model.LtiRequest?.Platform?.ProductFamilyCode ?? "(no family code)")
+                                                @(Model.LtiRequest?.Platform?.Version ?? "(no version)")
                                             </div>
                                         </div>
                                     </div>
@@ -100,7 +100,7 @@
                                                     @(Model.LtiRequest?.Email ?? "(no email)")
                                                 </div>
                                                 <div>
-                                                    @(string.Join(", ", Model.LtiRequest?.Roles))
+                                                    @(Model.LtiRequest?.Roles != null ? string.Join(", ", Model.LtiRequest?.Roles) : "(no roles)")
                                                 </div>
                                                 <div>
                                                     @(Model.LtiRequest?.Lis?.PersonSourcedId ?? "(no sis id)")
@@ -135,7 +135,7 @@
                                             <h4 class="card-header">Context</h4>
                                             <div class="card-body">
                                                 <div class="row">
-                                                    <div class="col-4 mb-3">
+                                                    <div class="col-3 mb-3">
                                                         <div class="card bg-transparent">
                                                             <h5 class="card-header">Context Details</h5>
                                                             <div class="card-body">
@@ -151,7 +151,7 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div class="col-4 mb-3">
+                                                    <div class="col-3 mb-3">
                                                         <div class="card bg-transparent">
                                                             <h5 class="card-header">Member</h5>
                                                             <div class="card-body">
@@ -171,7 +171,7 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div class="col-4 mb-3">
+                                                    <div class="col-3 mb-3">
                                                         <div class="card bg-transparent">
                                                             <h5 class="card-header">Resource Link</h5>
                                                             <div class="card-body">
@@ -184,7 +184,87 @@
                                                             </div>
                                                         </div>
                                                     </div>
+                                                    <div class="col-3 mb-3">
+                                                        <div class="card bg-transparent">
+                                                            <h5 class="card-header">Custom</h5>
+                                                            <div class="card-body">
+                                                                <div>
+                                                                    @(Model.LtiRequest.Custom == null ? "" : string.Join(",", Model.LtiRequest.Custom.OrderBy(kv => kv.Key)))
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
+
+                                                @if (!string.IsNullOrEmpty(Model.LtiRequest.AssignmentGradeServices.LineItemUrl))
+                                                {
+                                                    <div class="row">
+                                                        <div class="col-12 mb-3">
+                                                            <div class="card bg-transparent">
+                                                                <h5 class="card-header">Line Item</h5>
+                                                                <div class="card-body">
+                                                                    <div>
+                                                                        <div>
+                                                                            <strong>ID: </strong>@(Model.LineItem.Id)
+                                                                        </div>
+                                                                        <div>
+                                                                            <strong>Label: </strong>@(Model.LineItem.Label ?? "(no label)")
+                                                                        </div>
+                                                                        <div>
+                                                                            <strong>Resource Id: </strong>@(Model.LineItem.ResourceId ?? "(no resource id)")
+                                                                        </div>
+                                                                        <div>
+                                                                            <strong>ResourceLink Id: </strong>@(Model.LineItem.ResourceLinkId ?? "(no resourcelink id)")
+                                                                        </div>
+                                                                        <div>
+                                                                            <strong>ScoreMaximum: </strong>@(Model.LineItem.ScoreMaximum)
+                                                                        </div>
+                                                                        <div>
+                                                                            <strong>Results</strong>
+                                                                        </div>
+                                                                        <div>
+                                                                            <table class="table table-bordered table-responsive-sm border-0">
+                                                                                <thead>
+                                                                                    <tr>
+                                                                                        <th>Id</th>
+                                                                                        <th>UserId</th>
+                                                                                        <th>ResultScore</th>
+                                                                                        <th>ResultMaximum</th>
+                                                                                        <th>ScoreOf</th>
+                                                                                    </tr>
+                                                                                </thead>
+                                                                                <tbody>
+                                                                                    @foreach (var result in Model.Results)
+                                                                                    {
+                                                                                        <tr>
+                                                                                            <td>@result.Id</td>
+                                                                                            <td>@result.UserId</td>
+                                                                                            <td>@result.ResultScore</td>
+                                                                                            <td>@result.ResultMaximum</td>
+                                                                                            <td>@result.ScoreOf</td>
+                                                                                        </tr>
+                                                                                    }
+                                                                                </tbody>
+                                                                            </table>
+                                                                        </div>
+                                                                        <div class="mt-4">
+                                                                            <form method="post">
+                                                                                <input type="hidden" name="id_token" value="@Model.IdToken" />
+                                                                                <button type="submit" class="btn btn-light btn-sm"
+                                                                                        data-toggle="tooltip" title="Add a score"
+                                                                                        asp-page-handler="PostScore"
+                                                                                        asp-all-route-data="@(new Dictionary<string, string>{ {"lineItemUrl", Model.LtiRequest.AssignmentGradeServices.LineItemUrl } })">
+                                                                                    Submit a Score
+                                                                                </button>
+                                                                            </form>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                }
+
 
                                                 @await Component.InvokeAsync("LineItems", Model.IdToken)
 

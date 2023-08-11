@@ -3,17 +3,22 @@
 @if (Model != null)
 {
     <div class="row">
-        <div class="col-12">
+        <div class="col-12 mb-3">
             <div class="card bg-transparent">
                 <form method="post">
                     <input type="hidden" name="id_token" value="@Model.IdToken" />
                     <h5 class="card-header">
                         Gradebook
-                        <button type="submit" class="btn btn-light btn-sm float-right" asp-page-handler="CreateLineItem">
-                            Add a line item for <span class="font-italic">@Model.LtiRequest.ResourceLink.Title</span>
-                        </button>
                     </h5>
+                    
                     <div class="card-body">
+                        <div class="form-group">
+                            <label>Resource Link ID</label>
+                            <input type="text" name="resource_link_id" value="@Model.LtiRequest.ResourceLink.Title" class="form-control mb-3 w-25"/>
+                            <button type="submit" class="btn btn-light btn-sm form-control w-25" asp-page-handler="CreateLineItem">
+                                Add a line item
+                            </button>
+                        </div>
                         @Model.Status
                         @if (Model.LineItems == null)
                         {
@@ -29,7 +34,16 @@
                                         <th scope="col" class="border-left-0 border-top-0"></th>
                                         @foreach (var lineItem in Model.LineItems.OrderBy(l => l.Header))
                                         {
-                                            <th scope="col" class="text-center">@lineItem.Header</th>
+                                            <th scope="col" class="text-center">
+                                                @lineItem.Header
+                                                @{var deleteRouteData = new Dictionary<string, string> { { "lineItemUrl", lineItem.AgsLineItem.Id } };}
+                                                <button type="submit" class="btn btn-sm btn-link"
+                                                        data-toggle="tooltip" title="Delete line item"
+                                                        asp-page-handler="DeleteLineItem"
+                                                        asp-all-route-data="@deleteRouteData">
+                                                    <i class="fa fa-minus-square fa-lg text-light"></i>
+                                                </button>
+                                            </th>
                                         }
                                     </tr>
                                 </thead>
@@ -74,4 +88,41 @@
             </div>
         </div>
     </div>
-}
+    <div class="row">
+        <div class="col-4 mb-3">
+            <div class="card bg-transparent">
+                <h5 class="card-header">
+                    Members
+                </h5>
+                <div class="card-body">
+                    @if (Model.Members == null)
+                    {
+                        <p>
+                            This context does not have any members.
+                        </p>
+                    }
+                    else
+                    {
+                        <table class="table table-bordered table-responsive-sm border-0">
+                            <thead>
+                                <tr>
+                                    <th scope="col" class="text-center">UserId</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var member in Model.Members)
+                                {
+                                    <tr>
+                                        <td>
+                                            @member.Key
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+ }

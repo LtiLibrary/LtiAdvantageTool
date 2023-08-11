@@ -62,39 +62,6 @@ namespace AdvantageTool.Pages.Components.LineItems
                 return View(model);
             }
 
-            // Get all the line items
-            try
-            {
-                var httpClient = _httpClientFactory.CreateClient();
-                httpClient.SetBearerToken(tokenResponse.AccessToken);
-
-                httpClient.DefaultRequestHeaders.Accept
-                    .Add(new MediaTypeWithQualityHeaderValue(Constants.MediaTypes.LineItemContainer));
-
-                using (var response = await httpClient.GetAsync(model.LtiRequest.AssignmentGradeServices?.LineItemsUrl))
-                {
-                    if (!response.IsSuccessStatusCode)
-                    {
-                        model.Status = response.ReasonPhrase;
-                        return View(model);
-                    }
-
-                    var content = await response.Content.ReadAsStringAsync();
-                    model.LineItems = JsonConvert.DeserializeObject<List<LineItem>>(content)
-                        .Select(i => new MyLineItem
-                        {
-                            AgsLineItem = i,
-                            Header = i.Label ?? $"Tag: {i.Tag}"
-                        })
-                        .ToList();
-                }
-            }
-            catch (Exception e)
-            {
-                model.Status = e.Message;
-                return View();
-            }
-
             // Get all the members of the course
             model.Members = new Dictionary<string, string>();
 
@@ -124,6 +91,39 @@ namespace AdvantageTool.Pages.Components.LineItems
                             model.Members.Add(member.UserId, $"{member.FamilyName}, {member.GivenName}");
                         }
                     }
+                }
+            }
+            catch (Exception e)
+            {
+                model.Status = e.Message;
+                return View(model);
+            }
+
+            // Get all the line items
+            try
+            {
+                var httpClient = _httpClientFactory.CreateClient();
+                httpClient.SetBearerToken(tokenResponse.AccessToken);
+
+                httpClient.DefaultRequestHeaders.Accept
+                    .Add(new MediaTypeWithQualityHeaderValue(Constants.MediaTypes.LineItemContainer));
+
+                using (var response = await httpClient.GetAsync(model.LtiRequest.AssignmentGradeServices?.LineItemsUrl))
+                {
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        model.Status = response.ReasonPhrase;
+                        return View(model);
+                    }
+
+                    var content = await response.Content.ReadAsStringAsync();
+                    model.LineItems = JsonConvert.DeserializeObject<List<LineItem>>(content)
+                        .Select(i => new MyLineItem
+                        {
+                            AgsLineItem = i,
+                            Header = i.Label ?? $"Tag: {i.Tag}"
+                        })
+                        .ToList();
                 }
             }
             catch (Exception e)

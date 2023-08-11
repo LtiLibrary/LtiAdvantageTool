@@ -8,6 +8,8 @@ using AdvantageTool.Data;
 using AdvantageTool.Utility;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using System.Net.Http;
 
 namespace AdvantageTool
 {
@@ -60,7 +62,17 @@ namespace AdvantageTool
                 .AddRazorPagesOptions(options => options.Conventions.AuthorizeFolder("/Platforms"))
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
-            services.AddHttpClient();
+            services.AddHttpClient(Options.DefaultName, c =>
+            {
+            }).ConfigurePrimaryHttpMessageHandler(() =>
+            {
+                return new HttpClientHandler
+                {
+                    ClientCertificateOptions = ClientCertificateOption.Manual,
+                    ServerCertificateCustomValidationCallback =
+                        (httpRequestMessage, cert, certChain, policyErrors) => true
+                };
+            });
 
             // Make AccessTokenService available for dependency injection.
             services.AddTransient<AccessTokenService>();

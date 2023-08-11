@@ -63,6 +63,10 @@ namespace AdvantageTool.Pages
         /// </summary>
         public LtiResourceLinkRequest LtiRequest { get; set; }
 
+        public ResultContainer Results { get; set; }
+
+        public LineItem LineItem { get; set; }
+
         /// <summary>
         /// Handle the LTI POST request from the Authorization Server. 
         /// </summary>
@@ -208,11 +212,31 @@ namespace AdvantageTool.Pages
 
             if (messageType == Constants.Lti.LtiDeepLinkingRequestMessageType)
             {
-                return Post("./Catalog", new { idToken });
+                return Post("/Catalog", new { idToken });
             }
 
             IdToken = idToken;
             LtiRequest = new LtiResourceLinkRequest(jwt.Payload);
+
+            var tokenResponse = await _accessTokenService.GetAccessTokenAsync(
+                LtiRequest.Iss, 
+                Constants.LtiScopes.Ags.LineItem);
+
+            var lineItemClient = _httpClientFactory.CreateClient();
+            lineItemClient.SetBearerToken(tokenResponse.AccessToken);
+            lineItemClient.DefaultRequestHeaders.Accept
+                .Add(new MediaTypeWithQualityHeaderValue(Constants.MediaTypes.LineItem));
+
+            var resultsUrl = $"{LtiRequest.AssignmentGradeServices.LineItemUrl}/{Constants.ServiceEndpoints.Ags.ResultsService}";
+            var resultsResponse = await lineItemClient.GetAsync(resultsUrl);
+            var resultsContent = await resultsResponse.Content.ReadAsStringAsync();
+            var results = JsonConvert.DeserializeObject<ResultContainer>(resultsContent);
+            Results = results;
+
+            var lineItemResponse = await lineItemClient.GetAsync(LtiRequest.AssignmentGradeServices.LineItemUrl);
+            var lineItemContent = await lineItemResponse.Content.ReadAsStringAsync();
+            var lineItem = JsonConvert.DeserializeObject<LineItem>(lineItemContent);
+            LineItem = lineItem;
 
             return Page();
         }
@@ -221,7 +245,7 @@ namespace AdvantageTool.Pages
         /// Handler for creating a line item.
         /// </summary>
         /// <returns>The result.</returns>
-        public async Task<IActionResult> OnPostCreateLineItemAsync([FromForm(Name = "id_token")] string idToken)
+        public async Task<IActionResult> OnPostCreateLineItemAsync([FromForm(Name = "id_token")] string idToken, [FromForm(Name = "resource_link_id")] string resourceLinkId)
         {
             if (idToken.IsMissing())
             {
@@ -251,11 +275,12 @@ namespace AdvantageTool.Pages
 
             try
             {
+                
                 var lineItem = new LineItem
                 {
                     EndDateTime = DateTime.UtcNow.AddMonths(3),
                     Label = LtiRequest.ResourceLink.Title,
-                    ResourceLinkId = LtiRequest.ResourceLink.Id,
+                    ResourceLinkId = string.IsNullOrEmpty(resourceLinkId) ? LtiRequest.ResourceLink.Id : resourceLinkId,
                     ScoreMaximum = 100,
                     StartDateTime = DateTime.UtcNow
                 };
@@ -263,6 +288,62 @@ namespace AdvantageTool.Pages
                 using (var response = await httpClient.PostAsync(
                         LtiRequest.AssignmentGradeServices.LineItemsUrl,
                         new StringContent(JsonConvert.SerializeObject(lineItem), Encoding.UTF8, Constants.MediaTypes.LineItem)))
+                {
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        Error = response.ReasonPhrase;
+                        return Page();
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Error = e.Message;
+                return Page();
+            }
+
+            return Relaunch(
+                LtiRequest.Iss,
+                LtiRequest.UserId,
+                LtiRequest.ResourceLink.Id,
+                LtiRequest.Context.Id);
+        }
+
+                /// <summary>
+        /// Handler for creating a line item.
+        /// </summary>
+        /// <returns>The result.</returns>
+        public async Task<IActionResult> OnPostDeleteLineItemAsync([FromForm(Name = "id_token")] string idToken, string lineItemUrl)
+        {
+            if (idToken.IsMissing())
+            {
+                Error = $"{nameof(idToken)} is missing.";
+                return Page();
+            }
+
+            var handler = new JwtSecurityTokenHandler();
+            var jwt = handler.ReadJwtToken(idToken);
+            LtiRequest = new LtiResourceLinkRequest(jwt.Payload);
+
+            var tokenResponse = await _accessTokenService.GetAccessTokenAsync(
+                LtiRequest.Iss, 
+                Constants.LtiScopes.Ags.LineItem);
+
+            // The IMS reference implementation returns "Created" with success. 
+            if (tokenResponse.IsError && tokenResponse.Error != "Created")
+            {
+                Error = tokenResponse.Error;
+                return Page();
+            }
+
+            var httpClient = _httpClientFactory.CreateClient();
+            httpClient.SetBearerToken(tokenResponse.AccessToken);
+            httpClient.DefaultRequestHeaders.Accept
+                .Add(new MediaTypeWithQualityHeaderValue(Constants.MediaTypes.LineItem));
+
+            try
+            {
+                using (var response = await httpClient.DeleteAsync(lineItemUrl))
                 {
                     if (!response.IsSuccessStatusCode)
                     {
