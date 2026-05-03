@@ -9,6 +9,16 @@
         }
         else
         {
+            @if (Model.LtiRequest?.AssignmentGradeServices?.LineItemsUrl is { Length: > 0 })
+            {
+                <form method="post" action="?handler=CreateLineItem" class="form-inline mb-3">
+                    <input type="hidden" name="id_token" value="@Model.IdToken" />
+                    <label class="me-2 mb-0">Resource Link ID</label>
+                    <input type="text" name="resource_link_id" value="@Model.LtiRequest.ResourceLink?.Id" class="form-control form-control-sm me-2" />
+                    <button type="submit" class="btn btn-light btn-sm">Add line item</button>
+                </form>
+            }
+
             <h5>Line items</h5>
             @if (Model.LineItems.Count == 0)
             {

@@ -1,7 +1,12 @@
 using System.IdentityModel.Tokens.Jwt;
+using System.Net.Http.Headers;
 using System.Text;
+using System.Text.Json;
 using AdvantageTool.Data;
+using AdvantageTool.Services;
+using IdentityModel.Client;
 using LtiAdvantage;
+using LtiAdvantage.AssignmentGradeServices;
 using LtiAdvantage.Lti;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -13,10 +18,12 @@ namespace AdvantageTool.Pages;
 public class ToolModel(
     ApplicationDbContext context,
     StateDbContext state,
-    IHttpClientFactory httpClientFactory) : PageModel
+    IHttpClientFactory httpClientFactory,
+    AccessTokenService tokens) : PageModel
 {
     public string? Error { get; set; }
     public string? IdToken { get; set; }
+    public string? PlatformId { get; set; }
     public JwtHeader? JwtHeader { get; set; }
     public LtiResourceLinkRequest? LtiRequest { get; set; }
 
@@ -79,8 +86,65 @@ public class ToolModel(
             return AutoPost(Url.Page("/Catalog")!, new { IdToken = idToken });
 
         IdToken = idToken;
+        PlatformId = platformId;
         LtiRequest = new LtiResourceLinkRequest(jwt.Payload);
         return Page();
+    }
+
+    public async Task<IActionResult> OnPostCreateLineItemAsync(
+        [FromForm(Name = "id_token")] string? idToken,
+        [FromForm(Name = "resource_link_id")] string? resourceLinkId)
+    {
+        if (!RestoreLaunchState(idToken)) return Page();
+
+        var lineItemsUrl = LtiRequest!.AssignmentGradeServices?.LineItemsUrl;
+        if (string.IsNullOrEmpty(lineItemsUrl)) { Error = "AGS not present in launch."; return Page(); }
+
+        var http = await CreateAgsClientAsync(Constants.LtiScopes.Ags.LineItem, Constants.MediaTypes.LineItem);
+        if (http is null) return Page();
+
+        var lineItem = new LineItem
+        {
+            EndDateTime = DateTime.UtcNow.AddMonths(3),
+            Label = LtiRequest.ResourceLink?.Title ?? "Line item",
+            ResourceLinkId = string.IsNullOrEmpty(resourceLinkId) ? LtiRequest.ResourceLink?.Id : resourceLinkId,
+            ScoreMaximum = 100,
+            StartDateTime = DateTime.UtcNow,
+        };
+
+        try
+        {
+            var content = new StringContent(JsonSerializer.Serialize(lineItem), Encoding.UTF8, Constants.MediaTypes.LineItem);
+            using var response = await http.PostAsync(lineItemsUrl, content);
+            if (!response.IsSuccessStatusCode) Error = $"Create line item failed: {(int)response.StatusCode} {response.ReasonPhrase}";
+        }
+        catch (Exception e) { Error = e.Message; }
+
+        return Page();
+    }
+
+    private bool RestoreLaunchState(string? idToken)
+    {
+        if (string.IsNullOrEmpty(idToken)) { Error = "id_token missing"; return false; }
+        var handler = new JwtSecurityTokenHandler();
+        if (!handler.CanReadToken(idToken)) { Error = "Cannot read id_token"; return false; }
+        var jwt = handler.ReadJwtToken(idToken);
+        IdToken = idToken;
+        PlatformId = RouteData.Values["platformId"]?.ToString();
+        JwtHeader = jwt.Header;
+        LtiRequest = new LtiResourceLinkRequest(jwt.Payload);
+        return true;
+    }
+
+    private async Task<HttpClient?> CreateAgsClientAsync(string scope, string mediaType)
+    {
+        var token = await tokens.GetAccessTokenAsync(LtiRequest!.Iss!, scope);
+        if (token.IsError && token.Error != "Created") { Error = token.Error; return null; }
+
+        var http = httpClientFactory.CreateClient();
+        http.SetBearerToken(token.AccessToken!);
+        http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(mediaType));
+        return http;
     }
 
     private ContentResult AutoPost(string url, object values)
