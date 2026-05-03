@@ -1,10 +1,28 @@
-﻿@page
+@page
 @model IndexModel
-@{
-    ViewData["Title"] = "Home page";
-}
+@{ ViewData["Title"] = "Home"; }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<h1>LtiAdvantage sample tool</h1>
+<p class="lead">A minimal LTI 1.3 / LTI Advantage tool built with the
+    <a href="https://github.com/LtiLibrary/LtiAdvantage">LtiAdvantage</a> library on ASP.NET Core 10.</p>
+
+<p>What it demonstrates:</p>
+<ul>
+    <li>OIDC third-party login initiation</li>
+    <li>Resource link launch with full id_token validation against the platform's JWKS</li>
+    <li>Deep linking response (signed by the tool)</li>
+    <li>Assignment &amp; Grade Services and Names &amp; Roles Provisioning calls</li>
+    <li>A per-platform JWKS endpoint</li>
+</ul>
+
+@if (User.Identity?.IsAuthenticated == true)
+{
+    <p>You have @Model.PlatformCount platform registration(s).</p>
+    <a class="btn btn-primary" asp-page="/Platforms/Index">Manage platforms</a>
+}
+else
+{
+    <p>Register or log in, then add a platform to get launch / deep linking / JWKS URLs.</p>
+    <a class="btn btn-primary" asp-area="Identity" asp-page="/Account/Register">Register</a>
+    <a class="btn btn-secondary" asp-area="Identity" asp-page="/Account/Login">Log in</a>
+}

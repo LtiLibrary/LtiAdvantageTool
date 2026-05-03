@@ -35,6 +35,7 @@ builder.Services.AddRazorPages(options =>
 
 builder.Services.AddHttpClient();
 builder.Services.AddTransient<AccessTokenService>();
+builder.Services.AddTransient<JwksService>();
 
 var app = builder.Build();
 
@@ -59,5 +60,13 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapStaticAssets();
 app.MapRazorPages().WithStaticAssets();
+
+// JWKS endpoint: the platform fetches our public key from here to verify
+// JWTs signed by the tool (e.g. deep linking responses).
+app.MapGet("/jwks/{platformId}", async (string platformId, JwksService svc) =>
+{
+    var jwks = await svc.GetJwksAsync(platformId);
+    return jwks is null ? Results.NotFound() : Results.Json(jwks);
+});
 
 app.Run();
