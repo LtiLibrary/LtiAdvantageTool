@@ -104,18 +104,20 @@ available via the transitive `IdentityModel` 7.x).
 
 A real LTI 1.3 platform needs the tool's public keys to verify deep linking
 responses signed by the tool. The current sample never exposed its own JWKS.
-We add it.
+We add it as a small minimal-API endpoint local to the sample (the published
+LtiAdvantage library does not yet ship a JWKS abstraction we can reuse).
 
-- `Services/PlatformJwksKeyStore.cs` implements `LtiAdvantage.Jwks.IJwksKeyStore`,
-  taking a `platformId` (route parameter) and returning the tool's public key
-  for that platform registration as a `JsonWebKey` with `Use="sig"`,
-  `Alg="RS256"`, stable `Kid`.
 - A minimal-API endpoint:
-  `app.MapGet("/{platformId}/.well-known/jwks.json", ...)` returns the JWKS
-  JSON. Per-platform path so each platform registration has its own key
-  pair (matches existing per-platform `PrivateKey` storage).
+  `app.MapGet("/jwks/{platformId}", ...)` returns a JWKS JSON document built
+  from the tool's stored public key for that platform registration. The key
+  uses `Use="sig"`, `Alg="RS256"`, and the `Kid` already stored on the
+  `Platform` row. Per-platform path so each platform registration has its
+  own key pair (matches existing per-platform `PrivateKey` storage).
 - Surface this URL in `PlatformModel` so the management UI shows it
   alongside `LaunchUrl` / `LoginUrl`.
+- Add a `PublicKey` column to `Platform` (currently only `PrivateKey` is
+  stored). Generated together at platform-registration time via
+  `PemHelper.GenerateRsaKeyPair`.
 
 ## Tool side: AGS, NRPS, Deep Linking
 
