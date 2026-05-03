@@ -76,7 +76,7 @@ public class ToolModel(
         catch (Exception e) { Error = e.Message; return Page(); }
 
         if (messageType == Constants.Lti.LtiDeepLinkingRequestMessageType)
-            return AutoPost("./Catalog", new { IdToken = idToken });
+            return AutoPost(Url.Page("/Catalog")!, new { IdToken = idToken });
 
         IdToken = idToken;
         LtiRequest = new LtiResourceLinkRequest(jwt.Payload);
