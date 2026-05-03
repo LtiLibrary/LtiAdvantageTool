@@ -123,6 +123,26 @@ public class ToolModel(
         return Page();
     }
 
+    public async Task<IActionResult> OnPostDeleteLineItemAsync(
+        [FromForm(Name = "id_token")] string? idToken,
+        [FromForm(Name = "lineItemUrl")] string? lineItemUrl)
+    {
+        if (!RestoreLaunchState(idToken)) return Page();
+        if (string.IsNullOrEmpty(lineItemUrl)) { Error = "lineItemUrl missing"; return Page(); }
+
+        var http = await CreateAgsClientAsync(Constants.LtiScopes.Ags.LineItem, Constants.MediaTypes.LineItem);
+        if (http is null) return Page();
+
+        try
+        {
+            using var response = await http.DeleteAsync(lineItemUrl);
+            if (!response.IsSuccessStatusCode) Error = $"Delete line item failed: {(int)response.StatusCode} {response.ReasonPhrase}";
+        }
+        catch (Exception e) { Error = e.Message; }
+
+        return Page();
+    }
+
     public async Task<IActionResult> OnPostPostScoreAsync(
         [FromForm(Name = "id_token")] string? idToken,
         [FromForm(Name = "lineItemUrl")] string? lineItemUrl)

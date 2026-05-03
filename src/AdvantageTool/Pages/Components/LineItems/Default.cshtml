@@ -38,6 +38,11 @@
                                     <input type="hidden" name="lineItemUrl" value="@li.AgsLineItem.Id" />
                                     <button type="submit" class="btn btn-light btn-sm" title="Submit a random score for the launch user">Submit a score</button>
                                 </form>
+                                <form method="post" action="?handler=DeleteLineItem" class="d-inline ms-1">
+                                    <input type="hidden" name="id_token" value="@Model.IdToken" />
+                                    <input type="hidden" name="lineItemUrl" value="@li.AgsLineItem.Id" />
+                                    <button type="submit" class="btn btn-outline-danger btn-sm" title="Delete this line item">Delete</button>
+                                </form>
                             }
                             @if (li.Results is { Count: > 0 })
                             {
