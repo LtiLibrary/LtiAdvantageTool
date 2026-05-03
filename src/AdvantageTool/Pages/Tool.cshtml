@@ -42,6 +42,22 @@
         </div>
     </div>
 
+    @if (Model.LtiRequest.Custom is { Count: > 0 })
+    {
+        <div class="card mb-3">
+            <div class="card-header">Custom parameters</div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    @foreach (var (k, v) in Model.LtiRequest.Custom.OrderBy(kv => kv.Key))
+                    {
+                        <dt class="col-sm-3">@k</dt>
+                        <dd class="col-sm-9">@v</dd>
+                    }
+                </dl>
+            </div>
+        </div>
+    }
+
     @if (Model.LtiRequest.AssignmentGradeServices is not null || Model.LtiRequest.NamesRoleService is not null)
     {
         @await Component.InvokeAsync("LineItems", Model.IdToken)
