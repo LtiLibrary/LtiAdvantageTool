@@ -9,6 +9,16 @@
         }
         else
         {
+            @if (Model.LtiRequest?.AssignmentGradeServices?.LineItemsUrl is { Length: > 0 })
+            {
+                <form method="post" action="?handler=CreateLineItem" class="form-inline mb-3">
+                    <input type="hidden" name="id_token" value="@Model.IdToken" />
+                    <label class="me-2 mb-0">Resource Link ID</label>
+                    <input type="text" name="resource_link_id" value="@Model.LtiRequest.ResourceLink?.Id" class="form-control form-control-sm me-2" />
+                    <button type="submit" class="btn btn-light btn-sm">Add line item</button>
+                </form>
+            }
+
             <h5>Line items</h5>
             @if (Model.LineItems.Count == 0)
             {
@@ -21,6 +31,19 @@
                     {
                         <li>
                             <strong>@li.Header</strong>
+                            @if (!string.IsNullOrEmpty(li.AgsLineItem.Id))
+                            {
+                                <form method="post" action="?handler=PostScore" class="d-inline ms-2">
+                                    <input type="hidden" name="id_token" value="@Model.IdToken" />
+                                    <input type="hidden" name="lineItemUrl" value="@li.AgsLineItem.Id" />
+                                    <button type="submit" class="btn btn-light btn-sm" title="Submit a random score for the launch user">Submit a score</button>
+                                </form>
+                                <form method="post" action="?handler=DeleteLineItem" class="d-inline ms-1">
+                                    <input type="hidden" name="id_token" value="@Model.IdToken" />
+                                    <input type="hidden" name="lineItemUrl" value="@li.AgsLineItem.Id" />
+                                    <button type="submit" class="btn btn-outline-danger btn-sm" title="Delete this line item">Delete</button>
+                                </form>
+                            }
                             @if (li.Results is { Count: > 0 })
                             {
                                 <ul>

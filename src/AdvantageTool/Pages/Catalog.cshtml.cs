@@ -51,13 +51,15 @@ public class CatalogModel(ApplicationDbContext context) : PageModel
             DeploymentId = LtiRequest.DeploymentId,
         };
 
+        var platform = await context.GetPlatformByIssuerAsync(LtiRequest.Iss!);
+
         var contentItems = Activities
             .Where(a => a.Selected)
             .Select(a => (ContentItem)new LtiLinkItem
             {
                 Title = a.Title,
                 Text = a.Description,
-                Url = Url.Page("/Tool", null, null, Request.Scheme),
+                Url = Url.Page("/Tool", null, new { platformId = platform!.PlatformId }, Request.Scheme),
                 Custom = new Dictionary<string, string> { ["activity_id"] = a.Id.ToString() },
             })
             .ToArray();
@@ -71,7 +73,6 @@ public class CatalogModel(ApplicationDbContext context) : PageModel
         response.AddClaim(new Claim(JwtRegisteredClaimNames.Exp, EpochTime.GetIntDate(DateTime.UtcNow.AddMinutes(5)).ToString()));
         response.AddClaim(new Claim(JwtRegisteredClaimNames.Nonce, Guid.NewGuid().ToString("N")));
 
-        var platform = await context.GetPlatformByIssuerAsync(LtiRequest.Iss!);
         var creds = PemHelper.SigningCredentialsFromPem(platform!.PrivateKey, platform.KeyId);
         var jwtOut = new JwtSecurityTokenHandler().WriteToken(new JwtSecurityToken(new JwtHeader(creds), response));
 
