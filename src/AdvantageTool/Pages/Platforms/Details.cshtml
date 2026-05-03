@@ -1,0 +1,30 @@
+@page "{id:int}"
+@model AdvantageTool.Pages.Platforms.DetailsModel
+@{ ViewData["Title"] = "Platform details"; }
+
+<h1>@Model.Platform!.Name</h1>
+
+<h4>Platform side</h4>
+<dl class="row">
+    <dt class="col-sm-3">Issuer</dt><dd class="col-sm-9">@Model.Platform.Issuer</dd>
+    <dt class="col-sm-3">Authorize URL</dt><dd class="col-sm-9">@Model.Platform.AuthorizeUrl</dd>
+    <dt class="col-sm-3">Access token URL</dt><dd class="col-sm-9">@Model.Platform.AccessTokenUrl</dd>
+    <dt class="col-sm-3">JWKS URL (platform's)</dt><dd class="col-sm-9">@Model.Platform.JwkSetUrl</dd>
+    <dt class="col-sm-3">Client ID</dt><dd class="col-sm-9"><code>@Model.Platform.ClientId</code></dd>
+</dl>
+
+<h4>Tool side (give to the platform)</h4>
+<dl class="row">
+    <dt class="col-sm-3">Login URL</dt><dd class="col-sm-9">@Model.Platform.LoginUrl</dd>
+    <dt class="col-sm-3">Launch URL</dt><dd class="col-sm-9">@Model.Platform.LaunchUrl</dd>
+    <dt class="col-sm-3">Deep linking URL</dt><dd class="col-sm-9">@Model.Platform.DeepLinkingUrl</dd>
+    <dt class="col-sm-3">JWKS URL (tool's)</dt><dd class="col-sm-9">@Model.Platform.JwksUrl</dd>
+    <dt class="col-sm-3">Key ID</dt><dd class="col-sm-9"><code>@Model.Platform.KeyId</code></dd>
+</dl>
+<details>
+    <summary>Public key</summary>
+    <pre>@Model.Platform.PublicKey</pre>
+</details>
+
+<a asp-page="Edit" asp-route-id="@Model.Platform.Id" class="btn btn-primary">Edit</a>
+<a asp-page="Index" class="btn btn-secondary">Back</a>

@@ -1,0 +1,53 @@
+@model AdvantageTool.Pages.Components.LineItems.LineItemsModel
+
+<div class="card mt-3">
+    <div class="card-header">Assignment &amp; Grade Services / Names &amp; Roles</div>
+    <div class="card-body">
+        @if (!string.IsNullOrEmpty(Model.Status))
+        {
+            <div class="alert alert-warning">@Model.Status</div>
+        }
+        else
+        {
+            <h5>Line items</h5>
+            @if (Model.LineItems.Count == 0)
+            {
+                <p>No line items yet for this context.</p>
+            }
+            else
+            {
+                <ul>
+                    @foreach (var li in Model.LineItems)
+                    {
+                        <li>
+                            <strong>@li.Header</strong>
+                            @if (li.Results is { Count: > 0 })
+                            {
+                                <ul>
+                                    @foreach (var r in li.Results)
+                                    {
+                                        <li>
+                                            @(Model.Members.TryGetValue(r.UserId ?? "", out var n) ? n : r.UserId):
+                                            @r.ResultScore / @r.ResultMaximum
+                                        </li>
+                                    }
+                                </ul>
+                            }
+                        </li>
+                    }
+                </ul>
+            }
+
+            @if (Model.Members.Count > 0)
+            {
+                <h5>Members</h5>
+                <ul>
+                    @foreach (var m in Model.Members)
+                    {
+                        <li>@m.Value</li>
+                    }
+                </ul>
+            }
+        }
+    </div>
+</div>

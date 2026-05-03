@@ -1,0 +1,64 @@
+@page "{platformId}"
+@model AdvantageTool.Pages.ToolModel
+@{ ViewData["Title"] = Model.LtiRequest?.ResourceLink?.Title ?? "LTI launch"; }
+
+@if (!string.IsNullOrEmpty(Model.Error))
+{
+    <div class="alert alert-danger">@Model.Error</div>
+}
+
+@if (Model.LtiRequest is not null)
+{
+    <h1>@Model.LtiRequest.ResourceLink?.Title</h1>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card mb-3">
+                <div class="card-header">Platform</div>
+                <div class="card-body">
+                    <div>@(Model.LtiRequest.Platform?.Name ?? "(no name)")</div>
+                    <div class="text-muted">@Model.LtiRequest.Platform?.ProductFamilyCode @Model.LtiRequest.Platform?.Version</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-3">
+                <div class="card-header">User</div>
+                <div class="card-body">
+                    <div>@Model.LtiRequest.GivenName @Model.LtiRequest.FamilyName</div>
+                    <div class="text-muted">@Model.LtiRequest.Email</div>
+                    <div><small>@string.Join(", ", (Model.LtiRequest.Roles ?? []).Select(r => r.ToString()))</small></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-3">
+                <div class="card-header">Context</div>
+                <div class="card-body">
+                    <div>@(Model.LtiRequest.Context?.Title ?? "(no context)")</div>
+                    <div class="text-muted">@Model.LtiRequest.Context?.Label</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (Model.LtiRequest.AssignmentGradeServices is not null || Model.LtiRequest.NamesRoleService is not null)
+    {
+        @await Component.InvokeAsync("LineItems", Model.IdToken)
+    }
+}
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">JWT header</div>
+            <pre class="card-body">@Model.JwtHeader?.SerializeToJson()</pre>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">JWT payload</div>
+            <pre class="card-body">@Model.LtiRequest?.SerializeToJson()</pre>
+        </div>
+    </div>
+</div>
