@@ -82,7 +82,8 @@ public class LineItemsViewComponent(AccessTokenService tokens, IHttpClientFactor
             http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.MediaTypes.ResultContainer));
             foreach (var li in model.LineItems)
             {
-                var url = li.AgsLineItem.Id!.TrimEnd('/') + "/results";
+                var lineItemUri = new Uri(li.AgsLineItem.Id!);
+                var url = $"{lineItemUri.GetLeftPart(UriPartial.Path).TrimEnd('/')}/results{lineItemUri.Query}";
                 var json = await http.GetStringAsync(url);
                 li.Results = JsonSerializer.Deserialize<ResultContainer>(json, JsonOptions);
             }
