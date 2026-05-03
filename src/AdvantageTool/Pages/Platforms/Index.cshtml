@@ -1,0 +1,32 @@
+@page
+@model AdvantageTool.Pages.Platforms.IndexModel
+@{ ViewData["Title"] = "Platform registrations"; }
+
+<h1>Platform registrations</h1>
+<p><a class="btn btn-primary" asp-page="Create">Add platform</a></p>
+
+@if (!Model.Platforms.Any())
+{
+    <p>No platforms yet. Add one to get LTI launch / deep linking / JWKS URLs.</p>
+}
+else
+{
+    <table class="table">
+        <thead><tr><th>Name</th><th>Issuer</th><th>Client ID</th><th></th></tr></thead>
+        <tbody>
+        @foreach (var p in Model.Platforms)
+        {
+            <tr>
+                <td>@p.Name</td>
+                <td>@p.Issuer</td>
+                <td><code>@p.ClientId</code></td>
+                <td>
+                    <a asp-page="Details" asp-route-id="@p.Id">Details</a> |
+                    <a asp-page="Edit" asp-route-id="@p.Id">Edit</a> |
+                    <a asp-page="Delete" asp-route-id="@p.Id">Delete</a>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}

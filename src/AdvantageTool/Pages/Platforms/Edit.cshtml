@@ -1,0 +1,33 @@
+@page "{id:int}"
+@model AdvantageTool.Pages.Platforms.EditModel
+@{ ViewData["Title"] = "Edit platform"; }
+
+<h1>Edit platform</h1>
+
+<form method="post">
+    <div asp-validation-summary="All" class="text-danger"></div>
+
+    <h4>Platform side (provided by the LMS)</h4>
+    <div class="mb-3"><label asp-for="Platform.Name" class="form-label"></label><input asp-for="Platform.Name" class="form-control"/></div>
+    <div class="mb-3"><label asp-for="Platform.Issuer" class="form-label"></label><input asp-for="Platform.Issuer" class="form-control"/></div>
+    <div class="mb-3"><label asp-for="Platform.AuthorizeUrl" class="form-label"></label><input asp-for="Platform.AuthorizeUrl" class="form-control"/></div>
+    <div class="mb-3"><label asp-for="Platform.AccessTokenUrl" class="form-label"></label><input asp-for="Platform.AccessTokenUrl" class="form-control"/></div>
+    <div class="mb-3"><label asp-for="Platform.JwkSetUrl" class="form-label"></label><input asp-for="Platform.JwkSetUrl" class="form-control"/></div>
+    <div class="mb-3"><label asp-for="Platform.ClientId" class="form-label"></label><input asp-for="Platform.ClientId" class="form-control"/></div>
+
+    <h4 class="mt-4">Tool side (give these to the platform)</h4>
+    <div class="mb-3"><label class="form-label">Login URL</label><input class="form-control" value="@Model.Platform.LoginUrl" readonly/></div>
+    <div class="mb-3"><label class="form-label">Launch URL</label><input class="form-control" value="@Model.Platform.LaunchUrl" readonly/></div>
+    <div class="mb-3"><label class="form-label">JWKS URL</label><input class="form-control" value="@Model.Platform.JwksUrl" readonly/></div>
+    <div class="mb-3"><label class="form-label">Public key (PEM)</label><textarea class="form-control" rows="6" readonly>@Model.Platform.PublicKey</textarea></div>
+
+    <input type="hidden" asp-for="Platform.PlatformId"/>
+    <input type="hidden" asp-for="Platform.KeyId"/>
+    <input type="hidden" asp-for="Platform.PrivateKey"/>
+    <input type="hidden" asp-for="Platform.PublicKey"/>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a asp-page="Index" class="btn btn-secondary">Cancel</a>
+</form>
+
+@section Scripts { @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); } }

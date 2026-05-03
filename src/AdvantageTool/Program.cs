@@ -1,4 +1,5 @@
 using AdvantageTool.Data;
+using AdvantageTool.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -33,6 +34,7 @@ builder.Services.AddRazorPages(options =>
 });
 
 builder.Services.AddHttpClient();
+builder.Services.AddTransient<AccessTokenService>();
 
 var app = builder.Build();
 
