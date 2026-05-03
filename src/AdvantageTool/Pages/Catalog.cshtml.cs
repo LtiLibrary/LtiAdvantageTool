@@ -75,7 +75,7 @@ public class CatalogModel(ApplicationDbContext context) : PageModel
         var creds = PemHelper.SigningCredentialsFromPem(platform!.PrivateKey, platform.KeyId);
         var jwtOut = new JwtSecurityTokenHandler().WriteToken(new JwtSecurityToken(new JwtHeader(creds), response));
 
-        return AutoPost("id_token", jwtOut, LtiRequest.DeepLinkingSettings.DeepLinkReturnUrl);
+        return AutoPost("JWT", jwtOut, LtiRequest.DeepLinkingSettings.DeepLinkReturnUrl);
     }
 
     private static ContentResult AutoPost(string name, string value, string url)
