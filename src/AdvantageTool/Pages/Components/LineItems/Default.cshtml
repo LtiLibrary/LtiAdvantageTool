@@ -31,6 +31,14 @@
                     {
                         <li>
                             <strong>@li.Header</strong>
+                            @if (!string.IsNullOrEmpty(li.AgsLineItem.Id))
+                            {
+                                <form method="post" action="?handler=PostScore" class="d-inline ms-2">
+                                    <input type="hidden" name="id_token" value="@Model.IdToken" />
+                                    <input type="hidden" name="lineItemUrl" value="@li.AgsLineItem.Id" />
+                                    <button type="submit" class="btn btn-light btn-sm" title="Submit a random score for the launch user">Submit a score</button>
+                                </form>
+                            }
                             @if (li.Results is { Count: > 0 })
                             {
                                 <ul>

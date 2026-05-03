@@ -123,6 +123,39 @@ public class ToolModel(
         return Page();
     }
 
+    public async Task<IActionResult> OnPostPostScoreAsync(
+        [FromForm(Name = "id_token")] string? idToken,
+        [FromForm(Name = "lineItemUrl")] string? lineItemUrl)
+    {
+        if (!RestoreLaunchState(idToken)) return Page();
+        if (string.IsNullOrEmpty(lineItemUrl)) { Error = "lineItemUrl missing"; return Page(); }
+
+        var http = await CreateAgsClientAsync(Constants.LtiScopes.Ags.Score, Constants.MediaTypes.Score);
+        if (http is null) return Page();
+
+        var score = new Score
+        {
+            ActivityProgress = ActivityProgress.Completed,
+            GradingProgress = GradingProgress.FullyGraded,
+            ScoreGiven = Math.Round(Random.Shared.NextDouble() * 100, 2),
+            ScoreMaximum = 100,
+            TimeStamp = DateTime.UtcNow,
+            UserId = LtiRequest!.UserId!,
+        };
+        if (score.ScoreGiven > 75) score.Comment = "Good job!";
+
+        try
+        {
+            var scoresUrl = $"{lineItemUrl.TrimEnd('/')}/scores";
+            var content = new StringContent(JsonSerializer.Serialize(score), Encoding.UTF8, Constants.MediaTypes.Score);
+            using var response = await http.PostAsync(scoresUrl, content);
+            if (!response.IsSuccessStatusCode) Error = $"Submit score failed: {(int)response.StatusCode} {response.ReasonPhrase}";
+        }
+        catch (Exception e) { Error = e.Message; }
+
+        return Page();
+    }
+
     private bool RestoreLaunchState(string? idToken)
     {
         if (string.IsNullOrEmpty(idToken)) { Error = "id_token missing"; return false; }
