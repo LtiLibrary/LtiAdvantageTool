@@ -39,6 +39,9 @@ public class AccessTokenService(ApplicationDbContext context, IHttpClientFactory
         {
             Address = platform.AccessTokenUrl,
             ClientId = platform.ClientId,
+            // IdentityModel defaults to an Authorization header, which it refuses to
+            // combine with a client assertion. LTI expects the assertion in the body.
+            ClientCredentialStyle = ClientCredentialStyle.PostBody,
             Jwt = jwt,
             Scope = scope,
         });
