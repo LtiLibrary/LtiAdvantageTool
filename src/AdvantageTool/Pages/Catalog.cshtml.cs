@@ -136,6 +136,8 @@ public class CatalogModel(ApplicationDbContext context, LaunchStore launches) : 
                         ScoreMaximum = selection.ScoreMaximum,
                         Tag = string.IsNullOrWhiteSpace(selection.Tag) ? null : selection.Tag,
                         ResourceId = entry.Key,
+                        // AGS 2.0 gradesReleased: may the platform show the grades to learners?
+                        GradesReleased = GradesReleased.Parse(selection.GradesReleased),
                         // Submission Review 1.0: ask for "View submission" in the gradebook up front.
                         // Without a url the platform launches the link's own URL.
                         SubmissionReview = new SubmissionReviewProperty { Label = "Review in AdvantageTool" },
@@ -206,5 +208,6 @@ public class CatalogModel(ApplicationDbContext context, LaunchStore launches) : 
         public bool Graded { get; set; }
         public float ScoreMaximum { get; set; } = 100;
         public string? Tag { get; set; }
+        public string? GradesReleased { get; set; }
     }
 }

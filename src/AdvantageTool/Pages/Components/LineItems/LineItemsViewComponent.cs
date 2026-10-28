@@ -4,6 +4,7 @@ using AdvantageTool.Utility;
 using IdentityModel.Client;
 using LtiAdvantage;
 using LtiAdvantage.AssignmentGradeServices;
+using LtiAdvantage.IdentityModel.Client;
 using LtiAdvantage.Lti;
 using LtiAdvantage.NamesRoleProvisioningService;
 using LtiAdvantage.Utilities;
@@ -79,10 +80,8 @@ public class LineItemsViewComponent(AccessTokenService tokens, IHttpClientFactor
             foreach (var li in model.LineItems.Where(li => !string.IsNullOrEmpty(li.AgsLineItem.Id)))
             {
                 // AGS 2.0 §3.4: user_id narrows the results to one user.
-                var url = QueryHelpers.AddQueryString(AgsUrls.Results(li.AgsLineItem.Id!), Query(("user_id", model.ResultsUserFilter)));
-                var (results, _) = await Paging.GetAllPagesAsync(http, url,
-                    Constants.MediaTypes.ResultContainer,
-                    json => JsonSerializer.Deserialize<ResultContainer>(json, JsonOptions) ?? []);
+                // The library's GetResultsAsync adds /results and the filter, and follows paging.
+                var results = await http.GetResultsAsync(token.AccessToken!, li.AgsLineItem.Id!, model.ResultsUserFilter);
                 li.Results = new ResultContainer(results);
             }
         }

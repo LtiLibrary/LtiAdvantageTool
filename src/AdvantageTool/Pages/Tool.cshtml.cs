@@ -6,6 +6,7 @@ using AdvantageTool.Utility;
 using IdentityModel.Client;
 using LtiAdvantage;
 using LtiAdvantage.AssignmentGradeServices;
+using LtiAdvantage.IdentityModel.Client;
 using LtiAdvantage.Lti;
 using LtiAdvantage.SubmissionReview;
 using Microsoft.AspNetCore.Mvc;
@@ -70,15 +71,16 @@ public class ToolModel(
         [FromForm] string? launchId,
         [FromForm(Name = "resource_link_id")] string? resourceLinkId,
         [FromForm] string? tag,
-        [FromForm(Name = "resource_id")] string? resourceId)
+        [FromForm(Name = "resource_id")] string? resourceId,
+        [FromForm] string? gradesReleased)
     {
         if (!LoadLaunch(launchId)) return Page();
 
         var lineItemsUrl = LtiRequest!.AssignmentGradeServices?.LineItemsUrl;
         if (string.IsNullOrEmpty(lineItemsUrl)) { Error = "AGS not present in launch."; return Page(); }
 
-        var http = await CreateAgsClientAsync(Constants.LtiScopes.Ags.LineItem, Constants.MediaTypes.LineItem);
-        if (http is null) return Page();
+        var token = await GetTokenAsync(Constants.LtiScopes.Ags.LineItem);
+        if (token is null) return Page();
 
         var lineItem = new LineItem
         {
@@ -90,6 +92,9 @@ public class ToolModel(
             // tag and resourceId are the tool's own labels; the line item filters match on them.
             Tag = string.IsNullOrWhiteSpace(tag) ? null : tag,
             ResourceId = string.IsNullOrWhiteSpace(resourceId) ? null : resourceId,
+            // AGS 2.0: whether the platform may show these grades to learners. Not set means
+            // the platform decides.
+            GradesReleased = GradesReleased.Parse(gradesReleased),
             // Submission Review 1.0: lets the platform launch back into the tool from the gradebook
             // (LtiSubmissionReviewRequest) to show one user's submission. The launch URL handles it.
             SubmissionReviewExtension = new SubmissionReviewProperty
@@ -99,14 +104,43 @@ public class ToolModel(
             },
         };
 
-        try
-        {
-            var content = new StringContent(JsonSerializer.Serialize(lineItem, JsonOptions), Encoding.UTF8, Constants.MediaTypes.LineItem);
-            using var response = await http.PostAsync(lineItemsUrl, content);
-            if (!response.IsSuccessStatusCode) Error = $"Create line item failed: {await ServiceError.DescribeAsync(response)}";
-        }
-        catch (Exception e) { Error = e.Message; }
+        // The library's HttpClient extensions send the token, serialize the line item and turn an
+        // error answer into an LtiServiceException with what the platform said.
+        await CallAsync("Create line item", http => http.AddLineItemAsync(token, lineItemsUrl, lineItem));
+        return Page();
+    }
 
+    /// <summary>
+    /// Changes a line item's label, scoreMaximum and gradesReleased (AGS 2.0 PUT).
+    /// </summary>
+    public async Task<IActionResult> OnPostUpdateLineItemAsync(
+        [FromForm] string? launchId,
+        [FromForm] string? lineItemUrl,
+        [FromForm] string? label,
+        [FromForm] double? scoreMaximum,
+        [FromForm] string? gradesReleased)
+    {
+        if (!LoadLaunch(launchId)) return Page();
+        if (!IsLineItemUrl(lineItemUrl)) return Page();
+        if (string.IsNullOrWhiteSpace(label)) { Error = "Update line item failed: a label is required."; return Page(); }
+        if (scoreMaximum is not > 0) { Error = "Update line item failed: scoreMaximum must be a number above 0."; return Page(); }
+
+        var token = await GetTokenAsync(Constants.LtiScopes.Ags.LineItem);
+        if (token is null) return Page();
+
+        await CallAsync("Update line item", async http =>
+        {
+            // PUT replaces the whole line item, so start from what the platform has and change
+            // only the fields on the form. Otherwise resourceLinkId, tag, dates and
+            // submissionReview would be cleared. (Fields the LineItem class doesn't model, such
+            // as vendor extensions, are not kept.)
+            var lineItem = await http.GetLineItemAsync(token, lineItemUrl!)
+                ?? throw new InvalidOperationException("the platform returned no line item.");
+            lineItem.Label = label.Trim();
+            lineItem.ScoreMaximum = scoreMaximum;
+            lineItem.GradesReleased = GradesReleased.Parse(gradesReleased);
+            await http.UpdateLineItemAsync(token, lineItemUrl!, lineItem);
+        });
         return Page();
     }
 
@@ -117,16 +151,10 @@ public class ToolModel(
         if (!LoadLaunch(launchId)) return Page();
         if (!IsLineItemUrl(lineItemUrl)) return Page();
 
-        var http = await CreateAgsClientAsync(Constants.LtiScopes.Ags.LineItem, Constants.MediaTypes.LineItem);
-        if (http is null) return Page();
+        var token = await GetTokenAsync(Constants.LtiScopes.Ags.LineItem);
+        if (token is null) return Page();
 
-        try
-        {
-            using var response = await http.DeleteAsync(lineItemUrl);
-            if (!response.IsSuccessStatusCode) Error = $"Delete line item failed: {await ServiceError.DescribeAsync(response)}";
-        }
-        catch (Exception e) { Error = e.Message; }
-
+        await CallAsync("Delete line item", http => http.DeleteLineItemAsync(token, lineItemUrl!));
         return Page();
     }
 
@@ -151,8 +179,8 @@ public class ToolModel(
             return Page();
         }
 
-        var http = await CreateAgsClientAsync(Constants.LtiScopes.Ags.Score, Constants.MediaTypes.Score);
-        if (http is null) return Page();
+        var token = await GetTokenAsync(Constants.LtiScopes.Ags.Score);
+        if (token is null) return Page();
 
         // AGS 2.0 §3.3: activityProgress and gradingProgress tell the platform how far the user
         // got and whether the score is final; the platform decides what to show in its gradebook.
@@ -169,15 +197,8 @@ public class ToolModel(
             UserId = string.IsNullOrEmpty(userId) ? LtiRequest!.UserId! : userId,
         };
 
-        try
-        {
-            var scoresUrl = AgsUrls.Scores(lineItemUrl!);
-            var content = new StringContent(JsonSerializer.Serialize(score, JsonOptions), Encoding.UTF8, Constants.MediaTypes.Score);
-            using var response = await http.PostAsync(scoresUrl, content);
-            if (!response.IsSuccessStatusCode) Error = $"Submit score failed: {await ServiceError.DescribeAsync(response)}";
-        }
-        catch (Exception e) { Error = e.Message; }
-
+        // PostScoreAsync adds /scores to the line item URL's path, keeping its query.
+        await CallAsync("Submit score", http => http.PostScoreAsync(token, lineItemUrl!, score));
         return Page();
     }
 
@@ -242,13 +263,28 @@ public class ToolModel(
         return false;
     }
 
-    private async Task<HttpClient?> CreateAgsClientAsync(string scope, string mediaType)
+    private async Task<string?> GetTokenAsync(string scope)
     {
         var token = await tokens.GetAccessTokenAsync(Launch!.PlatformId, scope);
         if (token.IsError && token.Error != "Created") { Error = token.Error; return null; }
+        return token.AccessToken;
+    }
+
+    /// <summary>Runs a service call and shows what went wrong, if anything.</summary>
+    private async Task CallAsync(string what, Func<HttpClient, Task> call)
+    {
+        try { await call(httpClientFactory.CreateClient()); }
+        // LtiServiceException carries the platform's ProblemDetails title and detail.
+        catch (Exception e) { Error = $"{what} failed: {e.Message}"; }
+    }
+
+    private async Task<HttpClient?> CreateAgsClientAsync(string scope, string mediaType)
+    {
+        var token = await GetTokenAsync(scope);
+        if (token is null) return null;
 
         var http = httpClientFactory.CreateClient();
-        http.SetBearerToken(token.AccessToken!);
+        http.SetBearerToken(token);
         http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(mediaType));
         return http;
     }

@@ -73,6 +73,9 @@ else
 }
 
 app.UseHttpsRedirection();
+// Numbers on the forms (scores, scoreMaximum) are written and read in one culture, whatever
+// the server's language, so 12.5 is not shown as "12,5" or read back as 125.
+app.UseRequestLocalization("en-US");
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();

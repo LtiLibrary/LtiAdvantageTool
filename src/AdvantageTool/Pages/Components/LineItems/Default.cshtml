@@ -1,3 +1,4 @@
+@using AdvantageTool.Utility
 @using LtiAdvantage.AssignmentGradeServices
 @model AdvantageTool.Pages.Components.LineItems.LineItemsModel
 @{
@@ -66,6 +67,12 @@
                     <input type="text" name="tag" class="form-control form-control-sm" /></div>
                 <div class="col-auto"><label class="form-label small mb-0">Resource ID</label>
                     <input type="text" name="resource_id" class="form-control form-control-sm" /></div>
+                <div class="col-auto"><label class="form-label small mb-0">gradesReleased</label>
+                    <select name="gradesReleased" class="form-select form-select-sm">
+                        <option value="">(platform default)</option>
+                        <option value="true">true: show to learners</option>
+                        <option value="false">false: hide from learners</option>
+                    </select></div>
                 <div class="col-auto"><button type="submit" class="btn btn-light btn-sm">Add line item</button></div>
             </form>
 
@@ -91,6 +98,7 @@
                             @if (!string.IsNullOrEmpty(li.AgsLineItem.Tag)) { <text> · tag @li.AgsLineItem.Tag</text> }
                             @if (!string.IsNullOrEmpty(li.AgsLineItem.ResourceId)) { <text> · resource @li.AgsLineItem.ResourceId</text> }
                             @if (li.AgsLineItem.SubmissionReviewExtension is not null) { <text> · submission review</text> }
+                            · @GradesReleased.Describe(li.AgsLineItem.GradesReleased)
                         </small>
                         @if (!string.IsNullOrEmpty(li.AgsLineItem.Id))
                         {
@@ -130,6 +138,25 @@
                                 <div class="col-auto"><input name="comment" placeholder="comment" class="form-control form-control-sm" /></div>
                                 <div class="col-auto"><button type="submit" class="btn btn-light btn-sm">Submit score</button></div>
                             </form>
+                            @* PUT: change the label, maximum and gradesReleased. The tool reads the line item
+                               first and sends it back whole, so nothing else changes. *@
+                            <details class="mt-1">
+                                <summary class="small">Edit line item</summary>
+                                <form method="post" action="?handler=UpdateLineItem" class="row g-1 align-items-center mt-1">
+                                    <input type="hidden" name="launchId" value="@Model.LaunchId" />
+                                    <input type="hidden" name="lineItemUrl" value="@li.AgsLineItem.Id" />
+                                    <div class="col-auto"><input name="label" value="@li.AgsLineItem.Label" class="form-control form-control-sm" title="label" required /></div>
+                                    <div class="col-auto"><input name="scoreMaximum" type="number" step="any" min="0" value="@li.AgsLineItem.ScoreMaximum" class="form-control form-control-sm" style="width:6em" title="scoreMaximum" required /></div>
+                                    <div class="col-auto">
+                                        <select name="gradesReleased" class="form-select form-select-sm" title="gradesReleased">
+                                            <option value="" selected="@(li.AgsLineItem.GradesReleased is null)" title="Leave gradesReleased out; the platform keeps what it has">(not sent)</option>
+                                            <option value="true" selected="@(li.AgsLineItem.GradesReleased == true)">released</option>
+                                            <option value="false" selected="@(li.AgsLineItem.GradesReleased == false)">hidden from learners</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-auto"><button type="submit" class="btn btn-light btn-sm">Save</button></div>
+                                </form>
+                            </details>
                             <form method="post" action="?handler=DeleteLineItem" class="d-inline">
                                 <input type="hidden" name="launchId" value="@Model.LaunchId" />
                                 <input type="hidden" name="lineItemUrl" value="@li.AgsLineItem.Id" />

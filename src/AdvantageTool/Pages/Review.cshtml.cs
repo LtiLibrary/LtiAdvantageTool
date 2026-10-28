@@ -1,16 +1,10 @@
-using System.Net.Http.Headers;
-using System.Text.Json;
 using AdvantageTool.Services;
-using AdvantageTool.Utility;
-using IdentityModel.Client;
 using LtiAdvantage;
 using LtiAdvantage.AssignmentGradeServices;
 using LtiAdvantage.IdentityModel.Client;
 using LtiAdvantage.Lti;
-using LtiAdvantage.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.WebUtilities;
 
 namespace AdvantageTool.Pages;
 
@@ -21,12 +15,6 @@ namespace AdvantageTool.Pages;
 /// </summary>
 public class ReviewModel(LaunchStore launches, AccessTokenService tokens, IHttpClientFactory httpClientFactory) : PageModel
 {
-    private static readonly JsonSerializerOptions JsonOptions = new()
-    {
-        PropertyNameCaseInsensitive = true,
-        Converters = { new IsoDateTimeConverter() },
-    };
-
     public LtiSubmissionReviewRequest? LtiRequest { get; private set; }
     public LineItem? LineItem { get; private set; }
     public IList<Result> Results { get; private set; } = [];
@@ -54,25 +42,20 @@ public class ReviewModel(LaunchStore launches, AccessTokenService tokens, IHttpC
             $"{Constants.LtiScopes.Ags.LineItemReadonly} {Constants.LtiScopes.Ags.ResultReadonly}");
         if (token.IsError) { Error = token.Error; return Page(); }
 
+        // The library's HttpClient extensions: GetResultsAsync adds /results and the user_id
+        // filter and follows paging; GetLineItemAsync reads the line item.
         var http = httpClientFactory.CreateClient();
-        http.SetBearerToken(token.AccessToken!);
         try
         {
             // Only the reviewed user's results (AGS 2.0 §3.4 user_id filter).
-            var url = QueryHelpers.AddQueryString(AgsUrls.Results(lineItemUrl), "user_id", userId);
-            (Results, _) = await Paging.GetAllPagesAsync(http, url, Constants.MediaTypes.ResultContainer,
-                json => JsonSerializer.Deserialize<ResultContainer>(json, JsonOptions) ?? []);
+            Results = await http.GetResultsAsync(token.AccessToken!, lineItemUrl, userId);
         }
         catch (Exception e) { Error = $"Results: {e.Message}"; }
 
         try
         {
             // The line item itself, for its label; the review still works without it.
-            using var request = new HttpRequestMessage(HttpMethod.Get, lineItemUrl);
-            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.MediaTypes.LineItem));
-            using var response = await http.SendAsync(request);
-            await response.EnsureLtiSuccessAsync();
-            LineItem = JsonSerializer.Deserialize<LineItem>(await response.Content.ReadAsStringAsync(), JsonOptions);
+            LineItem = await http.GetLineItemAsync(token.AccessToken!, lineItemUrl);
         }
         catch (Exception e) { Error ??= $"Line item: {e.Message}"; }
 

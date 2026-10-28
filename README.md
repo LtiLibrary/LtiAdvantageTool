@@ -144,8 +144,8 @@ A deep linking launch opens the catalog (`Pages/Catalog.cshtml.cs`):
 
 - It offers `ltiResourceLink`, `link`, `html`, `file` and `image` items, but only
   the types in the request's `accept_types`.
-- An LTI link can carry a `lineItem` (score maximum, label, tag, resourceId),
-  so the platform creates a gradebook column for it.
+- An LTI link can carry a `lineItem` (score maximum, label, tag, resourceId,
+  `gradesReleased`), so the platform creates a gradebook column for it.
 - With `accept_multiple: false` only one item can be picked.
 - Links can open in an `iframe` or `window`, or be embedded (`embed`, a `link`
   item with `embed.html`), if the platform lists that target in
@@ -163,17 +163,30 @@ The services panel on a resource link launch
 
 - **Line items**, filtered by `resource_link_id`, `tag` and `resource_id`. New
   line items can carry a tag and resource ID to filter on.
+- **Edit line item** changes the label, `scoreMaximum` and `gradesReleased`
+  (whether the platform may show the grades to learners; "not sent" leaves the
+  property out, so the platform keeps what it has). A PUT replaces the whole line item, so the tool reads it first
+  (`GetLineItemAsync`) and sends it back with only those fields changed
+  (`UpdateLineItemAsync`).
 - **Scores** with a chosen `activityProgress`, `gradingProgress`, score and
   comment, for any member of the course. Leave the score empty to report
   progress only (no `scoreGiven` / `scoreMaximum`).
 - **Results**, for everyone or one user (`user_id`).
 - **Members**, filtered by `role` (full role URI) and `rlid`.
 
-`limit` sets the page size for line items and members. The tool then follows
-the platform's `Link: <…>; rel="next"` headers (`Utility/Paging.cs`, built on the
-library's `GetNextPageUrl`) and shows how many pages it read. Without the page
-count, the library's `HttpClientLtiServiceExtensions` (`GetLineItemsAsync`,
-`GetMembershipAsync`, `GetGroupsAsync`, …) do this in one call.
+Creating, editing and deleting line items and posting scores
+(`Pages/Tool.cshtml.cs`), and reading results (the services panel and the
+Submission Review page), use the
+library's `HttpClientLtiServiceExtensions` (`AddLineItemAsync`,
+`UpdateLineItemAsync`, `DeleteLineItemAsync`, `PostScoreAsync`,
+`GetResultsAsync`, …). They send the token with the request and throw an
+`LtiServiceException` with what the platform said when a call fails.
+
+`limit` sets the page size for line items and members. The panel follows the
+platform's `Link: <…>; rel="next"` headers itself (`Utility/Paging.cs`, built on
+the library's `GetNextPageUrl`) so it can show how many pages it read. Without
+the page count, `GetLineItemsAsync`, `GetMembershipAsync` and `GetGroupsAsync`
+do this in one call.
 
 ### When a service call fails
 
