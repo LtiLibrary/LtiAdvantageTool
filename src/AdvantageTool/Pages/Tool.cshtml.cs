@@ -64,7 +64,9 @@ public class ToolModel(
 
     public async Task<IActionResult> OnPostCreateLineItemAsync(
         [FromForm] string? launchId,
-        [FromForm(Name = "resource_link_id")] string? resourceLinkId)
+        [FromForm(Name = "resource_link_id")] string? resourceLinkId,
+        [FromForm] string? tag,
+        [FromForm(Name = "resource_id")] string? resourceId)
     {
         if (!LoadLaunch(launchId)) return Page();
 
@@ -81,6 +83,9 @@ public class ToolModel(
             ResourceLinkId = string.IsNullOrEmpty(resourceLinkId) ? LtiRequest.ResourceLink?.Id : resourceLinkId,
             ScoreMaximum = 100,
             StartDateTime = DateTime.UtcNow,
+            // tag and resourceId are the tool's own labels; the line item filters match on them.
+            Tag = string.IsNullOrWhiteSpace(tag) ? null : tag,
+            ResourceId = string.IsNullOrWhiteSpace(resourceId) ? null : resourceId,
         };
 
         try
@@ -116,7 +121,13 @@ public class ToolModel(
 
     public async Task<IActionResult> OnPostPostScoreAsync(
         [FromForm] string? launchId,
-        [FromForm] string? lineItemUrl)
+        [FromForm] string? lineItemUrl,
+        [FromForm] string? userId,
+        [FromForm] double scoreGiven,
+        [FromForm] double scoreMaximum,
+        [FromForm] ActivityProgress activityProgress,
+        [FromForm] GradingProgress gradingProgress,
+        [FromForm] string? comment)
     {
         if (!LoadLaunch(launchId)) return Page();
         if (!IsLineItemUrl(lineItemUrl)) return Page();
@@ -124,16 +135,18 @@ public class ToolModel(
         var http = await CreateAgsClientAsync(Constants.LtiScopes.Ags.Score, Constants.MediaTypes.Score);
         if (http is null) return Page();
 
+        // AGS 2.0 §3.3: activityProgress and gradingProgress tell the platform how far the user
+        // got and whether the score is final; the platform decides what to show in its gradebook.
         var score = new Score
         {
-            ActivityProgress = ActivityProgress.Completed,
-            GradingProgress = GradingProgress.FullyGraded,
-            ScoreGiven = Math.Round(Random.Shared.NextDouble() * 100, 2),
-            ScoreMaximum = 100,
+            ActivityProgress = activityProgress,
+            GradingProgress = gradingProgress,
+            ScoreGiven = scoreGiven,
+            ScoreMaximum = scoreMaximum,
+            Comment = string.IsNullOrWhiteSpace(comment) ? null : comment,
             TimeStamp = DateTime.UtcNow,
-            UserId = LtiRequest!.UserId!,
+            UserId = string.IsNullOrEmpty(userId) ? LtiRequest!.UserId! : userId,
         };
-        if (score.ScoreGiven > 75) score.Comment = "Good job!";
 
         try
         {

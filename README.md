@@ -10,8 +10,9 @@ ASP.NET Core 10. Demonstrates:
   launch checks the LTI 1.3 Security Framework expects (see below)
 - Deep linking response (signed by the tool) with several content item types,
   line items and messages
-- Assignment and Grade Services: line items, results
-- Names and Role Provisioning Service: course members
+- Assignment and Grade Services: line items (with filters and paging), scores,
+  results
+- Names and Role Provisioning Service: course members (with filters and paging)
 - The tool's JWKS, published with the library's `JwksControllerBase`, with key
   rotation
 
@@ -104,6 +105,22 @@ Every launch goes through `Services/LaunchValidator.cs`:
   in Development.
 - **No re-posted tokens.** A validated launch is kept server-side for an hour;
   pages and AGS/NRPS buttons only carry its opaque id.
+
+## AGS and NRPS
+
+The services panel on a resource link launch
+(`Pages/Components/LineItems/`) shows:
+
+- **Line items**, filtered by `resource_link_id`, `tag` and `resource_id`. New
+  line items can carry a tag and resource ID to filter on.
+- **Scores** with a chosen `activityProgress`, `gradingProgress`, score and
+  comment, for any member of the course.
+- **Results**, for everyone or one user (`user_id`).
+- **Members**, filtered by `role` (full role URI) and `rlid`.
+
+`limit` sets the page size for line items and members. The tool then follows
+the platform's `Link: <…>; rel="next"` headers (`Utility/Paging.cs`) and shows
+how many pages it read.
 
 ## Deep linking
 
