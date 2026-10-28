@@ -1,0 +1,57 @@
+@page "/register"
+@model AdvantageTool.Pages.DynamicRegistrationModel
+@{ ViewData["Title"] = "Register with a platform"; }
+
+<h1>Register with a platform</h1>
+
+@if (!string.IsNullOrEmpty(Model.Error))
+{
+    <div class="alert alert-danger">@Model.Error</div>
+}
+
+@if (Model.Registered is not null)
+{
+    <div class="alert alert-success">
+        Registered with <strong>@Model.Registered.Name</strong>
+        (client ID <code>@Model.Registered.ClientId</code>).
+    </div>
+    @if (Model.Registered.DeploymentIdList.Count == 0)
+    {
+        <p class="text-warning">The platform did not return a deployment ID. Add it on the platform's
+            <a asp-page="/Platforms/Edit" asp-route-id="@Model.Registered.Id" target="_blank">edit page</a>,
+            or launches will be rejected.</p>
+    }
+}
+else if (Model.PlatformConfiguration is not null)
+{
+    var platform = Model.PlatformConfiguration;
+    <p>This platform asks to register the tool:</p>
+    <dl class="row">
+        <dt class="col-sm-3">Issuer</dt><dd class="col-sm-9">@platform.Issuer</dd>
+        <dt class="col-sm-3">Product</dt><dd class="col-sm-9">@platform.LtiPlatformConfiguration?.ProductFamilyCode @platform.LtiPlatformConfiguration?.Version</dd>
+        <dt class="col-sm-3">Registration endpoint</dt><dd class="col-sm-9">@platform.RegistrationEndpoint</dd>
+    </dl>
+    <form method="post">
+        <input type="hidden" name="openid_configuration" value="@Model.OpenIdConfiguration" />
+        <input type="hidden" name="registration_token" value="@Model.RegistrationToken" />
+        <button type="submit" class="btn btn-primary">Register</button>
+        <button type="button" class="btn btn-secondary" onclick="closeRegistration()">Cancel</button>
+    </form>
+}
+
+@if (Model.Registered is not null || Model.PlatformConfiguration is null)
+{
+    <button type="button" class="btn btn-primary" onclick="closeRegistration()">Close</button>
+}
+
+@section Scripts {
+<script>
+    // Dynamic Registration §3.7: tell the platform the tool is done. The platform opened this
+    // page either in an iframe (window.parent) or in a popup (window.opener).
+    function closeRegistration() {
+        const platformWindow = window.opener || (window.parent !== window ? window.parent : null);
+        if (platformWindow) platformWindow.postMessage({ subject: 'org.imsglobal.lti.close' }, '*');
+        if (window.opener) window.close();
+    }
+</script>
+}

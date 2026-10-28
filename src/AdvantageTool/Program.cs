@@ -32,6 +32,7 @@ builder.Services.AddAntiforgery(options => options.SuppressXFrameOptionsHeader =
 builder.Services.AddRazorPages(options =>
 {
     options.Conventions.AuthorizeFolder("/Platforms");
+    options.Conventions.AuthorizePage("/DynamicRegistration");
 });
 
 builder.Services.AddHttpClient();

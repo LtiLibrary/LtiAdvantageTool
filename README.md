@@ -4,6 +4,7 @@ A minimal LTI 1.3 / LTI Advantage Tool built with the
 [LtiAdvantage](https://github.com/LtiLibrary/LtiAdvantage) library and
 ASP.NET Core 10. Demonstrates:
 
+- LTI Dynamic Registration (tool side)
 - OIDC third-party login initiation
 - Resource-link launch validated with the library's `LtiTokenValidator`, plus the
   launch checks the LTI 1.3 Security Framework expects (see below)
@@ -46,8 +47,30 @@ Then in a browser:
 4. The page also shows the URLs to give the platform side: Login URL,
    Launch URL, Deep linking URL, JWKS URL, and the public key.
 
+### Dynamic Registration
+
+Instead of copying URLs and IDs by hand, give the platform the tool's
+registration URL: `http://localhost:5072/register`. The platform opens it (in
+an iframe or a popup) with `openid_configuration` and `registration_token`.
+After you sign in as a tool admin and confirm, the tool:
+
+1. fetches the platform's OpenID configuration
+   (`GetPlatformOpenIdConfigurationAsync`, which also checks the issuer matches
+   the URL),
+2. posts its `ToolConfiguration` / `LtiToolConfiguration` to the platform's
+   registration endpoint (`RegisterToolAsync`),
+3. stores the returned client ID and deployment ID as a new platform with its
+   own key pair, and
+4. closes with the `org.imsglobal.lti.close` postMessage (to `window.opener`
+   for a popup, `window.parent` for an iframe).
+
+See `Pages/DynamicRegistration.cshtml.cs`. In production, fetch the platform
+configuration with an `HttpClient` that refuses private addresses: the URL
+comes from the browser.
+
 ## Where to look first
 
+- `Pages/DynamicRegistration.cshtml.cs` — Dynamic Registration (tool side).
 - `Pages/OidcLogin.cshtml.cs` — third-party login initiation.
 - `Services/LaunchValidator.cs` — every check a launch goes through.
 - `Pages/Tool.cshtml.cs` — the launch URL: validates, then hands off by message type.
