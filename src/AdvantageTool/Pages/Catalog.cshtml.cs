@@ -124,7 +124,8 @@ public class CatalogModel(ApplicationDbContext context, LaunchStore launches) : 
             Constants.ContentItemTypes.LtiLink => new LtiLinkItem
             {
                 Url = Url.Page("/Tool", null, new { platformId = platform.PlatformId }, Request.Scheme),
-                Custom = new Dictionary<string, string> { ["activity_id"] = entry.Key },
+                // activity_id is a plain value; the rest ask the platform for substitutions.
+                Custom = new Dictionary<string, string>(CustomVariables.ForLink()) { ["activity_id"] = entry.Key },
                 // A lineItem asks the platform to create a gradebook column for this link.
                 LineItem = selection.Graded
                     ? new LineItemProperty

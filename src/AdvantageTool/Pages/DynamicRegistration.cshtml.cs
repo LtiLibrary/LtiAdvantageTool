@@ -155,6 +155,8 @@ public class DynamicRegistrationModel(
                 TargetLinkUri = launchUrl,
                 Description = "Sample LTI 1.3 tool built with the LtiAdvantage library.",
                 Claims = ["iss", "sub", "name", "given_name", "family_name", "email"],
+                // Custom parameters with $Variable values: the platform fills them in on every launch.
+                CustomParameters = Utility.CustomVariables.ForRegistration(),
                 Messages = messages,
             },
         };

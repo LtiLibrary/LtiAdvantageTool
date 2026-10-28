@@ -45,13 +45,18 @@
     @if (Model.LtiRequest.Custom is { Count: > 0 })
     {
         <div class="card mb-3">
-            <div class="card-header">Custom parameters</div>
+            <div class="card-header">Custom parameters <small class="text-muted">($Variable values are filled in by the platform)</small></div>
             <div class="card-body">
                 <dl class="row mb-0">
                     @foreach (var (k, v) in Model.LtiRequest.Custom.OrderBy(kv => kv.Key))
                     {
                         <dt class="col-sm-3">@k</dt>
-                        <dd class="col-sm-9">@v</dd>
+                        <dd class="col-sm-9">@v
+                            @if (AdvantageTool.Utility.CustomVariables.IsUnresolved(v))
+                            {
+                                <span class="badge bg-warning text-dark ms-1" title="The platform left the variable as is, so it does not support it">not substituted</span>
+                            }
+                        </dd>
                     }
                 </dl>
             </div>

@@ -103,6 +103,22 @@ Every launch goes through `Services/LaunchValidator.cs`:
 - **No re-posted tokens.** A validated launch is kept server-side for an hour;
   pages and AGS/NRPS buttons only carry its opaque id.
 
+## Custom variable substitution
+
+The tool asks the platform for values by sending custom parameters whose value
+is a `$Variable` name (`Utility/CustomVariables.cs`):
+
+- with Dynamic Registration (`custom_parameters`): `user_id=$User.id`,
+  `user_full_name=$Person.name.full`, `context_history=$Context.id.history`,
+  `platform_product=$ToolPlatform.productFamilyCode`;
+- on each deep-linked LTI link: `resource_link_title=$ResourceLink.title`,
+  `resource_link_history=$ResourceLink.id.history`,
+  `context_history=$Context.id.history`, `groups=$Membership.course.groupIds`.
+
+The launch page lists every custom parameter with the value the platform sent,
+and flags values that are still a literal `$Variable`: the platform does not
+support that variable, so it left it unchanged as the spec requires.
+
 ## Keys and JWKS
 
 Each platform registration gets its own RSA key pair (with its own `kid`). The
