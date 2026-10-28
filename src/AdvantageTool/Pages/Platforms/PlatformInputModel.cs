@@ -30,6 +30,7 @@ public class PlatformInputModel
             JwkSetUrl = platform.JwkSetUrl;
             PlatformId = platform.PlatformId;
             ClientId = platform.ClientId;
+            DeploymentIds = platform.DeploymentIds;
             KeyId = platform.KeyId;
             PrivateKey = platform.PrivateKey;
             PublicKey = platform.PublicKey;
@@ -49,6 +50,7 @@ public class PlatformInputModel
     [Required, Display(Name = "Access token URL")] public string AccessTokenUrl { get; set; } = string.Empty;
     [Required, Display(Name = "JWKS URL (platform's)")] public string JwkSetUrl { get; set; } = string.Empty;
     [Required, Display(Name = "Client ID")] public string ClientId { get; set; } = string.Empty;
+    [Required, Display(Name = "Deployment IDs (one per line)")] public string DeploymentIds { get; set; } = string.Empty;
 
     public string PlatformId { get; set; } = string.Empty;
     public string KeyId { get; set; } = string.Empty;
@@ -69,6 +71,7 @@ public class PlatformInputModel
         p.JwkSetUrl = JwkSetUrl;
         p.PlatformId = PlatformId;
         p.ClientId = ClientId;
+        p.DeploymentIds = DeploymentIds;
         p.KeyId = KeyId;
         p.PrivateKey = PrivateKey;
         p.PublicKey = PublicKey;

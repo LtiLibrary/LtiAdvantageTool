@@ -1,7 +1,7 @@
-using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Headers;
 using System.Text.Json;
 using AdvantageTool.Services;
+using AdvantageTool.Utility;
 using IdentityModel.Client;
 using LtiAdvantage;
 using LtiAdvantage.AssignmentGradeServices;
@@ -20,13 +20,10 @@ public class LineItemsViewComponent(AccessTokenService tokens, IHttpClientFactor
         Converters = { new IsoDateTimeConverter() },
     };
 
-    public async Task<IViewComponentResult> InvokeAsync(string? idToken)
+    public async Task<IViewComponentResult> InvokeAsync(Launch launch)
     {
-        var model = new LineItemsModel(idToken);
-        if (string.IsNullOrEmpty(idToken)) { model.Status = "id_token missing"; return View(model); }
-
-        var jwt = new JwtSecurityTokenHandler().ReadJwtToken(idToken);
-        model.LtiRequest = new LtiResourceLinkRequest(jwt.Payload);
+        var model = new LineItemsModel(launch);
+        model.LtiRequest = new LtiResourceLinkRequest(launch.Payload);
         var lti = model.LtiRequest;
 
         if (lti.AssignmentGradeServices is null) { model.Status = "Assignment & Grade Services not present in launch."; return View(model); }
@@ -36,7 +33,7 @@ public class LineItemsViewComponent(AccessTokenService tokens, IHttpClientFactor
             Constants.LtiScopes.Ags.LineItem,
             Constants.LtiScopes.Ags.ResultReadonly,
             Constants.LtiScopes.Nrps.MembershipReadonly);
-        var token = await tokens.GetAccessTokenAsync(lti.Iss!, scopes);
+        var token = await tokens.GetAccessTokenAsync(launch.PlatformId, scopes);
         if (token.IsError) { model.Status = token.Error; return View(model); }
 
         var http = httpClientFactory.CreateClient();
@@ -82,9 +79,7 @@ public class LineItemsViewComponent(AccessTokenService tokens, IHttpClientFactor
             http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.MediaTypes.ResultContainer));
             foreach (var li in model.LineItems)
             {
-                var lineItemUri = new Uri(li.AgsLineItem.Id!);
-                var url = $"{lineItemUri.GetLeftPart(UriPartial.Path).TrimEnd('/')}/results{lineItemUri.Query}";
-                var json = await http.GetStringAsync(url);
+                var json = await http.GetStringAsync(AgsUrls.Results(li.AgsLineItem.Id!));
                 li.Results = JsonSerializer.Deserialize<ResultContainer>(json, JsonOptions);
             }
         }

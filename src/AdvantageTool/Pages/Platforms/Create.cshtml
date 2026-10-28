@@ -14,6 +14,11 @@
     <div class="mb-3"><label asp-for="Platform.AccessTokenUrl" class="form-label"></label><input asp-for="Platform.AccessTokenUrl" class="form-control"/></div>
     <div class="mb-3"><label asp-for="Platform.JwkSetUrl" class="form-label"></label><input asp-for="Platform.JwkSetUrl" class="form-control"/></div>
     <div class="mb-3"><label asp-for="Platform.ClientId" class="form-label"></label><input asp-for="Platform.ClientId" class="form-control"/></div>
+    <div class="mb-3">
+        <label asp-for="Platform.DeploymentIds" class="form-label"></label>
+        <textarea asp-for="Platform.DeploymentIds" class="form-control" rows="2"></textarea>
+        <div class="form-text">Launches from any other deployment are rejected (LTI 1.3 §5.1.1).</div>
+    </div>
 
     <h4 class="mt-4">Tool side (give these to the platform)</h4>
     <div class="mb-3">

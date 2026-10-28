@@ -1,11 +1,12 @@
+using AdvantageTool.Services;
 using LtiAdvantage.AssignmentGradeServices;
 using LtiAdvantage.Lti;
 
 namespace AdvantageTool.Pages.Components.LineItems;
 
-public class LineItemsModel(string? idToken)
+public class LineItemsModel(Launch launch)
 {
-    public string IdToken { get; } = idToken ?? string.Empty;
+    public string LaunchId { get; } = launch.Id;
     public string? Status { get; set; }
     public string? LineItemUrl { get; set; }
     public LtiResourceLinkRequest? LtiRequest { get; set; }

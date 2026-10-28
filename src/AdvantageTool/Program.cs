@@ -1,5 +1,6 @@
 using AdvantageTool.Data;
 using AdvantageTool.Services;
+using LtiAdvantage.IdentityModel.Validation;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,7 +9,6 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite(connectionString));
-builder.Services.AddDbContext<StateDbContext>(options => options.UseInMemoryDatabase("LtiStates"));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddDefaultIdentity<AdvantageToolUser>(options =>
@@ -36,6 +36,18 @@ builder.Services.AddRazorPages(options =>
 builder.Services.AddHttpClient();
 builder.Services.AddTransient<AccessTokenService>();
 builder.Services.AddTransient<JwksService>();
+
+// Launch validation. One JwksCache is shared by every launch, so the platform's JWKS is
+// fetched once and refreshed when the platform rotates its key, not fetched per launch.
+// It holds its HttpClient for the app's lifetime, so recycle connections to pick up DNS changes.
+builder.Services.AddSingleton(new JwksCache(
+    new HttpClient(new SocketsHttpHandler { PooledConnectionLifetime = TimeSpan.FromMinutes(15) }),
+    cacheDuration: TimeSpan.FromHours(1),
+    minimumRefreshInterval: TimeSpan.FromMinutes(1)));
+builder.Services.AddSingleton<INonceStore, InMemoryNonceStore>();
+builder.Services.AddMemoryCache();
+builder.Services.AddSingleton<LaunchStore>();
+builder.Services.AddScoped<LaunchValidator>();
 
 var app = builder.Build();
 

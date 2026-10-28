@@ -12,6 +12,13 @@ public class Platform
     public string JwkSetUrl { get; set; } = string.Empty;
     public string PlatformId { get; set; } = string.Empty;
 
+    // The deployment ids the platform assigned to this registration, one per line.
+    // LTI 1.3 §5.1.1: a tool must reject launches from deployments it does not know.
+    public string DeploymentIds { get; set; } = string.Empty;
+
+    public IReadOnlyList<string> DeploymentIdList => DeploymentIds
+        .Split(['\n', '\r', ','], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
     // Tool side
     public string ClientId { get; set; } = string.Empty;
     public string KeyId { get; set; } = string.Empty;

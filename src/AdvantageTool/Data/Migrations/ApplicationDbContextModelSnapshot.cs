@@ -15,7 +15,7 @@ namespace AdvantageTool.Data.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "10.0.7");
+            modelBuilder.HasAnnotation("ProductVersion", "10.0.14");
 
             modelBuilder.Entity("AdvantageTool.Data.AdvantageToolUser", b =>
                 {
@@ -99,6 +99,10 @@ namespace AdvantageTool.Data.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("DeploymentIds")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Issuer")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -133,13 +137,13 @@ namespace AdvantageTool.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Issuer")
-                        .IsUnique();
-
                     b.HasIndex("PlatformId")
                         .IsUnique();
 
                     b.HasIndex("UserId");
+
+                    b.HasIndex("Issuer", "ClientId")
+                        .IsUnique();
 
                     b.ToTable("Platforms");
                 });

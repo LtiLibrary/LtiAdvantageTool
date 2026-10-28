@@ -16,8 +16,8 @@ public class CreateModel(ApplicationDbContext context) : PageModel
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (context.Platforms.Any(p => p.Issuer == Platform.Issuer))
-            ModelState.AddModelError($"{nameof(Platform)}.{nameof(Platform.Issuer)}", "Issuer already registered.");
+        if (context.Platforms.Any(p => p.Issuer == Platform.Issuer && p.ClientId == Platform.ClientId))
+            ModelState.AddModelError($"{nameof(Platform)}.{nameof(Platform.ClientId)}", "This issuer and client ID are already registered.");
         if (!ModelState.IsValid) return Page();
 
         var user = await context.GetUserAsync(User);

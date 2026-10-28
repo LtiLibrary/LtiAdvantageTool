@@ -60,7 +60,7 @@
 
     @if (Model.LtiRequest.AssignmentGradeServices is not null || Model.LtiRequest.NamesRoleService is not null)
     {
-        @await Component.InvokeAsync("LineItems", Model.IdToken)
+        @await Component.InvokeAsync("LineItems", Model.Launch)
     }
 }
 
@@ -68,7 +68,7 @@
     <div class="col-md-6">
         <div class="card">
             <div class="card-header">JWT header</div>
-            <pre class="card-body">@Model.JwtHeader?.SerializeToJson()</pre>
+            <pre class="card-body">@Model.Launch?.Header.SerializeToJson()</pre>
         </div>
     </div>
     <div class="col-md-6">

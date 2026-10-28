@@ -10,14 +10,13 @@ namespace AdvantageTool.Services;
 
 public class AccessTokenService(ApplicationDbContext context, IHttpClientFactory httpClientFactory)
 {
-    public async Task<TokenResponse> GetAccessTokenAsync(string issuer, string scope)
+    public async Task<TokenResponse> GetAccessTokenAsync(string platformId, string scope)
     {
-        if (string.IsNullOrWhiteSpace(issuer))
-            return ProtocolResponse.FromException<TokenResponse>(new ArgumentNullException(nameof(issuer)));
         if (string.IsNullOrWhiteSpace(scope))
             return ProtocolResponse.FromException<TokenResponse>(new ArgumentNullException(nameof(scope)));
 
-        var platform = await context.GetPlatformByIssuerAsync(issuer);
+        // By registration, not by issuer: one issuer can have several client ids.
+        var platform = await context.GetPlatformByPlatformIdAsync(platformId);
         if (platform is null)
             return ProtocolResponse.FromException<TokenResponse>(new InvalidOperationException("Platform not registered"));
 

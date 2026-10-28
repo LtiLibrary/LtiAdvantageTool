@@ -5,7 +5,8 @@ A minimal LTI 1.3 / LTI Advantage Tool built with the
 ASP.NET Core 10. Demonstrates:
 
 - OIDC third-party login initiation
-- Resource-link launch with full id_token validation against the platform's JWKS
+- Resource-link launch validated with the library's `LtiTokenValidator`, plus the
+  launch checks the LTI 1.3 Security Framework expects (see below)
 - Deep linking response (signed by the tool)
 - Assignment and Grade Services: line items, results
 - Names and Role Provisioning Service: course members
@@ -40,15 +41,15 @@ Then in a browser:
 2. Register a tool admin account (the password rules are deliberately lax —
    this is a sample).
 3. Go to **Platforms → Add platform** and fill in your LMS's Issuer,
-   Authorize URL, Access token URL, JWKS URL, and Client ID.
+   Authorize URL, Access token URL, JWKS URL, Client ID and Deployment ID(s).
 4. The page also shows the URLs to give the platform side: Login URL,
    Launch URL, Deep linking URL, JWKS URL, and the public key.
 
 ## Where to look first
 
 - `Pages/OidcLogin.cshtml.cs` — third-party login initiation.
-- `Pages/Tool.cshtml.cs` — resource-link launch handler with full id_token
-  validation against the platform's JWKS.
+- `Services/LaunchValidator.cs` — every check a launch goes through.
+- `Pages/Tool.cshtml.cs` — the launch URL: validates, then hands off by message type.
 - `Pages/Catalog.cshtml.cs` — deep linking response: select activities,
   build and sign the `LtiDeepLinkingResponse`, post it back.
 - `Pages/Components/LineItems/LineItemsViewComponent.cs` — token-protected
@@ -56,6 +57,28 @@ Then in a browser:
 - `Services/AccessTokenService.cs` — JWT client-credentials flow.
 - `Services/JwksService.cs` and the `MapGet("/jwks/{platformId}", ...)` in
   `Program.cs` — the tool's JWKS endpoint.
+
+## Launch security
+
+Every launch goes through `Services/LaunchValidator.cs`:
+
+- **Login initiation** looks the registration up by issuer *and* `client_id`,
+  so one platform can register the tool several times (as real LMSs do).
+- **State bound to the browser.** The login sets a short-lived
+  `lti1p3-state-{state}` cookie (`SameSite=None; Secure; Partitioned`) holding the
+  nonce. The launch must come back with that cookie, and the id_token's nonce
+  must match it.
+- **id_token** is checked by the library's `LtiTokenValidator`: signature
+  against the platform's JWKS (cached in a shared `JwksCache`, refreshed when the
+  platform rotates its key, so not fetched per launch), `iss`, `aud`/`azp`,
+  `exp`/`iat`, LTI version, `message_type`, nonce replay (`INonceStore`), and
+  `deployment_id` against the deployment IDs registered for the platform.
+- **Errors go back to the platform.** When a launch fails and the platform sent
+  `launch_presentation.return_url` (on the platform's own origin), the user is
+  sent there with `lti_errormsg` / `lti_errorlog`. Error details are only shown
+  in Development.
+- **No re-posted tokens.** A validated launch is kept server-side for an hour;
+  pages and AGS/NRPS buttons only carry its opaque id.
 
 ## Platform side
 
@@ -71,6 +94,7 @@ running on `http://localhost:5099`:
 | Access token URL  | `http://localhost:5099/connect/token`     |
 | JWKS URL          | `http://localhost:5099/.well-known/jwks`  |
 | Client ID         | the Client ID shown on the platform       |
+| Deployment IDs    | the Deployment ID shown on the platform   |
 
 The Issuer must match the `iss` claim in the platform's id_token exactly, so
 copy it from the platform rather than typing it.
