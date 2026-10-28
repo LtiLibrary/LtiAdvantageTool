@@ -13,6 +13,7 @@ ASP.NET Core 10. Demonstrates:
 - Assignment and Grade Services: line items (with filters and paging), scores,
   results
 - Names and Role Provisioning Service: course members (with filters and paging)
+- Submission Review: launches from the platform's gradebook
 - The tool's JWKS, published with the library's `JwksControllerBase`, with key
   rotation
 
@@ -121,6 +122,15 @@ The services panel on a resource link launch
 `limit` sets the page size for line items and members. The tool then follows
 the platform's `Link: <…>; rel="next"` headers (`Utility/Paging.cs`) and shows
 how many pages it read.
+
+## Submission Review
+
+Line items the tool creates carry a `submissionReview` property
+(`SubmissionReviewProperty`) pointing at the tool's launch URL. The platform can
+then launch an `LtiSubmissionReviewRequest` from its gradebook. The launch URL
+sends it to `Pages/Review.cshtml.cs`, which shows the user in the `for_user`
+claim and the results the tool posted for them on that line item (AGS results
+with `user_id`).
 
 ## Deep linking
 

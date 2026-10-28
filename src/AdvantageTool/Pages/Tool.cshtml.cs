@@ -7,6 +7,7 @@ using IdentityModel.Client;
 using LtiAdvantage;
 using LtiAdvantage.AssignmentGradeServices;
 using LtiAdvantage.Lti;
+using LtiAdvantage.SubmissionReview;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -52,6 +53,7 @@ public class ToolModel(
         {
             Constants.Lti.LtiResourceLinkRequestMessageType => RedirectToPage("/Tool", new { platformId, launchId }),
             Constants.Lti.LtiDeepLinkingRequestMessageType => RedirectToPage("/Catalog", new { launchId }),
+            Constants.Lti.LtiSubmissionReviewRequestMessageType => RedirectToPage("/Review", new { launchId }),
             _ => ShowError($"This tool does not handle {outcome.Launch.MessageType} messages."),
         };
     }
@@ -86,6 +88,13 @@ public class ToolModel(
             // tag and resourceId are the tool's own labels; the line item filters match on them.
             Tag = string.IsNullOrWhiteSpace(tag) ? null : tag,
             ResourceId = string.IsNullOrWhiteSpace(resourceId) ? null : resourceId,
+            // Submission Review 1.0: lets the platform launch back into the tool from the gradebook
+            // (LtiSubmissionReviewRequest) to show one user's submission. The launch URL handles it.
+            SubmissionReviewExtension = new SubmissionReviewProperty
+            {
+                Label = "Review in AdvantageTool",
+                Url = Url.Page("/Tool", null, new { platformId = Launch!.PlatformId }, Request.Scheme),
+            },
         };
 
         try

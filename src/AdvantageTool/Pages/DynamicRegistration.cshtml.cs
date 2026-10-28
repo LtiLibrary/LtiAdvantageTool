@@ -128,6 +128,7 @@ public class DynamicRegistrationModel(
         {
             new() { Type = Constants.Lti.LtiResourceLinkRequestMessageType },
             new() { Type = Constants.Lti.LtiDeepLinkingRequestMessageType, TargetLinkUri = launchUrl, Label = "Pick activities" },
+            new() { Type = Constants.Lti.LtiSubmissionReviewRequestMessageType },
         };
         var supported = platform.LtiPlatformConfiguration?.MessagesSupported?.Select(m => m.Type).ToHashSet();
         if (supported is not null) messages.RemoveAll(m => !supported.Contains(m.Type));
