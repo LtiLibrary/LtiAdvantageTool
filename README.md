@@ -25,18 +25,8 @@ ASP.NET Core 10. Demonstrates:
 Prerequisites:
 
 - .NET 10 SDK.
-- A checkout of [LtiAdvantage](https://github.com/LtiLibrary/LtiAdvantage) next
-  to this repository. The sample builds against the library source, so the
-  folders must sit side by side:
-
-  ```
-  some-folder/
-  ├── LtiAdvantage/
-  └── LtiAdvantageTool/
-  ```
-
-  This is temporary: once LtiAdvantage 4.0.0 is on NuGet the sample goes back
-  to package references.
+- The [LtiAdvantage](https://github.com/LtiLibrary/LtiAdvantage) 4.0.0 packages,
+  restored from NuGet.
 
 ```sh
 cd src/AdvantageTool

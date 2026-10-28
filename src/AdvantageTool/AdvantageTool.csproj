@@ -8,20 +8,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="LtiAdvantage" Version="4.0.0" />
+    <PackageReference Include="LtiAdvantage.AspNetCore" Version="4.0.0" />
+    <PackageReference Include="LtiAdvantage.IdentityModel" Version="4.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="10.0.14" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.14" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="10.0.14" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.14" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.14" PrivateAssets="all" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.14" />
-  </ItemGroup>
-
-  <!-- Built against the sibling LtiAdvantage checkout until LtiAdvantage 4.0.0
-       ships on NuGet; then these go back to PackageReferences. -->
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\LtiAdvantage\src\LtiAdvantage\LtiAdvantage.csproj" />
-    <ProjectReference Include="..\..\..\LtiAdvantage\src\LtiAdvantage.AspNetCore\LtiAdvantage.AspNetCore.csproj" />
-    <ProjectReference Include="..\..\..\LtiAdvantage\src\LtiAdvantage.IdentityModel\LtiAdvantage.IdentityModel.csproj" />
   </ItemGroup>
 
 </Project>
