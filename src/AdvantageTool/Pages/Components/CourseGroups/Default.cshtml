@@ -1,0 +1,49 @@
+@model AdvantageTool.Pages.Components.CourseGroups.CourseGroupsModel
+
+@{
+    void GroupList(IEnumerable<LtiAdvantage.CourseGroupsService.Group> groups)
+    {
+        <ul>
+            @foreach (var group in groups)
+            {
+                var members = Model.MembersOf(group).ToList();
+                <li>
+                    <strong>@group.Name</strong>
+                    @if (!string.IsNullOrEmpty(group.Tag)) { <small class="text-muted"> · tag @group.Tag</small> }
+                    @if (members.Count > 0)
+                    {
+                        <small>: @string.Join("; ", members.Select(m => $"{m.FamilyName}, {m.GivenName}"))</small>
+                    }
+                    else
+                    {
+                        <small class="text-muted">: no members listed</small>
+                    }
+                </li>
+            }
+        </ul>
+    }
+}
+
+<div class="card mt-3">
+    <div class="card-header">Course Groups</div>
+    <div class="card-body">
+        @if (!string.IsNullOrEmpty(Model.Status))
+        {
+            <div class="alert alert-warning">@Model.Status</div>
+        }
+        @if (Model.Groups.Count == 0)
+        {
+            <p>This course has no groups.</p>
+        }
+        @foreach (var set in Model.Sets)
+        {
+            <h6>@set.Name <small class="text-muted">(group set)</small></h6>
+            GroupList(Model.GroupsIn(set));
+        }
+        @if (Model.GroupsWithoutSet.Any())
+        {
+            <h6>Other groups</h6>
+            GroupList(Model.GroupsWithoutSet);
+        }
+    </div>
+</div>

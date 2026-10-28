@@ -62,6 +62,11 @@
     {
         @await Component.InvokeAsync("LineItems", Model.Launch)
     }
+
+    @if (Model.LtiRequest.CourseGroupsService is not null)
+    {
+        @await Component.InvokeAsync("CourseGroups", Model.Launch)
+    }
 }
 
 <div class="row mt-4">

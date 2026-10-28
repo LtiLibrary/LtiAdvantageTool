@@ -122,6 +122,7 @@ public class DynamicRegistrationModel(
             Constants.LtiScopes.Ags.ResultReadonly,
             Constants.LtiScopes.Ags.Score,
             Constants.LtiScopes.Nrps.MembershipReadonly,
+            Constants.LtiScopes.Gs.ContextGroupReadonly,
         }.Where(s => platform.ScopesSupported is null || platform.ScopesSupported.Contains(s));
 
         var messages = new List<MessageDescriptor>

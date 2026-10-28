@@ -14,6 +14,7 @@ ASP.NET Core 10. Demonstrates:
   results
 - Names and Role Provisioning Service: course members (with filters and paging)
 - Submission Review: launches from the platform's gradebook
+- Course Groups: group sets, groups and their members
 - The tool's JWKS, published with the library's `JwksControllerBase`, with key
   rotation
 
@@ -122,6 +123,15 @@ The services panel on a resource link launch
 `limit` sets the page size for line items and members. The tool then follows
 the platform's `Link: <…>; rel="next"` headers (`Utility/Paging.cs`) and shows
 how many pages it read.
+
+## Course Groups
+
+When the launch has the course groups service claim
+(`CourseGroupsServiceClaimValueType`), the launch page lists the course's group
+sets and groups (`GroupSetsControllerBase` / `GroupsControllerBase` on the
+platform) and the members of each group. Group membership comes from Names &
+Roles with `groups=true`, which adds each member's `group_enrollments` when the
+token also holds the groups scope. See `Pages/Components/CourseGroups/`.
 
 ## Submission Review
 
