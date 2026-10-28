@@ -149,7 +149,7 @@
                                     <div class="col-auto"><input name="scoreMaximum" type="number" step="any" min="0" value="@li.AgsLineItem.ScoreMaximum" class="form-control form-control-sm" style="width:6em" title="scoreMaximum" required /></div>
                                     <div class="col-auto">
                                         <select name="gradesReleased" class="form-select form-select-sm" title="gradesReleased">
-                                            <option value="" selected="@(li.AgsLineItem.GradesReleased is null)">(platform default)</option>
+                                            <option value="" selected="@(li.AgsLineItem.GradesReleased is null)" title="Leave gradesReleased out; the platform keeps what it has">(not sent)</option>
                                             <option value="true" selected="@(li.AgsLineItem.GradesReleased == true)">released</option>
                                             <option value="false" selected="@(li.AgsLineItem.GradesReleased == false)">hidden from learners</option>
                                         </select>

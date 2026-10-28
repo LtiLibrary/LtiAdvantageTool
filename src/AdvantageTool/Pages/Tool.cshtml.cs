@@ -132,8 +132,10 @@ public class ToolModel(
         {
             // PUT replaces the whole line item, so start from what the platform has and change
             // only the fields on the form. Otherwise resourceLinkId, tag, dates and
-            // submissionReview would be cleared.
-            var lineItem = await http.GetLineItemAsync(token, lineItemUrl!);
+            // submissionReview would be cleared. (Fields the LineItem class doesn't model, such
+            // as vendor extensions, are not kept.)
+            var lineItem = await http.GetLineItemAsync(token, lineItemUrl!)
+                ?? throw new InvalidOperationException("the platform returned no line item.");
             lineItem.Label = label.Trim();
             lineItem.ScoreMaximum = scoreMaximum;
             lineItem.GradesReleased = GradesReleased.Parse(gradesReleased);
@@ -272,17 +274,17 @@ public class ToolModel(
     private async Task CallAsync(string what, Func<HttpClient, Task> call)
     {
         try { await call(httpClientFactory.CreateClient()); }
-        catch (LtiServiceException e) { Error = $"{what} failed: {e.Message}"; }
+        // LtiServiceException carries the platform's ProblemDetails title and detail.
         catch (Exception e) { Error = $"{what} failed: {e.Message}"; }
     }
 
     private async Task<HttpClient?> CreateAgsClientAsync(string scope, string mediaType)
     {
-        var token = await tokens.GetAccessTokenAsync(Launch!.PlatformId, scope);
-        if (token.IsError && token.Error != "Created") { Error = token.Error; return null; }
+        var token = await GetTokenAsync(scope);
+        if (token is null) return null;
 
         var http = httpClientFactory.CreateClient();
-        http.SetBearerToken(token.AccessToken!);
+        http.SetBearerToken(token);
         http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(mediaType));
         return http;
     }

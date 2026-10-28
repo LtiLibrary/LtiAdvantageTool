@@ -164,8 +164,8 @@ The services panel on a resource link launch
 - **Line items**, filtered by `resource_link_id`, `tag` and `resource_id`. New
   line items can carry a tag and resource ID to filter on.
 - **Edit line item** changes the label, `scoreMaximum` and `gradesReleased`
-  (whether the platform may show the grades to learners; empty leaves it to the
-  platform). A PUT replaces the whole line item, so the tool reads it first
+  (whether the platform may show the grades to learners; "not sent" leaves the
+  property out, so the platform keeps what it has). A PUT replaces the whole line item, so the tool reads it first
   (`GetLineItemAsync`) and sends it back with only those fields changed
   (`UpdateLineItemAsync`).
 - **Scores** with a chosen `activityProgress`, `gradingProgress`, score and
@@ -175,7 +175,8 @@ The services panel on a resource link launch
 - **Members**, filtered by `role` (full role URI) and `rlid`.
 
 Creating, editing and deleting line items and posting scores
-(`Pages/Tool.cshtml.cs`), and the results on the Submission Review page, use the
+(`Pages/Tool.cshtml.cs`), and reading results (the services panel and the
+Submission Review page), use the
 library's `HttpClientLtiServiceExtensions` (`AddLineItemAsync`,
 `UpdateLineItemAsync`, `DeleteLineItemAsync`, `PostScoreAsync`,
 `GetResultsAsync`, …). They send the token with the request and throw an
