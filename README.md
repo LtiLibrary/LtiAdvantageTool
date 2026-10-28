@@ -84,6 +84,9 @@ comes from the browser.
   build and sign the `LtiDeepLinkingResponse`, post it back.
 - `Pages/Components/LineItems/LineItemsViewComponent.cs` — token-protected
   AGS + NRPS calls using the LtiAdvantage models.
+- `Pages/Review.cshtml.cs` — Submission Review launches.
+- `Pages/Components/CourseGroups/CourseGroupsViewComponent.cs` — Course Groups.
+- `Pages/Proctoring.cshtml.cs` and `Pages/Proctor/Index.cshtml.cs` — proctoring.
 - `Services/AccessTokenService.cs` — JWT client-credentials flow.
 - `Controllers/JwksController.cs` and `Services/PlatformJwksKeyStore.cs` — the
   tool's JWKS endpoint.
@@ -110,6 +113,39 @@ Every launch goes through `Services/LaunchValidator.cs`:
 - **No re-posted tokens.** A validated launch is kept server-side for an hour;
   pages and AGS/NRPS buttons only carry its opaque id.
 
+## Keys and JWKS
+
+Each platform registration gets its own RSA key pair (with its own `kid`). The
+tool publishes all public keys in one JWKS at `/.well-known/jwks.json`, served by
+the library's `JwksControllerBase` (`Controllers/JwksController.cs`) from an
+`IJwksKeyStore` backed by the database (`Services/PlatformJwksKeyStore.cs`).
+The platform picks the key by the `kid` in the JWT header.
+
+**Rotate key** on a platform's details page generates a new key pair. The tool
+signs with the new key straight away, and keeps publishing the old one next to
+it until you press **Retire previous key**, so tokens already signed with it and
+platforms that cached the JWKS keep working.
+
+The old per-platform URL `/jwks/{platformId}` redirects to the new one.
+
+## Deep linking
+
+A deep linking launch opens the catalog (`Pages/Catalog.cshtml.cs`):
+
+- It offers `ltiResourceLink`, `link`, `html`, `file` and `image` items, but only
+  the types in the request's `accept_types`.
+- An LTI link can carry a `lineItem` (score maximum, label, tag, resourceId),
+  so the platform creates a gradebook column for it.
+- With `accept_multiple: false` only one item can be picked.
+- Links can open in an `iframe` or `window`, if the platform lists that target in
+  `accept_presentation_document_targets`.
+- Nothing is pre-selected. **Add selected** with nothing selected says so;
+  **Cancel** returns no items with `errormsg` / `errorlog`. A normal return
+  carries `msg` / `log`. `data` is echoed back unchanged.
+
+Image `width`/`height` and file `expiresAt` are not set: LtiAdvantage currently
+serializes them with the wrong JSON names.
+
 ## AGS and NRPS
 
 The services panel on a resource link launch
@@ -125,6 +161,15 @@ The services panel on a resource link launch
 `limit` sets the page size for line items and members. The tool then follows
 the platform's `Link: <…>; rel="next"` headers (`Utility/Paging.cs`) and shows
 how many pages it read.
+
+## Submission Review
+
+Line items the tool creates carry a `submissionReview` property
+(`SubmissionReviewProperty`) pointing at the tool's launch URL. The platform can
+then launch an `LtiSubmissionReviewRequest` from its gradebook. The launch URL
+sends it to `Pages/Review.cshtml.cs`, which shows the user in the `for_user`
+claim and the results the tool posted for them on that line item (AGS results
+with `user_id`).
 
 ## Course Groups
 
@@ -155,48 +200,6 @@ A minimal proctoring tool flow (Proctoring Services 1.0):
 
 Attempts are kept in memory, so restarting the tool forgets them.
 
-## Submission Review
-
-Line items the tool creates carry a `submissionReview` property
-(`SubmissionReviewProperty`) pointing at the tool's launch URL. The platform can
-then launch an `LtiSubmissionReviewRequest` from its gradebook. The launch URL
-sends it to `Pages/Review.cshtml.cs`, which shows the user in the `for_user`
-claim and the results the tool posted for them on that line item (AGS results
-with `user_id`).
-
-## Deep linking
-
-A deep linking launch opens the catalog (`Pages/Catalog.cshtml.cs`):
-
-- It offers `ltiResourceLink`, `link`, `html`, `file` and `image` items, but only
-  the types in the request's `accept_types`.
-- An LTI link can carry a `lineItem` (score maximum, label, tag, resourceId),
-  so the platform creates a gradebook column for it.
-- With `accept_multiple: false` only one item can be picked.
-- Links can open in an `iframe` or `window`, if the platform lists that target in
-  `accept_presentation_document_targets`.
-- Nothing is pre-selected. **Add selected** with nothing selected says so;
-  **Cancel** returns no items with `errormsg` / `errorlog`. A normal return
-  carries `msg` / `log`. `data` is echoed back unchanged.
-
-Image `width`/`height` and file `expiresAt` are not set: LtiAdvantage currently
-serializes them with the wrong JSON names.
-
-## Keys and JWKS
-
-Each platform registration gets its own RSA key pair (with its own `kid`). The
-tool publishes all public keys in one JWKS at `/.well-known/jwks.json`, served by
-the library's `JwksControllerBase` (`Controllers/JwksController.cs`) from an
-`IJwksKeyStore` backed by the database (`Services/PlatformJwksKeyStore.cs`).
-The platform picks the key by the `kid` in the JWT header.
-
-**Rotate key** on a platform's details page generates a new key pair. The tool
-signs with the new key straight away, and keeps publishing the old one next to
-it until you press **Retire previous key**, so tokens already signed with it and
-platforms that cached the JWKS keep working.
-
-The old per-platform URL `/jwks/{platformId}` redirects to the new one.
-
 ## Platform side
 
 A sample LTI Advantage platform lives at
@@ -215,5 +218,8 @@ running on `http://localhost:5099`:
 
 The Issuer must match the `iss` claim in the platform's id_token exactly, so
 copy it from the platform rather than typing it.
+
+Or skip the copying: register the tool from the platform with Dynamic
+Registration, using `http://localhost:5072/register` as the registration URL.
 
 The IMS reference implementation (lti-ri.imsglobal.org) also works.
