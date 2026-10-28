@@ -16,7 +16,13 @@ public static class ServiceError
     {
         var status = $"{(int)response.StatusCode} {response.ReasonPhrase}";
         var body = await response.Content.ReadAsStringAsync();
-        if (string.IsNullOrWhiteSpace(body)) return status;
+        if (string.IsNullOrWhiteSpace(body))
+        {
+            // A token without the needed scope is refused before any controller runs: the reason
+            // is in the WWW-Authenticate header (RFC 6750 §3), not in a body.
+            var challenge = string.Join(", ", response.Headers.WwwAuthenticate);
+            return string.IsNullOrEmpty(challenge) ? status : $"{status} · {challenge}";
+        }
 
         try
         {
