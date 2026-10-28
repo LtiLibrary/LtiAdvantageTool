@@ -51,6 +51,26 @@ public class DynamicRegistrationModel(
         var platformId = CryptoRandom.CreateUniqueId(8);
         var keys = Utility.PemHelper.GenerateRsaKeyPair();
 
+        // Store the platform with its new key pair *before* registering: the platform may fetch
+        // the tool's jwks_uri while it handles the registration request (to check the key), so
+        // the new key must already be published. The client id is filled in from the response.
+        var user = await context.GetUserAsync(User);
+        Registered = new Platform
+        {
+            Name = PlatformConfiguration.LtiPlatformConfiguration?.ProductFamilyCode ?? new Uri(PlatformConfiguration.Issuer).Host,
+            Issuer = PlatformConfiguration.Issuer,
+            AuthorizeUrl = PlatformConfiguration.AuthorizationEndpoint,
+            AccessTokenUrl = PlatformConfiguration.TokenEndpoint,
+            JwkSetUrl = PlatformConfiguration.JwksUri,
+            PlatformId = platformId,
+            KeyId = keys.KeyId,
+            PrivateKey = keys.PrivateKey,
+            PublicKey = keys.PublicKey,
+            UserId = user!.Id,
+        };
+        context.Platforms.Add(Registered);
+        await context.SaveChangesAsync();
+
         ToolConfiguration registered;
         try
         {
@@ -62,28 +82,16 @@ public class DynamicRegistrationModel(
         catch (Exception e) when (e is HttpRequestException or InvalidOperationException or ArgumentException)
         {
             logger.LogWarning(e, "Dynamic registration failed.");
+            context.Platforms.Remove(Registered);
+            await context.SaveChangesAsync();
+            Registered = null;
             Error = $"The platform rejected the registration: {e.Message}";
             return Page();
         }
 
-        var user = await context.GetUserAsync(User);
-        Registered = new Platform
-        {
-            Name = PlatformConfiguration.LtiPlatformConfiguration?.ProductFamilyCode ?? new Uri(PlatformConfiguration.Issuer).Host,
-            Issuer = PlatformConfiguration.Issuer,
-            AuthorizeUrl = PlatformConfiguration.AuthorizationEndpoint,
-            AccessTokenUrl = PlatformConfiguration.TokenEndpoint,
-            JwkSetUrl = PlatformConfiguration.JwksUri,
-            PlatformId = platformId,
-            // The platform assigns the client id, and usually a deployment id (§3.6).
-            ClientId = registered.ClientId,
-            DeploymentIds = registered.LtiToolConfiguration?.DeploymentId ?? string.Empty,
-            KeyId = keys.KeyId,
-            PrivateKey = keys.PrivateKey,
-            PublicKey = keys.PublicKey,
-            UserId = user!.Id,
-        };
-        context.Platforms.Add(Registered);
+        // The platform assigns the client id, and usually a deployment id (§3.6).
+        Registered.ClientId = registered.ClientId;
+        Registered.DeploymentIds = registered.LtiToolConfiguration?.DeploymentId ?? string.Empty;
         await context.SaveChangesAsync();
         return Page();
     }
