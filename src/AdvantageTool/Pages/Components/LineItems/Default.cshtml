@@ -50,6 +50,11 @@
                 <input name="limit" type="number" min="1" value="@Model.Limit" class="form-control form-control-sm" style="width:6em" /></div>
             <div class="col-auto"><button type="submit" class="btn btn-light btn-sm">Apply filters</button></div>
         </form>
+        <p class="small text-muted">
+            The filters use the spec's parameter names. Platforms built on LtiAdvantage 4.0.0 ignore
+            <code>resource_link_id</code>, <code>resource_id</code> and <code>user_id</code>, and answer a
+            role URI with 400 Bad Request: the library binds different names and a role enum there.
+        </p>
 
         @if (Model.LtiRequest?.AssignmentGradeServices?.LineItemsUrl is { Length: > 0 })
         {
