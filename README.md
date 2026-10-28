@@ -25,7 +25,7 @@ ASP.NET Core 10. Demonstrates:
 Prerequisites:
 
 - .NET 10 SDK.
-- The [LtiAdvantage](https://github.com/LtiLibrary/LtiAdvantage) 4.0.0 packages,
+- The [LtiAdvantage](https://github.com/LtiLibrary/LtiAdvantage) 4.1.0 packages,
   restored from NuGet.
 
 ```sh
@@ -90,12 +90,13 @@ Every launch goes through `Services/LaunchValidator.cs`:
 - **State bound to the browser.** The login sets a short-lived
   `lti1p3-state-{state}` cookie (`SameSite=None; Secure; Partitioned`) holding the
   nonce. The launch must come back with that cookie, and the id_token's nonce
-  must match it.
+  must match it: the tool passes it to `LtiTokenValidator.ValidateAsync(idToken, expectedNonce)`.
 - **id_token** is checked by the library's `LtiTokenValidator`: signature
   against the platform's JWKS (cached in a shared `JwksCache`, refreshed when the
   platform rotates its key, so not fetched per launch), `iss`, `aud`/`azp`,
-  `exp`/`iat`, LTI version, `message_type`, nonce replay (`INonceStore`), and
-  `deployment_id` against the deployment IDs registered for the platform.
+  `exp`/`iat`, LTI version, `message_type`, the nonce bound to the state, nonce
+  replay (the library's `InMemoryNonceStore`), and `deployment_id` against the
+  deployment IDs registered for the platform.
 - **Errors go back to the platform.** When a launch fails and the platform sent
   `launch_presentation.return_url` (on the platform's own origin), the user is
   sent there with `lti_errormsg` / `lti_errorlog`. Error details are only shown
@@ -125,7 +126,10 @@ Each platform registration gets its own RSA key pair (with its own `kid`). The
 tool publishes all public keys in one JWKS at `/.well-known/jwks.json`, served by
 the library's `JwksControllerBase` (`Controllers/JwksController.cs`) from an
 `IJwksKeyStore` backed by the database (`Services/PlatformJwksKeyStore.cs`).
-The platform picks the key by the `kid` in the JWT header.
+The platform picks the key by the `kid` in the JWT header. Keys are created and
+read with the library's `RsaPemKeys`, and access tokens are requested with
+`AccessTokenUtil`, which signs the client assertion with the registration's key
+and `kid`.
 
 **Rotate key** on a platform's details page generates a new key pair. The tool
 signs with the new key straight away, and keeps publishing the old one next to
@@ -143,14 +147,14 @@ A deep linking launch opens the catalog (`Pages/Catalog.cshtml.cs`):
 - An LTI link can carry a `lineItem` (score maximum, label, tag, resourceId),
   so the platform creates a gradebook column for it.
 - With `accept_multiple: false` only one item can be picked.
-- Links can open in an `iframe` or `window`, if the platform lists that target in
+- Links can open in an `iframe` or `window`, or be embedded (`embed`, a `link`
+  item with `embed.html`), if the platform lists that target in
   `accept_presentation_document_targets`.
 - Nothing is pre-selected. **Add selected** with nothing selected says so;
   **Cancel** returns no items with `errormsg` / `errorlog`. A normal return
   carries `msg` / `log`. `data` is echoed back unchanged.
 
-Image `width`/`height` and file `expiresAt` are not set: LtiAdvantage currently
-serializes them with the wrong JSON names.
+Images carry `width`/`height` and files an `expiresAt`.
 
 ## AGS and NRPS
 
@@ -160,20 +164,24 @@ The services panel on a resource link launch
 - **Line items**, filtered by `resource_link_id`, `tag` and `resource_id`. New
   line items can carry a tag and resource ID to filter on.
 - **Scores** with a chosen `activityProgress`, `gradingProgress`, score and
-  comment, for any member of the course.
+  comment, for any member of the course. Leave the score empty to report
+  progress only (no `scoreGiven` / `scoreMaximum`).
 - **Results**, for everyone or one user (`user_id`).
 - **Members**, filtered by `role` (full role URI) and `rlid`.
 
 `limit` sets the page size for line items and members. The tool then follows
-the platform's `Link: <…>; rel="next"` headers (`Utility/Paging.cs`) and shows
-how many pages it read.
+the platform's `Link: <…>; rel="next"` headers (`Utility/Paging.cs`, built on the
+library's `GetNextPageUrl`) and shows how many pages it read. Without the page
+count, the library's `HttpClientLtiServiceExtensions` (`GetLineItemsAsync`,
+`GetMembershipAsync`, `GetGroupsAsync`, …) do this in one call.
 
 ### When a service call fails
 
 LtiAdvantage platforms answer a failed AGS, NRPS, Course Groups or Assessment
 Control call with a ProblemDetails body (`title`, `status`, `detail`).
-`Utility/ServiceError.cs` reads it, and the panels show status, title and
-detail instead of a generic error (other bodies are shown as they came). The
+`Utility/ServiceError.cs` reads it with the library's `EnsureLtiSuccessAsync`
+(`LtiServiceException`), and the panels show status, title and detail instead of
+a generic error (other bodies are shown as they came). The
 services panel has two buttons that fail on purpose: **Read a missing line
 item** (expect 404) and **Create with a read-only token** (expect 403).
 

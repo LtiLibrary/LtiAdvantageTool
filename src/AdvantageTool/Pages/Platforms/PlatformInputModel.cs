@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using AdvantageTool.Data;
-using AdvantageTool.Utility;
 using IdentityModel;
+using LtiAdvantage.IdentityModel.Client;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AdvantageTool.Pages.Platforms;
@@ -15,7 +15,7 @@ public class PlatformInputModel
         if (platform is null)
         {
             PlatformId = CryptoRandom.CreateUniqueId(8);
-            var pair = PemHelper.GenerateRsaKeyPair();
+            var pair = RsaPemKeys.GenerateKeyPair();
             PrivateKey = pair.PrivateKey;
             PublicKey = pair.PublicKey;
             KeyId = pair.KeyId;

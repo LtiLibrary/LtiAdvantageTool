@@ -32,8 +32,9 @@ public class LaunchValidator(
 
         // LtiTokenValidator checks the signature against the platform's JWKS (cached, refreshed
         // when the platform rotates its key), iss, aud/azp, exp/iat, the LTI version,
-        // message_type, that deployment_id is one registered for this platform, and that the
-        // nonce has not been used before.
+        // message_type, that deployment_id is one registered for this platform, that the nonce
+        // is the one this tool sent for this state (so a valid token captured from another login
+        // cannot be injected here), and that the nonce has not been used before.
         var validator = new LtiTokenValidator(new LtiTokenValidationOptions
         {
             Issuer = platform.Issuer,
@@ -43,17 +44,12 @@ public class LaunchValidator(
             DeploymentIds = platform.DeploymentIdList.ToList(),
         }, jwksCache);
 
-        var result = await validator.ValidateAsync(idToken!, http.RequestAborted);
+        var result = await validator.ValidateAsync(idToken!, expectedNonce, http.RequestAborted);
         if (!result.IsValid)
         {
             logger.LogWarning(result.Exception, "Launch rejected: {Error}", result.Error);
             return Fail(platform, idToken, result.Error);
         }
-
-        // The nonce must also be the one this tool sent for this state, so a valid token
-        // captured from another login cannot be injected here.
-        if (result.Payload.Nonce != expectedNonce)
-            return Fail(platform, idToken, "The id_token nonce does not match the login request.");
 
         var header = new JwtSecurityTokenHandler().ReadJwtToken(idToken).Header;
         return new LaunchOutcome(launches.Save(platform.PlatformId, result.MessageType, header, result.Payload), null, null);

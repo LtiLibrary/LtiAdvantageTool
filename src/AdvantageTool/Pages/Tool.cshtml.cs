@@ -134,7 +134,7 @@ public class ToolModel(
         [FromForm] string? launchId,
         [FromForm] string? lineItemUrl,
         [FromForm] string? userId,
-        [FromForm] double scoreGiven,
+        [FromForm] double? scoreGiven,
         [FromForm] double scoreMaximum,
         [FromForm] ActivityProgress activityProgress,
         [FromForm] GradingProgress gradingProgress,
@@ -148,12 +148,14 @@ public class ToolModel(
 
         // AGS 2.0 §3.3: activityProgress and gradingProgress tell the platform how far the user
         // got and whether the score is final; the platform decides what to show in its gradebook.
+        // An empty score sends progress only: no scoreGiven and no scoreMaximum, so the platform
+        // does not record a grade of 0.
         var score = new Score
         {
             ActivityProgress = activityProgress,
             GradingProgress = gradingProgress,
             ScoreGiven = scoreGiven,
-            ScoreMaximum = scoreMaximum,
+            ScoreMaximum = scoreGiven is null ? null : scoreMaximum,
             Comment = string.IsNullOrWhiteSpace(comment) ? null : comment,
             TimeStamp = DateTime.UtcNow,
             UserId = string.IsNullOrEmpty(userId) ? LtiRequest!.UserId! : userId,

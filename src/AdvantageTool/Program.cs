@@ -48,7 +48,8 @@ builder.Services.AddSingleton(new JwksCache(
     new HttpClient(new SocketsHttpHandler { PooledConnectionLifetime = TimeSpan.FromMinutes(15) }),
     cacheDuration: TimeSpan.FromHours(1),
     minimumRefreshInterval: TimeSpan.FromMinutes(1)));
-builder.Services.AddSingleton<INonceStore, InMemoryNonceStore>();
+// The library's in-memory nonce store: fine for one instance; several servers need a shared store.
+builder.Services.AddSingleton<INonceStore>(new InMemoryNonceStore());
 builder.Services.AddMemoryCache();
 builder.Services.AddSingleton<LaunchStore>();
 builder.Services.AddScoped<LaunchValidator>();

@@ -7,7 +7,9 @@ using AdvantageTool.Utility;
 using IdentityModel;
 using LtiAdvantage;
 using LtiAdvantage.DeepLinking;
+using LtiAdvantage.IdentityModel.Client;
 using LtiAdvantage.Lti;
+using LtiAdvantage.SubmissionReview;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.IdentityModel.Tokens;
@@ -109,7 +111,7 @@ public class CatalogModel(ApplicationDbContext context, LaunchStore launches) : 
         Offered = Entries.Where(e => accepted.Contains(e.Type)).ToList();
 
         Targets = (Settings?.AcceptPresentationDocumentTargets ?? [])
-            .Where(t => t is DocumentTarget.Iframe or DocumentTarget.Window)
+            .Where(t => t is DocumentTarget.Iframe or DocumentTarget.Window or DocumentTarget.Embed)
             .Select(t => t.ToString().ToLowerInvariant())
             .ToList();
         return true;
@@ -134,6 +136,9 @@ public class CatalogModel(ApplicationDbContext context, LaunchStore launches) : 
                         ScoreMaximum = selection.ScoreMaximum,
                         Tag = string.IsNullOrWhiteSpace(selection.Tag) ? null : selection.Tag,
                         ResourceId = entry.Key,
+                        // Submission Review 1.0: ask for "View submission" in the gradebook up front.
+                        // Without a url the platform launches the link's own URL.
+                        SubmissionReview = new SubmissionReviewProperty { Label = "Review in AdvantageTool" },
                     }
                     : null,
             },
@@ -142,9 +147,9 @@ public class CatalogModel(ApplicationDbContext context, LaunchStore launches) : 
             {
                 Html = "<div style=\"padding:1em;background:#eef\"><strong>Welcome!</strong> This block came from the sample tool.</div>",
             },
-            Constants.ContentItemTypes.File => new FileItem { Url = Absolute("/files/worksheet.txt") },
-            // Width/height are left out on purpose: see the README (library serialization issue).
-            Constants.ContentItemTypes.Image => new ImageItem { Url = Absolute("/images/sample.svg") },
+            // expiresAt tells the platform how long the URL works, so it can copy the file in time.
+            Constants.ContentItemTypes.File => new FileItem { Url = Absolute("/files/worksheet.txt"), ExpiresAt = DateTime.UtcNow.AddDays(1) },
+            Constants.ContentItemTypes.Image => new ImageItem { Url = Absolute("/images/sample.svg"), Width = 240, Height = 120 },
             _ => throw new InvalidOperationException($"Unknown item type {entry.Type}"),
         };
         item.Title = entry.Title;
@@ -155,6 +160,9 @@ public class CatalogModel(ApplicationDbContext context, LaunchStore launches) : 
         {
             if (Target == "iframe") item.Iframe = new IframeProperty { Src = entry.Type == Constants.ContentItemTypes.Link ? item.Url : null, Height = 600 };
             if (Target == "window") item.Window = new WindowProperty { TargetName = "_blank" };
+            // embed: the platform shows this HTML in its own page. DL 2.0 defines it for link items.
+            if (Target == "embed" && entry.Type == Constants.ContentItemTypes.Link)
+                item.Embed = $"<iframe src=\"{item.Url}\" width=\"100%\" height=\"600\" title=\"{System.Net.WebUtility.HtmlEncode(entry.Title)}\"></iframe>";
         }
         return item;
     }
@@ -176,7 +184,7 @@ public class CatalogModel(ApplicationDbContext context, LaunchStore launches) : 
         response.AddClaim(new Claim(JwtRegisteredClaimNames.Exp, EpochTime.GetIntDate(now.AddMinutes(5)).ToString(), ClaimValueTypes.Integer64));
         response.AddClaim(new Claim(JwtRegisteredClaimNames.Nonce, CryptoRandom.CreateUniqueId()));
 
-        var credentials = PemHelper.SigningCredentialsFromPem(platform.PrivateKey, platform.KeyId);
+        var credentials = RsaPemKeys.SigningCredentialsFromPem(platform.PrivateKey, platform.KeyId);
         var jwt = new JwtSecurityTokenHandler().WriteToken(new JwtSecurityToken(new JwtHeader(credentials), response));
         return AutoPost.Form(Settings!.DeepLinkReturnUrl, new Dictionary<string, string> { ["JWT"] = jwt });
     }

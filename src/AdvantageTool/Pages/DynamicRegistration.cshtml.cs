@@ -49,7 +49,7 @@ public class DynamicRegistrationModel(
 
         // The tool's identity for this platform: a new id (part of the launch URL) and key pair.
         var platformId = CryptoRandom.CreateUniqueId(8);
-        var keys = Utility.PemHelper.GenerateRsaKeyPair();
+        var keys = RsaPemKeys.GenerateKeyPair();
 
         // Store the platform with its new key pair *before* registering: the platform may fetch
         // the tool's jwks_uri while it handles the registration request (to check the key), so

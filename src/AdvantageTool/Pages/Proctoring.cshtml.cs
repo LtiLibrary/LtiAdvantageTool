@@ -5,6 +5,7 @@ using AdvantageTool.Services;
 using AdvantageTool.Utility;
 using IdentityModel;
 using LtiAdvantage;
+using LtiAdvantage.IdentityModel.Client;
 using LtiAdvantage.Lti;
 using LtiAdvantage.Proctoring;
 using Microsoft.AspNetCore.Mvc;
@@ -117,7 +118,7 @@ public class ProctoringModel(ApplicationDbContext context, LaunchStore launches,
         start.AddClaim(new Claim(JwtRegisteredClaimNames.Exp, EpochTime.GetIntDate(now.AddMinutes(5)).ToString(), ClaimValueTypes.Integer64));
         start.AddClaim(new Claim(JwtRegisteredClaimNames.Nonce, CryptoRandom.CreateUniqueId()));
 
-        var credentials = PemHelper.SigningCredentialsFromPem(platform.PrivateKey, platform.KeyId);
+        var credentials = RsaPemKeys.SigningCredentialsFromPem(platform.PrivateKey, platform.KeyId);
         var jwt = new JwtSecurityTokenHandler().WriteToken(new JwtSecurityToken(new JwtHeader(credentials), start));
         return AutoPost.Form(StartRequest.StartAssessmentUrl, new Dictionary<string, string> { ["JWT"] = jwt });
     }
