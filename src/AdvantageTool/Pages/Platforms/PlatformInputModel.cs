@@ -39,7 +39,8 @@ public class PlatformInputModel
         LaunchUrl = url.Page("/Tool", null, new { platformId = PlatformId }, request.Scheme)!;
         LoginUrl = url.Page("/OidcLogin", null, null, request.Scheme)!;
         DeepLinkingUrl = url.Page("/Tool", null, new { platformId = PlatformId }, request.Scheme)!;
-        JwksUrl = $"{request.Scheme}://{request.Host}/jwks/{PlatformId}";
+        // Served by JwksController (the library's JwksControllerBase) at /.well-known/jwks.json.
+        JwksUrl = url.RouteUrl(LtiAdvantage.Constants.ServiceEndpoints.Jwks.JwksService, null, request.Scheme)!;
     }
 
     public int Id { get; set; }

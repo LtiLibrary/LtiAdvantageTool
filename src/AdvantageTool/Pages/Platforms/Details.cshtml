@@ -21,7 +21,21 @@
     <dt class="col-sm-3">Deep linking URL</dt><dd class="col-sm-9">@Model.Platform.DeepLinkingUrl</dd>
     <dt class="col-sm-3">JWKS URL (tool's)</dt><dd class="col-sm-9">@Model.Platform.JwksUrl</dd>
     <dt class="col-sm-3">Key ID</dt><dd class="col-sm-9"><code>@Model.Platform.KeyId</code></dd>
+    @if (Model.PreviousKeyId is not null)
+    {
+        <dt class="col-sm-3">Previous key ID</dt><dd class="col-sm-9"><code>@Model.PreviousKeyId</code> (still published)</dd>
+    }
 </dl>
+
+<form method="post" class="mb-3">
+    <button type="submit" asp-page-handler="RotateKey" asp-route-id="@Model.Platform.Id" class="btn btn-outline-primary btn-sm"
+            title="Sign with a new key; keep publishing the current one next to it">Rotate key</button>
+    @if (Model.PreviousKeyId is not null)
+    {
+        <button type="submit" asp-page-handler="RetirePreviousKey" asp-route-id="@Model.Platform.Id" class="btn btn-outline-secondary btn-sm"
+                title="Stop publishing the previous key">Retire previous key</button>
+    }
+</form>
 <details>
     <summary>Public key</summary>
     <pre>@Model.Platform.PublicKey</pre>

@@ -10,7 +10,8 @@ ASP.NET Core 10. Demonstrates:
 - Deep linking response (signed by the tool)
 - Assignment and Grade Services: line items, results
 - Names and Role Provisioning Service: course members
-- A per-platform JWKS endpoint so the platform can validate tool-signed JWTs
+- The tool's JWKS, published with the library's `JwksControllerBase`, with key
+  rotation
 
 ## Running locally
 
@@ -55,8 +56,8 @@ Then in a browser:
 - `Pages/Components/LineItems/LineItemsViewComponent.cs` — token-protected
   AGS + NRPS calls using the LtiAdvantage models.
 - `Services/AccessTokenService.cs` — JWT client-credentials flow.
-- `Services/JwksService.cs` and the `MapGet("/jwks/{platformId}", ...)` in
-  `Program.cs` — the tool's JWKS endpoint.
+- `Controllers/JwksController.cs` and `Services/PlatformJwksKeyStore.cs` — the
+  tool's JWKS endpoint.
 
 ## Launch security
 
@@ -79,6 +80,21 @@ Every launch goes through `Services/LaunchValidator.cs`:
   in Development.
 - **No re-posted tokens.** A validated launch is kept server-side for an hour;
   pages and AGS/NRPS buttons only carry its opaque id.
+
+## Keys and JWKS
+
+Each platform registration gets its own RSA key pair (with its own `kid`). The
+tool publishes all public keys in one JWKS at `/.well-known/jwks.json`, served by
+the library's `JwksControllerBase` (`Controllers/JwksController.cs`) from an
+`IJwksKeyStore` backed by the database (`Services/PlatformJwksKeyStore.cs`).
+The platform picks the key by the `kid` in the JWT header.
+
+**Rotate key** on a platform's details page generates a new key pair. The tool
+signs with the new key straight away, and keeps publishing the old one next to
+it until you press **Retire previous key**, so tokens already signed with it and
+platforms that cached the JWKS keep working.
+
+The old per-platform URL `/jwks/{platformId}` redirects to the new one.
 
 ## Platform side
 

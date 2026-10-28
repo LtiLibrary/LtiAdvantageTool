@@ -25,6 +25,11 @@ public class Platform
     public string PrivateKey { get; set; } = string.Empty;
     public string PublicKey { get; set; } = string.Empty;
 
+    // The key that was current before the last rotation. It stays published until it is
+    // retired, so the platform can still verify tokens signed with it.
+    public string? PreviousKeyId { get; set; }
+    public string? PreviousPublicKey { get; set; }
+
     public string UserId { get; set; } = string.Empty;
     public AdvantageToolUser? User { get; set; }
 }

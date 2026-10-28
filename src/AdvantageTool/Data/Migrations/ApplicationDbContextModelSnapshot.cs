@@ -123,6 +123,12 @@ namespace AdvantageTool.Data.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("PreviousKeyId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PreviousPublicKey")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("PrivateKey")
                         .IsRequired()
                         .HasColumnType("TEXT");

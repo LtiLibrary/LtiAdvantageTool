@@ -1,6 +1,7 @@
 using AdvantageTool.Data;
 using AdvantageTool.Services;
 using LtiAdvantage.IdentityModel.Validation;
+using LtiAdvantage.Jwks;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -35,7 +36,8 @@ builder.Services.AddRazorPages(options =>
 
 builder.Services.AddHttpClient();
 builder.Services.AddTransient<AccessTokenService>();
-builder.Services.AddTransient<JwksService>();
+builder.Services.AddControllers();
+builder.Services.AddScoped<IJwksKeyStore, PlatformJwksKeyStore>();
 
 // Launch validation. One JwksCache is shared by every launch, so the platform's JWKS is
 // fetched once and refreshed when the platform rotates its key, not fetched per launch.
@@ -72,13 +74,9 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapStaticAssets();
 app.MapRazorPages().WithStaticAssets();
+app.MapControllers();
 
-// JWKS endpoint: the platform fetches our public key from here to verify
-// JWTs signed by the tool (e.g. deep linking responses).
-app.MapGet("/jwks/{platformId}", async (string platformId, JwksService svc) =>
-{
-    var jwks = await svc.GetJwksAsync(platformId);
-    return jwks is null ? Results.NotFound() : Results.Json(jwks);
-});
+// Older registrations point at a per-platform JWKS URL; every key now lives in the one JWKS.
+app.MapGet("/jwks/{platformId}", () => Results.Redirect("/.well-known/jwks.json"));
 
 app.Run();
