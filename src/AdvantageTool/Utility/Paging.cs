@@ -23,7 +23,7 @@ public static partial class Paging
             using var request = new HttpRequestMessage(HttpMethod.Get, next);
             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(mediaType));
             using var response = await http.SendAsync(request);
-            response.EnsureSuccessStatusCode();
+            await ServiceError.ThrowIfFailedAsync(response);
             items.AddRange(read(await response.Content.ReadAsStringAsync()));
             pages++;
             next = NextLink(response);

@@ -103,7 +103,7 @@ public class ToolModel(
         {
             var content = new StringContent(JsonSerializer.Serialize(lineItem, JsonOptions), Encoding.UTF8, Constants.MediaTypes.LineItem);
             using var response = await http.PostAsync(lineItemsUrl, content);
-            if (!response.IsSuccessStatusCode) Error = $"Create line item failed: {(int)response.StatusCode} {response.ReasonPhrase}";
+            if (!response.IsSuccessStatusCode) Error = $"Create line item failed: {await ServiceError.DescribeAsync(response)}";
         }
         catch (Exception e) { Error = e.Message; }
 
@@ -123,7 +123,7 @@ public class ToolModel(
         try
         {
             using var response = await http.DeleteAsync(lineItemUrl);
-            if (!response.IsSuccessStatusCode) Error = $"Delete line item failed: {(int)response.StatusCode} {response.ReasonPhrase}";
+            if (!response.IsSuccessStatusCode) Error = $"Delete line item failed: {await ServiceError.DescribeAsync(response)}";
         }
         catch (Exception e) { Error = e.Message; }
 
@@ -164,12 +164,54 @@ public class ToolModel(
             var scoresUrl = AgsUrls.Scores(lineItemUrl!);
             var content = new StringContent(JsonSerializer.Serialize(score, JsonOptions), Encoding.UTF8, Constants.MediaTypes.Score);
             using var response = await http.PostAsync(scoresUrl, content);
-            if (!response.IsSuccessStatusCode) Error = $"Submit score failed: {(int)response.StatusCode} {response.ReasonPhrase}";
+            if (!response.IsSuccessStatusCode) Error = $"Submit score failed: {await ServiceError.DescribeAsync(response)}";
         }
         catch (Exception e) { Error = e.Message; }
 
         return Page();
     }
+
+    /// <summary>
+    /// Makes a service call fail on purpose, to show what the platform answers (a ProblemDetails
+    /// body from LtiAdvantage platforms) and how the tool reports it.
+    /// </summary>
+    public async Task<IActionResult> OnPostErrorDemoAsync([FromForm] string? launchId, [FromForm] string? kind)
+    {
+        if (!LoadLaunch(launchId)) return Page();
+        var lineItemsUrl = LtiRequest!.AssignmentGradeServices?.LineItemsUrl;
+        if (string.IsNullOrEmpty(lineItemsUrl)) { Error = "AGS not present in launch."; return Page(); }
+
+        try
+        {
+            if (kind == "missing-line-item")
+            {
+                // A line item id that does not exist: expect 404.
+                var http = await CreateAgsClientAsync(Constants.LtiScopes.Ags.LineItemReadonly, Constants.MediaTypes.LineItem);
+                if (http is null) return Page();
+                var uri = new Uri(lineItemsUrl);
+                using var response = await http.GetAsync($"{uri.GetLeftPart(UriPartial.Path).TrimEnd('/')}/does-not-exist{uri.Query}");
+                Error = $"Read a missing line item: {await DescribeExpectedFailureAsync(response)}";
+            }
+            else
+            {
+                // Create a line item with a token that only has the read-only scope: expect 403.
+                var http = await CreateAgsClientAsync(Constants.LtiScopes.Ags.LineItemReadonly, Constants.MediaTypes.LineItem);
+                if (http is null) return Page();
+                var content = new StringContent(JsonSerializer.Serialize(new LineItem { Label = "Should fail", ScoreMaximum = 1 }, JsonOptions),
+                    Encoding.UTF8, Constants.MediaTypes.LineItem);
+                using var response = await http.PostAsync(lineItemsUrl, content);
+                Error = $"Create a line item with a read-only token: {await DescribeExpectedFailureAsync(response)}";
+            }
+        }
+        catch (Exception e) { Error = e.Message; }
+
+        return Page();
+    }
+
+    private static async Task<string> DescribeExpectedFailureAsync(HttpResponseMessage response) =>
+        response.IsSuccessStatusCode
+            ? $"the platform accepted the call ({(int)response.StatusCode}), so it did not fail as expected."
+            : await ServiceError.DescribeAsync(response);
 
     private bool LoadLaunch(string? launchId)
     {

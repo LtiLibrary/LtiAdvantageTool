@@ -119,6 +119,7 @@ public class DynamicRegistrationModel(
         var scopes = new[]
         {
             Constants.LtiScopes.Ags.LineItem,
+            Constants.LtiScopes.Ags.LineItemReadonly,
             Constants.LtiScopes.Ags.ResultReadonly,
             Constants.LtiScopes.Ags.Score,
             Constants.LtiScopes.Nrps.MembershipReadonly,

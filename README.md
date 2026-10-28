@@ -168,6 +168,15 @@ The services panel on a resource link launch
 the platform's `Link: <…>; rel="next"` headers (`Utility/Paging.cs`) and shows
 how many pages it read.
 
+### When a service call fails
+
+LtiAdvantage platforms answer a failed AGS, NRPS, Course Groups or Assessment
+Control call with a ProblemDetails body (`title`, `status`, `detail`).
+`Utility/ServiceError.cs` reads it, and the panels show status, title and
+detail instead of a generic error (other bodies are shown as they came). The
+services panel has two buttons that fail on purpose: **Read a missing line
+item** (expect 404) and **Create with a read-only token** (expect 403).
+
 ## Submission Review
 
 Line items the tool creates carry a `submissionReview` property

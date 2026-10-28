@@ -64,6 +64,13 @@
                 <div class="col-auto"><button type="submit" class="btn btn-light btn-sm">Add line item</button></div>
             </form>
 
+            <form method="post" action="?handler=ErrorDemo" class="mb-3">
+                <input type="hidden" name="launchId" value="@Model.LaunchId" />
+                <small class="text-muted me-2">See a failure on purpose:</small>
+                <button type="submit" name="kind" value="missing-line-item" class="btn btn-outline-secondary btn-sm">Read a missing line item</button>
+                <button type="submit" name="kind" value="wrong-scope" class="btn btn-outline-secondary btn-sm">Create with a read-only token</button>
+            </form>
+
             <h5>Line items <small class="text-muted">(@Model.LineItemPages page(s))</small></h5>
             @if (Model.LineItems.Count == 0)
             {

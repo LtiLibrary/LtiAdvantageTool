@@ -57,20 +57,23 @@ public class ReviewModel(LaunchStore launches, AccessTokenService tokens, IHttpC
         http.SetBearerToken(token.AccessToken!);
         try
         {
-            using (var request = new HttpRequestMessage(HttpMethod.Get, lineItemUrl))
-            {
-                request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.MediaTypes.LineItem));
-                using var response = await http.SendAsync(request);
-                if (response.IsSuccessStatusCode)
-                    LineItem = JsonSerializer.Deserialize<LineItem>(await response.Content.ReadAsStringAsync(), JsonOptions);
-            }
-
             // Only the reviewed user's results (AGS 2.0 §3.4 user_id filter).
             var url = QueryHelpers.AddQueryString(AgsUrls.Results(lineItemUrl), "user_id", userId);
             (Results, _) = await Paging.GetAllPagesAsync(http, url, Constants.MediaTypes.ResultContainer,
                 json => JsonSerializer.Deserialize<ResultContainer>(json, JsonOptions) ?? []);
         }
-        catch (Exception e) { Error = e.Message; }
+        catch (Exception e) { Error = $"Results: {e.Message}"; }
+
+        try
+        {
+            // The line item itself, for its label; the review still works without it.
+            using var request = new HttpRequestMessage(HttpMethod.Get, lineItemUrl);
+            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.MediaTypes.LineItem));
+            using var response = await http.SendAsync(request);
+            await ServiceError.ThrowIfFailedAsync(response);
+            LineItem = JsonSerializer.Deserialize<LineItem>(await response.Content.ReadAsStringAsync(), JsonOptions);
+        }
+        catch (Exception e) { Error ??= $"Line item: {e.Message}"; }
 
         return Page();
     }

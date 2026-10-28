@@ -74,8 +74,8 @@ public class IndexModel(ProctoringSessions sessions, AccessTokenService tokens, 
         {
             var content = new StringContent(JsonSerializer.Serialize(request, JsonOptions), Encoding.UTF8, Constants.MediaTypes.AssessmentControl);
             using var response = await http.PostAsync(session.AssessmentControlUrl, content);
+            if (!response.IsSuccessStatusCode) return await Utility.ServiceError.DescribeAsync(response);
             var body = await response.Content.ReadAsStringAsync();
-            if (!response.IsSuccessStatusCode) return $"{(int)response.StatusCode} {response.ReasonPhrase} {body}";
 
             // The platform answers with the attempt's new status (running, paused, terminated, ...).
             var result = JsonSerializer.Deserialize<AssessmentControlResponse>(body);
