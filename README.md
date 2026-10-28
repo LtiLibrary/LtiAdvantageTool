@@ -15,6 +15,8 @@ ASP.NET Core 10. Demonstrates:
 - Names and Role Provisioning Service: course members (with filters and paging)
 - Submission Review: launches from the platform's gradebook
 - Course Groups: group sets, groups and their members
+- Proctoring Services: start proctoring, start assessment, end assessment,
+  and the Assessment Control Service
 - The tool's JWKS, published with the library's `JwksControllerBase`, with key
   rotation
 
@@ -132,6 +134,26 @@ sets and groups (`GroupSetsControllerBase` / `GroupsControllerBase` on the
 platform) and the members of each group. Group membership comes from Names &
 Roles with `groups=true`, which adds each member's `group_enrollments` when the
 token also holds the groups scope. See `Pages/Components/CourseGroups/`.
+
+## Proctoring
+
+A minimal proctoring tool flow (Proctoring Services 1.0):
+
+1. The platform launches `LtiStartProctoring`. The tool shows a pretend
+   identity check (`Pages/Proctoring.cshtml.cs`).
+2. On confirm, the tool posts a signed `LtiStartAssessment` (as `JWT`) to the
+   platform's `start_assessment_url`, echoing `session_data`, `resource_link`
+   and `attempt_number`, with `verified_user` and `end_assessment_return: true`.
+   The platform continues into the assessment.
+3. A tool admin opens **Proctor** (`/Proctor`) to see the attempts. Its
+   buttons call the platform's Assessment Control Service
+   (`assessment_control_url` from the `acs` claim, scope `control.all`) with an
+   `AssessmentControlRequest` for the actions the platform listed (pause,
+   resume, terminate, flag, update), and show the returned status.
+4. When the attempt ends, the platform may launch `LtiEndAssessment`; the tool
+   marks the attempt as ended and shows any error message.
+
+Attempts are kept in memory, so restarting the tool forgets them.
 
 ## Submission Review
 

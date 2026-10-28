@@ -33,6 +33,7 @@ builder.Services.AddRazorPages(options =>
 {
     options.Conventions.AuthorizeFolder("/Platforms");
     options.Conventions.AuthorizePage("/DynamicRegistration");
+    options.Conventions.AuthorizeFolder("/Proctor");
 });
 
 builder.Services.AddHttpClient();
@@ -51,6 +52,7 @@ builder.Services.AddSingleton<INonceStore, InMemoryNonceStore>();
 builder.Services.AddMemoryCache();
 builder.Services.AddSingleton<LaunchStore>();
 builder.Services.AddScoped<LaunchValidator>();
+builder.Services.AddSingleton<ProctoringSessions>();
 
 var app = builder.Build();
 

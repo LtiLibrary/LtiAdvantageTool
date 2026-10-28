@@ -123,6 +123,7 @@ public class DynamicRegistrationModel(
             Constants.LtiScopes.Ags.Score,
             Constants.LtiScopes.Nrps.MembershipReadonly,
             Constants.LtiScopes.Gs.ContextGroupReadonly,
+            Constants.LtiScopes.Ap.ControlAll,
         }.Where(s => platform.ScopesSupported is null || platform.ScopesSupported.Contains(s));
 
         var messages = new List<MessageDescriptor>
@@ -130,6 +131,8 @@ public class DynamicRegistrationModel(
             new() { Type = Constants.Lti.LtiResourceLinkRequestMessageType },
             new() { Type = Constants.Lti.LtiDeepLinkingRequestMessageType, TargetLinkUri = launchUrl, Label = "Pick activities" },
             new() { Type = Constants.Lti.LtiSubmissionReviewRequestMessageType },
+            new() { Type = Constants.Lti.LtiStartProctoringRequestMessageType },
+            new() { Type = Constants.Lti.LtiEndAssessmentRequestMessageType },
         };
         var supported = platform.LtiPlatformConfiguration?.MessagesSupported?.Select(m => m.Type).ToHashSet();
         if (supported is not null) messages.RemoveAll(m => !supported.Contains(m.Type));

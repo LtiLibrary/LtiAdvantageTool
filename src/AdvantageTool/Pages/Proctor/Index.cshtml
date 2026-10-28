@@ -1,0 +1,52 @@
+@page
+@model AdvantageTool.Pages.Proctor.IndexModel
+@{ ViewData["Title"] = "Proctor"; }
+
+<h1>Proctor</h1>
+<p>Attempts this tool is proctoring. The buttons call the platform's Assessment Control Service.</p>
+
+@if (!string.IsNullOrEmpty(Model.Message))
+{
+    <div class="alert alert-info">@Model.Message</div>
+}
+
+@if (Model.Sessions.Count == 0)
+{
+    <p>No attempts yet. Launch a proctored assessment from the platform.</p>
+}
+
+@foreach (var session in Model.Sessions)
+{
+    <div class="card mb-3">
+        <div class="card-header">
+            <strong>@session.UserName</strong> · @(session.ResourceLinkTitle ?? session.ResourceLinkId) · attempt @session.AttemptNumber
+            <span class="badge bg-secondary ms-2">@session.Status</span>
+        </div>
+        <div class="card-body">
+            @if (session.AssessmentControlUrl is null)
+            {
+                <p class="text-muted">The platform did not offer the Assessment Control Service for this attempt.</p>
+            }
+            else
+            {
+                <form method="post" class="mb-2">
+                    <input type="hidden" name="sessionId" value="@session.Id" />
+                    @foreach (var action in session.Actions)
+                    {
+                        <button type="submit" name="control" value="@action"
+                                class="btn btn-sm @(action == "terminate" ? "btn-outline-danger" : "btn-outline-primary") me-1">@action</button>
+                    }
+                </form>
+            }
+            @if (session.Log.Count > 0)
+            {
+                <ul class="small mb-0">
+                    @foreach (var line in session.Log)
+                    {
+                        <li>@line</li>
+                    }
+                </ul>
+            }
+        </div>
+    </div>
+}

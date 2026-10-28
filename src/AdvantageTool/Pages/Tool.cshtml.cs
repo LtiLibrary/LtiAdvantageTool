@@ -54,6 +54,8 @@ public class ToolModel(
             Constants.Lti.LtiResourceLinkRequestMessageType => RedirectToPage("/Tool", new { platformId, launchId }),
             Constants.Lti.LtiDeepLinkingRequestMessageType => RedirectToPage("/Catalog", new { launchId }),
             Constants.Lti.LtiSubmissionReviewRequestMessageType => RedirectToPage("/Review", new { launchId }),
+            Constants.Lti.LtiStartProctoringRequestMessageType => RedirectToPage("/Proctoring", new { launchId }),
+            Constants.Lti.LtiEndAssessmentRequestMessageType => RedirectToPage("/Proctoring", new { launchId }),
             _ => ShowError($"This tool does not handle {outcome.Launch.MessageType} messages."),
         };
     }
