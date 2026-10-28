@@ -134,7 +134,7 @@ public class ToolModel(
         [FromForm] string? launchId,
         [FromForm] string? lineItemUrl,
         [FromForm] string? userId,
-        [FromForm] double scoreGiven,
+        [FromForm] double? scoreGiven,
         [FromForm] double scoreMaximum,
         [FromForm] ActivityProgress activityProgress,
         [FromForm] GradingProgress gradingProgress,
@@ -143,17 +143,27 @@ public class ToolModel(
         if (!LoadLaunch(launchId)) return Page();
         if (!IsLineItemUrl(lineItemUrl)) return Page();
 
+        // Only an empty field means "progress only"; a value that is not a number is an error,
+        // not a reason to drop the score.
+        if (scoreGiven is null && !string.IsNullOrWhiteSpace(Request.Form["scoreGiven"]))
+        {
+            Error = $"Submit score failed: '{Request.Form["scoreGiven"]}' is not a number.";
+            return Page();
+        }
+
         var http = await CreateAgsClientAsync(Constants.LtiScopes.Ags.Score, Constants.MediaTypes.Score);
         if (http is null) return Page();
 
         // AGS 2.0 §3.3: activityProgress and gradingProgress tell the platform how far the user
         // got and whether the score is final; the platform decides what to show in its gradebook.
+        // An empty score sends progress only: no scoreGiven and no scoreMaximum, so the platform
+        // does not record a grade of 0.
         var score = new Score
         {
             ActivityProgress = activityProgress,
             GradingProgress = gradingProgress,
             ScoreGiven = scoreGiven,
-            ScoreMaximum = scoreMaximum,
+            ScoreMaximum = scoreGiven is null ? null : scoreMaximum,
             Comment = string.IsNullOrWhiteSpace(comment) ? null : comment,
             TimeStamp = DateTime.UtcNow,
             UserId = string.IsNullOrEmpty(userId) ? LtiRequest!.UserId! : userId,

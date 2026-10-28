@@ -59,7 +59,7 @@
                     <option value="">(platform default)</option>
                     @foreach (var target in Model.Targets)
                     {
-                        <option value="@target">@target</option>
+                        <option value="@target">@(target == "embed" ? "embed (plain links only)" : target)</option>
                     }
                 </select>
             </div>

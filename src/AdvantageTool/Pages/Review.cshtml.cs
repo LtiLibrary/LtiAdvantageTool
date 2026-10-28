@@ -5,6 +5,7 @@ using AdvantageTool.Utility;
 using IdentityModel.Client;
 using LtiAdvantage;
 using LtiAdvantage.AssignmentGradeServices;
+using LtiAdvantage.IdentityModel.Client;
 using LtiAdvantage.Lti;
 using LtiAdvantage.Utilities;
 using Microsoft.AspNetCore.Mvc;
@@ -70,7 +71,7 @@ public class ReviewModel(LaunchStore launches, AccessTokenService tokens, IHttpC
             using var request = new HttpRequestMessage(HttpMethod.Get, lineItemUrl);
             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.MediaTypes.LineItem));
             using var response = await http.SendAsync(request);
-            await ServiceError.ThrowIfFailedAsync(response);
+            await response.EnsureLtiSuccessAsync();
             LineItem = JsonSerializer.Deserialize<LineItem>(await response.Content.ReadAsStringAsync(), JsonOptions);
         }
         catch (Exception e) { Error ??= $"Line item: {e.Message}"; }

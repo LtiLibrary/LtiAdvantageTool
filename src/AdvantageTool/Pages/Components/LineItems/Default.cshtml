@@ -51,9 +51,9 @@
             <div class="col-auto"><button type="submit" class="btn btn-light btn-sm">Apply filters</button></div>
         </form>
         <p class="small text-muted">
-            The filters use the spec's parameter names. Platforms built on LtiAdvantage 4.0.0 ignore
-            <code>resource_link_id</code>, <code>resource_id</code> and <code>user_id</code>, and answer a
-            role URI with 400 Bad Request: the library binds different names and a role enum there.
+            The filters use the spec's parameter names (<code>resource_link_id</code>, <code>resource_id</code>,
+            <code>user_id</code>, and the full role URI for <code>role</code>). Platforms built on
+            LtiAdvantage 4.0.0 ignored or rejected them; 4.1.0 binds them as the spec says.
         </p>
 
         @if (Model.LtiRequest?.AssignmentGradeServices?.LineItemsUrl is { Length: > 0 })
@@ -110,7 +110,7 @@
                                         }
                                     </select>
                                 </div>
-                                <div class="col-auto"><input name="scoreGiven" type="number" step="any" min="0" value="@(li.AgsLineItem.ScoreMaximum ?? 100)" class="form-control form-control-sm" style="width:6em" title="scoreGiven" /></div>
+                                <div class="col-auto"><input name="scoreGiven" type="number" step="any" min="0" value="@(li.AgsLineItem.ScoreMaximum ?? 100)" class="form-control form-control-sm" style="width:6em" title="scoreGiven (leave empty to report progress only)" placeholder="none" /></div>
                                 <div class="col-auto">
                                     <select name="activityProgress" class="form-select form-select-sm" title="activityProgress">
                                         @foreach (var p in Enum.GetValues<ActivityProgress>().Where(p => p != ActivityProgress.None))
@@ -141,7 +141,7 @@
                             <ul>
                                 @foreach (var r in li.Results)
                                 {
-                                    <li>@Model.NameOf(r.UserId): @r.ResultScore / @r.ResultMaximum
+                                    <li>@Model.NameOf(r.UserId): @(r.ResultScore is null ? "no score (progress only)" : $"{r.ResultScore} / {r.ResultMaximum}")
                                         @if (!string.IsNullOrEmpty(r.Comment)) { <em>— @r.Comment</em> }</li>
                                 }
                             </ul>

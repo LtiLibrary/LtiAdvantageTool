@@ -14,7 +14,13 @@
     var forUser = Model.LtiRequest.ForUser;
     <dl class="row">
         <dt class="col-sm-3">Reviewing</dt>
-        <dd class="col-sm-9">@(forUser?.Name ?? $"{forUser?.GivenName} {forUser?.FamilyName}") <small class="text-muted">(@forUser?.UserId)</small></dd>
+        <dd class="col-sm-9">@(forUser?.Name ?? $"{forUser?.GivenName} {forUser?.FamilyName}") <small class="text-muted">(@forUser?.UserId)</small>
+            @{ var reviewedRoles = (forUser?.Roles ?? []).Where(r => r != LtiAdvantage.Lti.Role.Unknown).ToList(); }
+            @if (reviewedRoles.Count > 0)
+            {
+                <div><small>@string.Join(", ", reviewedRoles)</small></div>
+            }
+        </dd>
         <dt class="col-sm-3">Reviewer</dt>
         <dd class="col-sm-9">@(Model.LtiRequest.Name ?? $"{Model.LtiRequest.GivenName} {Model.LtiRequest.FamilyName}") <small class="text-muted">(@Model.LtiRequest.UserId)</small></dd>
         <dt class="col-sm-3">Line item</dt>
@@ -33,7 +39,7 @@
             <tbody>
             @foreach (var r in Model.Results)
             {
-                <tr><td>@r.ResultScore / @r.ResultMaximum</td><td>@r.Comment</td></tr>
+                <tr><td>@(r.ResultScore is null ? "no score (progress only)" : $"{r.ResultScore} / {r.ResultMaximum}")</td><td>@r.Comment</td></tr>
             }
             </tbody>
         </table>

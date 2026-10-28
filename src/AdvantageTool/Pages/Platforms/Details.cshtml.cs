@@ -1,5 +1,5 @@
 using AdvantageTool.Data;
-using AdvantageTool.Utility;
+using LtiAdvantage.IdentityModel.Client;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -30,7 +30,7 @@ public class DetailsModel(ApplicationDbContext context) : PageModel
         var entity = await context.Platforms.FindAsync(id);
         if (entity is null) return NotFound();
 
-        var pair = PemHelper.GenerateRsaKeyPair();
+        var pair = RsaPemKeys.GenerateKeyPair();
         entity.PreviousKeyId = entity.KeyId;
         entity.PreviousPublicKey = entity.PublicKey;
         entity.KeyId = pair.KeyId;
