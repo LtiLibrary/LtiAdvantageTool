@@ -3,9 +3,6 @@ namespace AdvantageTool.Utility;
 /// <summary>URL helpers for the Assignment and Grade Services.</summary>
 public static class AgsUrls
 {
-    /// <summary>AGS 2.0 §3.3: the scores endpoint is the line item URL with /scores appended to the path (query kept).</summary>
-    public static string Scores(string lineItemUrl) => Append(lineItemUrl, "scores");
-
     /// <summary>AGS 2.0 §3.4: the results endpoint is the line item URL with /results appended to the path (query kept).</summary>
     public static string Results(string lineItemUrl) => Append(lineItemUrl, "results");
 

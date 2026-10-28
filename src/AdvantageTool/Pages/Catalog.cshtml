@@ -43,6 +43,11 @@
                                 <input class="form-check-input" type="checkbox" name="Items[@i].Graded" value="true" title="Create a line item"/>
                                 <input class="form-control form-control-sm" style="width:6em" type="number" name="Items[@i].ScoreMaximum" value="100" title="scoreMaximum"/>
                                 <input class="form-control form-control-sm" style="width:8em" type="text" name="Items[@i].Tag" placeholder="tag"/>
+                                <select class="form-select form-select-sm w-auto" name="Items[@i].GradesReleased" title="gradesReleased">
+                                    <option value="">(platform default)</option>
+                                    <option value="true">grades released</option>
+                                    <option value="false">grades hidden</option>
+                                </select>
                             </div>
                         }
                     </td>
