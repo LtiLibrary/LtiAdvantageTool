@@ -15,9 +15,10 @@
     <dl class="row">
         <dt class="col-sm-3">Reviewing</dt>
         <dd class="col-sm-9">@(forUser?.Name ?? $"{forUser?.GivenName} {forUser?.FamilyName}") <small class="text-muted">(@forUser?.UserId)</small>
-            @if (forUser?.Roles is { Length: > 0 })
+            @{ var reviewedRoles = (forUser?.Roles ?? []).Where(r => r != LtiAdvantage.Lti.Role.Unknown).ToList(); }
+            @if (reviewedRoles.Count > 0)
             {
-                <div><small>@string.Join(", ", forUser.Roles.Where(r => r != LtiAdvantage.Lti.Role.Unknown))</small></div>
+                <div><small>@string.Join(", ", reviewedRoles)</small></div>
             }
         </dd>
         <dt class="col-sm-3">Reviewer</dt>

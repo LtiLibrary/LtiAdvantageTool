@@ -160,9 +160,17 @@ public class CatalogModel(ApplicationDbContext context, LaunchStore launches) : 
         {
             if (Target == "iframe") item.Iframe = new IframeProperty { Src = entry.Type == Constants.ContentItemTypes.Link ? item.Url : null, Height = 600 };
             if (Target == "window") item.Window = new WindowProperty { TargetName = "_blank" };
-            // embed: the platform shows this HTML in its own page. DL 2.0 defines it for link items.
+            // embed: the platform shows this HTML in its own page. DL 2.0 defines it for link items
+            // only; an LTI link with this target keeps the platform's default. The HTML is a small
+            // card rather than an iframe, because many sites (the spec page included) refuse framing.
             if (Target == "embed" && entry.Type == Constants.ContentItemTypes.Link)
-                item.Embed = $"<iframe src=\"{item.Url}\" width=\"100%\" height=\"600\" title=\"{System.Net.WebUtility.HtmlEncode(entry.Title)}\"></iframe>";
+            {
+                var url = System.Net.WebUtility.HtmlEncode(item.Url);
+                item.Embed = $"<div style=\"padding:1em;border:1px solid #ccd;border-radius:6px;font-family:sans-serif\">" +
+                             $"<strong>{System.Net.WebUtility.HtmlEncode(entry.Title)}</strong>" +
+                             $"<p>{System.Net.WebUtility.HtmlEncode(entry.Description)}</p>" +
+                             $"<a href=\"{url}\">{url}</a></div>";
+            }
         }
         return item;
     }

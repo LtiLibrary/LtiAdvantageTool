@@ -143,6 +143,14 @@ public class ToolModel(
         if (!LoadLaunch(launchId)) return Page();
         if (!IsLineItemUrl(lineItemUrl)) return Page();
 
+        // Only an empty field means "progress only"; a value that is not a number is an error,
+        // not a reason to drop the score.
+        if (scoreGiven is null && !string.IsNullOrWhiteSpace(Request.Form["scoreGiven"]))
+        {
+            Error = $"Submit score failed: '{Request.Form["scoreGiven"]}' is not a number.";
+            return Page();
+        }
+
         var http = await CreateAgsClientAsync(Constants.LtiScopes.Ags.Score, Constants.MediaTypes.Score);
         if (http is null) return Page();
 

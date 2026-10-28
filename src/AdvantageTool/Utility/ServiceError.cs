@@ -23,7 +23,4 @@ public static class ServiceError
             return e.Message;
         }
     }
-
-    /// <summary>Throws an <see cref="LtiServiceException"/> describing the platform's answer when the call failed.</summary>
-    public static Task ThrowIfFailedAsync(HttpResponseMessage response) => response.EnsureLtiSuccessAsync();
 }
