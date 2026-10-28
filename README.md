@@ -43,6 +43,20 @@ Then in a browser:
 
 ## Platform side
 
-A separate sample LTI Advantage platform lives at
-[LtiAdvantagePlatform](https://github.com/LtiLibrary/LtiAdvantagePlatform).
+A sample LTI Advantage platform lives at
+[LtiAdvantagePlatform](https://github.com/LtiLibrary/LtiAdvantagePlatform); its
+README walks through connecting the two samples. In short, with the platform
+running on `http://localhost:5099`:
+
+| Tool field        | Value                                     |
+|-------------------|-------------------------------------------|
+| Issuer            | `http://localhost:5099/` (keep the slash) |
+| Authorize URL     | `http://localhost:5099/connect/authorize` |
+| Access token URL  | `http://localhost:5099/connect/token`     |
+| JWKS URL          | `http://localhost:5099/.well-known/jwks`  |
+| Client ID         | the Client ID shown on the platform       |
+
+The Issuer must match the `iss` claim in the platform's id_token exactly, so
+copy it from the platform rather than typing it.
+
 The IMS reference implementation (lti-ri.imsglobal.org) also works.
