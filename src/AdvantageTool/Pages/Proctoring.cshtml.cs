@@ -38,7 +38,8 @@ public class ProctoringModel(ApplicationDbContext context, LaunchStore launches,
         {
             case Constants.Lti.LtiStartProctoringRequestMessageType:
                 StartRequest = new LtiStartProctoringRequest(launch.Payload);
-                FullName = StartRequest.Name;
+                // name is optional in OpenID Connect; many platforms only send given and family name.
+                FullName = StartRequest.Name ?? $"{StartRequest.GivenName} {StartRequest.FamilyName}".Trim();
                 break;
             case Constants.Lti.LtiEndAssessmentRequestMessageType:
                 EndRequest = new LtiEndAssessmentRequest(launch.Payload);

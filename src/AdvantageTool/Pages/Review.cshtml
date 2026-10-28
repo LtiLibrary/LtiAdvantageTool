@@ -16,7 +16,7 @@
         <dt class="col-sm-3">Reviewing</dt>
         <dd class="col-sm-9">@(forUser?.Name ?? $"{forUser?.GivenName} {forUser?.FamilyName}") <small class="text-muted">(@forUser?.UserId)</small></dd>
         <dt class="col-sm-3">Reviewer</dt>
-        <dd class="col-sm-9">@Model.LtiRequest.Name <small class="text-muted">(@Model.LtiRequest.UserId)</small></dd>
+        <dd class="col-sm-9">@(Model.LtiRequest.Name ?? $"{Model.LtiRequest.GivenName} {Model.LtiRequest.FamilyName}") <small class="text-muted">(@Model.LtiRequest.UserId)</small></dd>
         <dt class="col-sm-3">Line item</dt>
         <dd class="col-sm-9">@(Model.LineItem?.Label ?? Model.LtiRequest.AssignmentGradeServices?.LineItemUrl)</dd>
     </dl>
