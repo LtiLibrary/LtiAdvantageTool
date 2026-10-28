@@ -8,7 +8,8 @@ ASP.NET Core 10. Demonstrates:
 - OIDC third-party login initiation
 - Resource-link launch validated with the library's `LtiTokenValidator`, plus the
   launch checks the LTI 1.3 Security Framework expects (see below)
-- Deep linking response (signed by the tool)
+- Deep linking response (signed by the tool) with several content item types,
+  line items and messages
 - Assignment and Grade Services: line items, results
 - Names and Role Provisioning Service: course members
 - The tool's JWKS, published with the library's `JwksControllerBase`, with key
@@ -74,7 +75,7 @@ comes from the browser.
 - `Pages/OidcLogin.cshtml.cs` — third-party login initiation.
 - `Services/LaunchValidator.cs` — every check a launch goes through.
 - `Pages/Tool.cshtml.cs` — the launch URL: validates, then hands off by message type.
-- `Pages/Catalog.cshtml.cs` — deep linking response: select activities,
+- `Pages/Catalog.cshtml.cs` — deep linking response: select content,
   build and sign the `LtiDeepLinkingResponse`, post it back.
 - `Pages/Components/LineItems/LineItemsViewComponent.cs` — token-protected
   AGS + NRPS calls using the LtiAdvantage models.
@@ -103,6 +104,24 @@ Every launch goes through `Services/LaunchValidator.cs`:
   in Development.
 - **No re-posted tokens.** A validated launch is kept server-side for an hour;
   pages and AGS/NRPS buttons only carry its opaque id.
+
+## Deep linking
+
+A deep linking launch opens the catalog (`Pages/Catalog.cshtml.cs`):
+
+- It offers `ltiResourceLink`, `link`, `html`, `file` and `image` items, but only
+  the types in the request's `accept_types`.
+- An LTI link can carry a `lineItem` (score maximum, label, tag, resourceId),
+  so the platform creates a gradebook column for it.
+- With `accept_multiple: false` only one item can be picked.
+- Links can open in an `iframe` or `window`, if the platform lists that target in
+  `accept_presentation_document_targets`.
+- Nothing is pre-selected. **Add selected** with nothing selected says so;
+  **Cancel** returns no items with `errormsg` / `errorlog`. A normal return
+  carries `msg` / `log`. `data` is echoed back unchanged.
+
+Image `width`/`height` and file `expiresAt` are not set: LtiAdvantage currently
+serializes them with the wrong JSON names.
 
 ## Keys and JWKS
 

@@ -1,0 +1,4 @@
+Sample worksheet from the LtiAdvantage sample tool.
+
+1. What does LTI stand for?
+2. Name one LTI Advantage service.
