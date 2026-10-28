@@ -1,4 +1,16 @@
+@using LtiAdvantage.AssignmentGradeServices
 @model AdvantageTool.Pages.Components.LineItems.LineItemsModel
+@{
+    var launchUser = Model.LtiRequest?.UserId;
+    // Role filter values are the full role URIs, as NRPS 2.0 §2.3 asks.
+    var roles = new Dictionary<string, string>
+    {
+        ["http://purl.imsglobal.org/vocab/lis/v2/membership#Learner"] = "Learner",
+        ["http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor"] = "Instructor",
+        ["http://purl.imsglobal.org/vocab/lis/v2/membership#ContentDeveloper"] = "Content developer",
+        ["http://purl.imsglobal.org/vocab/lis/v2/membership#Mentor"] = "Mentor",
+    };
+}
 
 <div class="card mt-3">
     <div class="card-header">Assignment &amp; Grade Services / Names &amp; Roles</div>
@@ -7,70 +19,147 @@
         {
             <div class="alert alert-warning">@Model.Status</div>
         }
-        else
-        {
-            @if (Model.LtiRequest?.AssignmentGradeServices?.LineItemsUrl is { Length: > 0 })
-            {
-                <form method="post" action="?handler=CreateLineItem" class="form-inline mb-3">
-                    <input type="hidden" name="id_token" value="@Model.IdToken" />
-                    <label class="me-2 mb-0">Resource Link ID</label>
-                    <input type="text" name="resource_link_id" value="@Model.LtiRequest.ResourceLink?.Id" class="form-control form-control-sm me-2" />
-                    <button type="submit" class="btn btn-light btn-sm">Add line item</button>
-                </form>
-            }
 
-            <h5>Line items</h5>
-            @if (Model.LineItems.Count == 0)
-            {
-                <p>No line items yet for this context.</p>
-            }
-            else
-            {
-                <ul>
-                    @foreach (var li in Model.LineItems)
-                    {
-                        <li>
-                            <strong>@li.Header</strong>
-                            @if (!string.IsNullOrEmpty(li.AgsLineItem.Id))
-                            {
-                                <form method="post" action="?handler=PostScore" class="d-inline ms-2">
-                                    <input type="hidden" name="id_token" value="@Model.IdToken" />
-                                    <input type="hidden" name="lineItemUrl" value="@li.AgsLineItem.Id" />
-                                    <button type="submit" class="btn btn-light btn-sm" title="Submit a random score for the launch user">Submit a score</button>
-                                </form>
-                                <form method="post" action="?handler=DeleteLineItem" class="d-inline ms-1">
-                                    <input type="hidden" name="id_token" value="@Model.IdToken" />
-                                    <input type="hidden" name="lineItemUrl" value="@li.AgsLineItem.Id" />
-                                    <button type="submit" class="btn btn-outline-danger btn-sm" title="Delete this line item">Delete</button>
-                                </form>
-                            }
-                            @if (li.Results is { Count: > 0 })
-                            {
-                                <ul>
-                                    @foreach (var r in li.Results)
-                                    {
-                                        <li>
-                                            @(Model.Members.TryGetValue(r.UserId ?? "", out var n) ? n : r.UserId):
-                                            @r.ResultScore / @r.ResultMaximum
-                                        </li>
-                                    }
-                                </ul>
-                            }
-                        </li>
-                    }
-                </ul>
-            }
-
-            @if (Model.Members.Count > 0)
-            {
-                <h5>Members</h5>
-                <ul>
+        <form method="get" class="row g-2 align-items-end mb-3">
+            <input type="hidden" name="launchId" value="@Model.LaunchId" />
+            <div class="col-auto"><label class="form-label small mb-0">resource_link_id</label>
+                <input name="resource_link_id" value="@Model.ResourceLinkIdFilter" placeholder="@Model.LtiRequest?.ResourceLink?.Id" class="form-control form-control-sm" /></div>
+            <div class="col-auto"><label class="form-label small mb-0">tag</label>
+                <input name="tag" value="@Model.TagFilter" class="form-control form-control-sm" /></div>
+            <div class="col-auto"><label class="form-label small mb-0">resource_id</label>
+                <input name="resource_id" value="@Model.ResourceIdFilter" class="form-control form-control-sm" /></div>
+            <div class="col-auto"><label class="form-label small mb-0">results for user_id</label>
+                <select name="user_id" class="form-select form-select-sm">
+                    <option value="">(everyone)</option>
                     @foreach (var m in Model.Members)
                     {
-                        <li>@m.Value</li>
+                        <option value="@m.UserId" selected="@(m.UserId == Model.ResultsUserFilter)">@Model.NameOf(m.UserId)</option>
                     }
-                </ul>
+                </select></div>
+            <div class="col-auto"><label class="form-label small mb-0">member role</label>
+                <select name="role" class="form-select form-select-sm">
+                    <option value="">(any)</option>
+                    @foreach (var (uri, label) in roles)
+                    {
+                        <option value="@uri" selected="@(uri == Model.RoleFilter)">@label</option>
+                    }
+                </select></div>
+            <div class="col-auto"><label class="form-label small mb-0">rlid</label>
+                <input name="rlid" value="@Model.RlidFilter" placeholder="@Model.LtiRequest?.ResourceLink?.Id" class="form-control form-control-sm" /></div>
+            <div class="col-auto"><label class="form-label small mb-0">limit (page size)</label>
+                <input name="limit" type="number" min="1" value="@Model.Limit" class="form-control form-control-sm" style="width:6em" /></div>
+            <div class="col-auto"><button type="submit" class="btn btn-light btn-sm">Apply filters</button></div>
+        </form>
+        <p class="small text-muted">
+            The filters use the spec's parameter names. Platforms built on LtiAdvantage 4.0.0 ignore
+            <code>resource_link_id</code>, <code>resource_id</code> and <code>user_id</code>, and answer a
+            role URI with 400 Bad Request: the library binds different names and a role enum there.
+        </p>
+
+        @if (Model.LtiRequest?.AssignmentGradeServices?.LineItemsUrl is { Length: > 0 })
+        {
+            <form method="post" action="?handler=CreateLineItem" class="row g-2 align-items-end mb-3">
+                <input type="hidden" name="launchId" value="@Model.LaunchId" />
+                <div class="col-auto"><label class="form-label small mb-0">Resource link ID</label>
+                    <input type="text" name="resource_link_id" value="@Model.LtiRequest.ResourceLink?.Id" class="form-control form-control-sm" /></div>
+                <div class="col-auto"><label class="form-label small mb-0">Tag</label>
+                    <input type="text" name="tag" class="form-control form-control-sm" /></div>
+                <div class="col-auto"><label class="form-label small mb-0">Resource ID</label>
+                    <input type="text" name="resource_id" class="form-control form-control-sm" /></div>
+                <div class="col-auto"><button type="submit" class="btn btn-light btn-sm">Add line item</button></div>
+            </form>
+
+            <form method="post" action="?handler=ErrorDemo" class="mb-3">
+                <input type="hidden" name="launchId" value="@Model.LaunchId" />
+                <small class="text-muted me-2">See a failure on purpose:</small>
+                <button type="submit" name="kind" value="missing-line-item" class="btn btn-outline-secondary btn-sm">Read a missing line item</button>
+                <button type="submit" name="kind" value="wrong-scope" class="btn btn-outline-secondary btn-sm">Create with a read-only token</button>
+            </form>
+
+            <h5>Line items <small class="text-muted">(@Model.LineItemPages page(s))</small></h5>
+            @if (Model.LineItems.Count == 0)
+            {
+                <p>No line items match.</p>
             }
+            <ul class="list-unstyled">
+                @foreach (var li in Model.LineItems)
+                {
+                    <li class="mb-3">
+                        <strong>@li.Header</strong>
+                        <small class="text-muted">
+                            max @li.AgsLineItem.ScoreMaximum
+                            @if (!string.IsNullOrEmpty(li.AgsLineItem.Tag)) { <text> · tag @li.AgsLineItem.Tag</text> }
+                            @if (!string.IsNullOrEmpty(li.AgsLineItem.ResourceId)) { <text> · resource @li.AgsLineItem.ResourceId</text> }
+                            @if (li.AgsLineItem.SubmissionReviewExtension is not null) { <text> · submission review</text> }
+                        </small>
+                        @if (!string.IsNullOrEmpty(li.AgsLineItem.Id))
+                        {
+                            <form method="post" action="?handler=PostScore" class="row g-1 align-items-center mt-1">
+                                <input type="hidden" name="launchId" value="@Model.LaunchId" />
+                                <input type="hidden" name="lineItemUrl" value="@li.AgsLineItem.Id" />
+                                <input type="hidden" name="scoreMaximum" value="@(li.AgsLineItem.ScoreMaximum ?? 100)" />
+                                <div class="col-auto">
+                                    <select name="userId" class="form-select form-select-sm" title="userId">
+                                        @if (Model.Members.All(m => m.UserId != launchUser))
+                                        {
+                                            <option value="@launchUser">@launchUser (you)</option>
+                                        }
+                                        @foreach (var m in Model.Members)
+                                        {
+                                            <option value="@m.UserId" selected="@(m.UserId == launchUser)">@Model.NameOf(m.UserId)</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="col-auto"><input name="scoreGiven" type="number" step="any" min="0" value="@(li.AgsLineItem.ScoreMaximum ?? 100)" class="form-control form-control-sm" style="width:6em" title="scoreGiven" /></div>
+                                <div class="col-auto">
+                                    <select name="activityProgress" class="form-select form-select-sm" title="activityProgress">
+                                        @foreach (var p in Enum.GetValues<ActivityProgress>().Where(p => p != ActivityProgress.None))
+                                        {
+                                            <option selected="@(p == ActivityProgress.Completed)">@p</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="col-auto">
+                                    <select name="gradingProgress" class="form-select form-select-sm" title="gradingProgress">
+                                        @foreach (var p in Enum.GetValues<GradingProgress>().Where(p => p != GradingProgress.None))
+                                        {
+                                            <option selected="@(p == GradingProgress.FullyGraded)">@p</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="col-auto"><input name="comment" placeholder="comment" class="form-control form-control-sm" /></div>
+                                <div class="col-auto"><button type="submit" class="btn btn-light btn-sm">Submit score</button></div>
+                            </form>
+                            <form method="post" action="?handler=DeleteLineItem" class="d-inline">
+                                <input type="hidden" name="launchId" value="@Model.LaunchId" />
+                                <input type="hidden" name="lineItemUrl" value="@li.AgsLineItem.Id" />
+                                <button type="submit" class="btn btn-link btn-sm text-danger p-0" title="Delete this line item">Delete line item</button>
+                            </form>
+                        }
+                        @if (li.Results is { Count: > 0 })
+                        {
+                            <ul>
+                                @foreach (var r in li.Results)
+                                {
+                                    <li>@Model.NameOf(r.UserId): @r.ResultScore / @r.ResultMaximum
+                                        @if (!string.IsNullOrEmpty(r.Comment)) { <em>— @r.Comment</em> }</li>
+                                }
+                            </ul>
+                        }
+                    </li>
+                }
+            </ul>
+        }
+
+        @if (Model.LtiRequest?.NamesRoleService is not null)
+        {
+            <h5>Members <small class="text-muted">(@Model.MemberPages page(s))</small></h5>
+            <ul>
+                @foreach (var m in Model.Members)
+                {
+                    <li>@Model.NameOf(m.UserId) <small class="text-muted">@string.Join(", ", (m.Roles ?? []).Select(r => r.ToString()))</small></li>
+                }
+            </ul>
         }
     </div>
 </div>

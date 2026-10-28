@@ -13,7 +13,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     {
         base.OnModelCreating(builder);
         builder.Entity<Platform>().HasIndex(p => p.PlatformId).IsUnique();
-        builder.Entity<Platform>().HasIndex(p => p.Issuer).IsUnique();
+        // One issuer can hold several registrations (one per client id), as real LMSs do.
+        builder.Entity<Platform>().HasIndex(p => new { p.Issuer, p.ClientId }).IsUnique();
     }
 
     public Task<AdvantageToolUser?> GetUserAsync(ClaimsPrincipal principal)
@@ -24,8 +25,11 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             : Users.Include(u => u.Platforms).SingleOrDefaultAsync(u => u.Id == id);
     }
 
-    public Task<Platform?> GetPlatformByIssuerAsync(string issuer)
-        => Platforms.SingleOrDefaultAsync(p => p.Issuer == issuer);
+    public Task<Platform?> GetPlatformAsync(string issuer, string clientId)
+        => Platforms.SingleOrDefaultAsync(p => p.Issuer == issuer && p.ClientId == clientId);
+
+    public Task<List<Platform>> GetPlatformsByIssuerAsync(string issuer)
+        => Platforms.Where(p => p.Issuer == issuer).ToListAsync();
 
     public Task<Platform?> GetPlatformByPlatformIdAsync(string platformId)
         => Platforms.SingleOrDefaultAsync(p => p.PlatformId == platformId);

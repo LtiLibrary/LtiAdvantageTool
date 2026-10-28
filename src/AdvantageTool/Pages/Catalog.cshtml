@@ -1,29 +1,81 @@
 @page "/Tool/Catalog"
 @model AdvantageTool.Pages.CatalogModel
-@{ ViewData["Title"] = "Pick activities"; }
+@{ ViewData["Title"] = "Pick content"; }
+
+<h1>Pick content</h1>
 
 @if (!string.IsNullOrEmpty(Model.Error))
 {
     <div class="alert alert-danger">@Model.Error</div>
 }
 
-<h1>Pick activities</h1>
-<p>Sample activities the platform will receive as deep-linked content items.</p>
+@if (Model.Settings is not null)
+{
+    <p>
+        Items are sent back to the platform as deep linking content items.
+        The platform accepts: <code>@string.Join(", ", Model.Settings.AcceptTypes ?? [])</code>.
+        @if (!Model.Settings.AcceptMultiple)
+        {
+            <strong>Only one item can be returned.</strong>
+        }
+    </p>
 
-<form method="post" asp-page-handler="AssignActivities">
-    <input type="hidden" asp-for="IdToken"/>
-    @for (int i = 0; i < Model.Activities.Count; i++)
+    <form method="post">
+        <input type="hidden" asp-for="LaunchId"/>
+        <table class="table align-middle">
+            <thead><tr><th></th><th>Item</th><th>Type</th><th>Gradebook column (lineItem)</th></tr></thead>
+            <tbody>
+            @for (var i = 0; i < Model.Offered.Count; i++)
+            {
+                var entry = Model.Offered[i];
+                <tr>
+                    <td>
+                        <input type="hidden" name="Items[@i].Key" value="@entry.Key"/>
+                        <input class="form-check-input item-select" type="checkbox" name="Items[@i].Selected" value="true"
+                               checked="@(Model.Items.ElementAtOrDefault(i)?.Selected == true)"/>
+                    </td>
+                    <td>@entry.Title<br/><small class="text-muted">@entry.Description</small></td>
+                    <td><code>@entry.Type</code></td>
+                    <td>
+                        @if (entry.Type == LtiAdvantage.Constants.ContentItemTypes.LtiLink)
+                        {
+                            <div class="d-flex gap-2 align-items-center">
+                                <input class="form-check-input" type="checkbox" name="Items[@i].Graded" value="true" title="Create a line item"/>
+                                <input class="form-control form-control-sm" style="width:6em" type="number" name="Items[@i].ScoreMaximum" value="100" title="scoreMaximum"/>
+                                <input class="form-control form-control-sm" style="width:8em" type="text" name="Items[@i].Tag" placeholder="tag"/>
+                            </div>
+                        }
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+
+        @if (Model.Targets.Count > 0)
+        {
+            <div class="mb-3">
+                <label class="form-label" for="Target">Open links in</label>
+                <select class="form-select w-auto" name="Target" id="Target">
+                    <option value="">(platform default)</option>
+                    @foreach (var target in Model.Targets)
+                    {
+                        <option value="@target">@target</option>
+                    }
+                </select>
+            </div>
+        }
+
+        <button type="submit" asp-page-handler="Add" class="btn btn-primary">Add selected</button>
+        <button type="submit" asp-page-handler="Cancel" class="btn btn-secondary">Cancel</button>
+    </form>
+
+    @if (!Model.Settings.AcceptMultiple)
     {
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" asp-for="Activities[i].Selected"/>
-            <input type="hidden" asp-for="Activities[i].Id"/>
-            <input type="hidden" asp-for="Activities[i].Title"/>
-            <input type="hidden" asp-for="Activities[i].Description"/>
-            <label class="form-check-label">
-                @Model.Activities[i].Title
-                <small class="text-muted">— @Model.Activities[i].Description</small>
-            </label>
-        </div>
+        <script>
+            // accept_multiple is false: keep at most one item checked.
+            document.querySelectorAll('.item-select').forEach(box => box.addEventListener('change', () => {
+                if (box.checked) document.querySelectorAll('.item-select').forEach(other => { if (other !== box) other.checked = false; });
+            }));
+        </script>
     }
-    <button type="submit" class="btn btn-primary mt-3">Assign</button>
-</form>
+}

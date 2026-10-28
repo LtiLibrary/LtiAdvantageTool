@@ -11,6 +11,7 @@
     <dt class="col-sm-3">Access token URL</dt><dd class="col-sm-9">@Model.Platform.AccessTokenUrl</dd>
     <dt class="col-sm-3">JWKS URL (platform's)</dt><dd class="col-sm-9">@Model.Platform.JwkSetUrl</dd>
     <dt class="col-sm-3">Client ID</dt><dd class="col-sm-9"><code>@Model.Platform.ClientId</code></dd>
+    <dt class="col-sm-3">Deployment IDs</dt><dd class="col-sm-9"><pre class="mb-0">@Model.Platform.DeploymentIds</pre></dd>
 </dl>
 
 <h4>Tool side (give to the platform)</h4>
@@ -20,7 +21,21 @@
     <dt class="col-sm-3">Deep linking URL</dt><dd class="col-sm-9">@Model.Platform.DeepLinkingUrl</dd>
     <dt class="col-sm-3">JWKS URL (tool's)</dt><dd class="col-sm-9">@Model.Platform.JwksUrl</dd>
     <dt class="col-sm-3">Key ID</dt><dd class="col-sm-9"><code>@Model.Platform.KeyId</code></dd>
+    @if (Model.PreviousKeyId is not null)
+    {
+        <dt class="col-sm-3">Previous key ID</dt><dd class="col-sm-9"><code>@Model.PreviousKeyId</code> (still published)</dd>
+    }
 </dl>
+
+<form method="post" class="mb-3">
+    <button type="submit" asp-page-handler="RotateKey" asp-route-id="@Model.Platform.Id" class="btn btn-outline-primary btn-sm"
+            title="Sign with a new key; keep publishing the current one next to it">Rotate key</button>
+    @if (Model.PreviousKeyId is not null)
+    {
+        <button type="submit" asp-page-handler="RetirePreviousKey" asp-route-id="@Model.Platform.Id" class="btn btn-outline-secondary btn-sm"
+                title="Stop publishing the previous key">Retire previous key</button>
+    }
+</form>
 <details>
     <summary>Public key</summary>
     <pre>@Model.Platform.PublicKey</pre>

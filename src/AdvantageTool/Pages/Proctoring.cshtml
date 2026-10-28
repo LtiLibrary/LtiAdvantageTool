@@ -1,0 +1,54 @@
+@page "/Tool/Proctoring"
+@model AdvantageTool.Pages.ProctoringModel
+@{ ViewData["Title"] = "Proctoring"; }
+
+<h1>Proctored assessment</h1>
+
+@if (!string.IsNullOrEmpty(Model.Error))
+{
+    <div class="alert alert-danger">@Model.Error</div>
+}
+
+@if (Model.StartRequest is not null)
+{
+    var start = Model.StartRequest;
+    <p>
+        <strong>@(start.ResourceLink?.Title ?? "Assessment")</strong>, attempt @start.AttemptNumber
+        <small class="text-muted">in @start.Context?.Title</small>
+    </p>
+    @if (!string.IsNullOrEmpty(start.ProctoringSettings?.Data))
+    {
+        <p>Proctoring settings from the platform: <code>@start.ProctoringSettings.Data</code></p>
+    }
+
+    <div class="card">
+        <div class="card-header">Identity check</div>
+        <div class="card-body">
+            <p class="text-muted">A real proctoring tool would check an ID document or a webcam here.
+                This sample only asks you to confirm your name.</p>
+            <form method="post">
+                <input type="hidden" asp-for="LaunchId" />
+                <div class="mb-3">
+                    <label class="form-label" asp-for="FullName">Full name</label>
+                    <input class="form-control" asp-for="FullName" />
+                </div>
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" asp-for="Confirmed" />
+                    <label class="form-check-label" asp-for="Confirmed">I am the person taking this assessment</label>
+                </div>
+                <button type="submit" class="btn btn-primary">Start the assessment</button>
+            </form>
+        </div>
+    </div>
+}
+
+@if (Model.EndRequest is not null)
+{
+    <div class="alert @(string.IsNullOrEmpty(Model.EndRequest.ErrorMessage) ? "alert-success" : "alert-warning")">
+        The assessment <strong>@Model.EndRequest.ResourceLink?.Title</strong> (attempt @Model.EndRequest.AttemptNumber) has ended.
+        @if (!string.IsNullOrEmpty(Model.EndRequest.ErrorMessage))
+        {
+            <div>The platform reported: @Model.EndRequest.ErrorMessage</div>
+        }
+    </div>
+}

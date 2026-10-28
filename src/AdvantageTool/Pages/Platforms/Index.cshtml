@@ -4,6 +4,8 @@
 
 <h1>Platform registrations</h1>
 <p><a class="btn btn-primary" asp-page="Create">Add platform</a></p>
+<p>Or let the platform register the tool with LTI Dynamic Registration: give it the
+    registration URL <code>@Url.Page("/DynamicRegistration", null, null, Request.Scheme)</code>.</p>
 
 @if (!Model.Platforms.Any())
 {

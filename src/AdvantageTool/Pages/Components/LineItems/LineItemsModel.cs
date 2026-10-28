@@ -1,16 +1,32 @@
+using AdvantageTool.Services;
 using LtiAdvantage.AssignmentGradeServices;
 using LtiAdvantage.Lti;
+using LtiAdvantage.NamesRoleProvisioningService;
 
 namespace AdvantageTool.Pages.Components.LineItems;
 
-public class LineItemsModel(string? idToken)
+public class LineItemsModel(Launch launch)
 {
-    public string IdToken { get; } = idToken ?? string.Empty;
+    public string LaunchId { get; } = launch.Id;
     public string? Status { get; set; }
-    public string? LineItemUrl { get; set; }
     public LtiResourceLinkRequest? LtiRequest { get; set; }
+
+    // Filters, read from the query string of the tool page.
+    public string? ResourceLinkIdFilter { get; set; }
+    public string? TagFilter { get; set; }
+    public string? ResourceIdFilter { get; set; }
+    public string? ResultsUserFilter { get; set; }
+    public string? RoleFilter { get; set; }
+    public string? RlidFilter { get; set; }
+    public int? Limit { get; set; }
+
     public IList<MyLineItem> LineItems { get; set; } = [];
-    public IDictionary<string, string> Members { get; set; } = new Dictionary<string, string>();
+    public int LineItemPages { get; set; }
+    public IList<Member> Members { get; set; } = [];
+    public int MemberPages { get; set; }
+
+    public string NameOf(string? userId) =>
+        Members.FirstOrDefault(m => m.UserId == userId) is { } m ? $"{m.FamilyName}, {m.GivenName}" : userId ?? "";
 }
 
 public class MyLineItem

@@ -1,7 +1,6 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Net.Http.Headers;
 using System.Text.Json;
 using AdvantageTool.Services;
+using AdvantageTool.Utility;
 using IdentityModel.Client;
 using LtiAdvantage;
 using LtiAdvantage.AssignmentGradeServices;
@@ -9,6 +8,7 @@ using LtiAdvantage.Lti;
 using LtiAdvantage.NamesRoleProvisioningService;
 using LtiAdvantage.Utilities;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
 
 namespace AdvantageTool.Pages.Components.LineItems;
 
@@ -20,76 +20,89 @@ public class LineItemsViewComponent(AccessTokenService tokens, IHttpClientFactor
         Converters = { new IsoDateTimeConverter() },
     };
 
-    public async Task<IViewComponentResult> InvokeAsync(string? idToken)
+    public async Task<IViewComponentResult> InvokeAsync(Launch launch)
     {
-        var model = new LineItemsModel(idToken);
-        if (string.IsNullOrEmpty(idToken)) { model.Status = "id_token missing"; return View(model); }
-
-        var jwt = new JwtSecurityTokenHandler().ReadJwtToken(idToken);
-        model.LtiRequest = new LtiResourceLinkRequest(jwt.Payload);
+        var model = new LineItemsModel(launch) { LtiRequest = new LtiResourceLinkRequest(launch.Payload) };
         var lti = model.LtiRequest;
-
-        if (lti.AssignmentGradeServices is null) { model.Status = "Assignment & Grade Services not present in launch."; return View(model); }
-        model.LineItemUrl = lti.AssignmentGradeServices.LineItemUrl;
+        ReadFilters(model);
 
         var scopes = string.Join(" ",
             Constants.LtiScopes.Ags.LineItem,
             Constants.LtiScopes.Ags.ResultReadonly,
             Constants.LtiScopes.Nrps.MembershipReadonly);
-        var token = await tokens.GetAccessTokenAsync(lti.Iss!, scopes);
+        var token = await tokens.GetAccessTokenAsync(launch.PlatformId, scopes);
         if (token.IsError) { model.Status = token.Error; return View(model); }
 
         var http = httpClientFactory.CreateClient();
         http.SetBearerToken(token.AccessToken!);
 
+        // Names & Roles first, so line item results can show names.
+        if (lti.NamesRoleService?.ContextMembershipUrl is { Length: > 0 } membershipUrl)
+        {
+            try
+            {
+                // NRPS 2.0 §2.3: role and rlid filter the members; limit sets the page size, and the
+                // platform's Link header (rel="next") leads to the next page.
+                var url = QueryHelpers.AddQueryString(membershipUrl, Query(
+                    ("role", model.RoleFilter), ("rlid", model.RlidFilter), ("limit", model.Limit?.ToString())));
+                (model.Members, model.MemberPages) = await Paging.GetAllPagesAsync(http, url,
+                    Constants.MediaTypes.MembershipContainer,
+                    json => JsonSerializer.Deserialize<MembershipContainer>(json, JsonOptions)?.Members ?? []);
+                model.Members = model.Members.OrderBy(m => m.FamilyName).ThenBy(m => m.GivenName).ToList();
+            }
+            catch (Exception e) { model.Status = $"Names & Roles: {e.Message}"; }
+        }
+
+        if (lti.AssignmentGradeServices?.LineItemsUrl is not { Length: > 0 } lineItemsUrl) return View(model);
+
         try
         {
-            http.DefaultRequestHeaders.Accept.Clear();
-            http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.MediaTypes.LineItemContainer));
-            var liJson = await http.GetStringAsync(lti.AssignmentGradeServices.LineItemsUrl);
-            var lineItems = JsonSerializer.Deserialize<LineItem[]>(liJson, JsonOptions) ?? [];
+            // AGS 2.0 §3.2.5: the line item container can be filtered by resource_link_id,
+            // resource_id and tag, and is paged with limit + Link headers like NRPS.
+            var url = QueryHelpers.AddQueryString(lineItemsUrl, Query(
+                ("resource_link_id", model.ResourceLinkIdFilter), ("resource_id", model.ResourceIdFilter),
+                ("tag", model.TagFilter), ("limit", model.Limit?.ToString())));
+            var (lineItems, pages) = await Paging.GetAllPagesAsync(http, url,
+                Constants.MediaTypes.LineItemContainer,
+                json => JsonSerializer.Deserialize<LineItem[]>(json, JsonOptions) ?? []);
+            model.LineItemPages = pages;
             model.LineItems = lineItems.Select(i => new MyLineItem
             {
                 AgsLineItem = i,
                 Header = i.Label ?? $"Tag: {i.Tag}",
             }).ToList();
         }
-        catch (Exception e) { model.Status = e.Message; return View(model); }
-
-        if (lti.NamesRoleService is not null)
-        {
-            try
-            {
-                http.DefaultRequestHeaders.Accept.Clear();
-                http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.MediaTypes.MembershipContainer));
-                var memJson = await http.GetStringAsync(lti.NamesRoleService.ContextMembershipUrl);
-                var container = JsonSerializer.Deserialize<MembershipContainer>(memJson, JsonOptions);
-                if (container?.Members is not null)
-                {
-                    foreach (var m in container.Members.OrderBy(m => m.FamilyName).ThenBy(m => m.GivenName))
-                    {
-                        if (!string.IsNullOrEmpty(m.UserId))
-                            model.Members.TryAdd(m.UserId, $"{m.FamilyName}, {m.GivenName}");
-                    }
-                }
-            }
-            catch (Exception e) { model.Status = e.Message; }
-        }
+        catch (Exception e) { model.Status = $"Line items: {e.Message}"; return View(model); }
 
         try
         {
-            http.DefaultRequestHeaders.Accept.Clear();
-            http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.MediaTypes.ResultContainer));
-            foreach (var li in model.LineItems)
+            foreach (var li in model.LineItems.Where(li => !string.IsNullOrEmpty(li.AgsLineItem.Id)))
             {
-                var lineItemUri = new Uri(li.AgsLineItem.Id!);
-                var url = $"{lineItemUri.GetLeftPart(UriPartial.Path).TrimEnd('/')}/results{lineItemUri.Query}";
-                var json = await http.GetStringAsync(url);
-                li.Results = JsonSerializer.Deserialize<ResultContainer>(json, JsonOptions);
+                // AGS 2.0 §3.4: user_id narrows the results to one user.
+                var url = QueryHelpers.AddQueryString(AgsUrls.Results(li.AgsLineItem.Id!), Query(("user_id", model.ResultsUserFilter)));
+                var (results, _) = await Paging.GetAllPagesAsync(http, url,
+                    Constants.MediaTypes.ResultContainer,
+                    json => JsonSerializer.Deserialize<ResultContainer>(json, JsonOptions) ?? []);
+                li.Results = new ResultContainer(results);
             }
         }
-        catch (Exception e) { model.Status = e.Message; }
+        catch (Exception e) { model.Status = $"Results: {e.Message}"; }
 
         return View(model);
     }
+
+    private void ReadFilters(LineItemsModel model)
+    {
+        string? Get(string name) => Request.Query[name] is { Count: > 0 } v && !string.IsNullOrWhiteSpace(v[0]) ? v[0] : null;
+        model.ResourceLinkIdFilter = Get("resource_link_id");
+        model.TagFilter = Get("tag");
+        model.ResourceIdFilter = Get("resource_id");
+        model.ResultsUserFilter = Get("user_id");
+        model.RoleFilter = Get("role");
+        model.RlidFilter = Get("rlid");
+        model.Limit = int.TryParse(Get("limit"), out var limit) && limit > 0 ? limit : null;
+    }
+
+    private static Dictionary<string, string?> Query(params (string Name, string? Value)[] parameters) =>
+        parameters.Where(p => !string.IsNullOrEmpty(p.Value)).ToDictionary(p => p.Name, p => p.Value);
 }

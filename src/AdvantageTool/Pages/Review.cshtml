@@ -1,0 +1,41 @@
+@page "/Tool/Review"
+@model AdvantageTool.Pages.ReviewModel
+@{ ViewData["Title"] = "Submission review"; }
+
+<h1>Submission review</h1>
+
+@if (!string.IsNullOrEmpty(Model.Error))
+{
+    <div class="alert alert-danger">@Model.Error</div>
+}
+
+@if (Model.LtiRequest is not null)
+{
+    var forUser = Model.LtiRequest.ForUser;
+    <dl class="row">
+        <dt class="col-sm-3">Reviewing</dt>
+        <dd class="col-sm-9">@(forUser?.Name ?? $"{forUser?.GivenName} {forUser?.FamilyName}") <small class="text-muted">(@forUser?.UserId)</small></dd>
+        <dt class="col-sm-3">Reviewer</dt>
+        <dd class="col-sm-9">@(Model.LtiRequest.Name ?? $"{Model.LtiRequest.GivenName} {Model.LtiRequest.FamilyName}") <small class="text-muted">(@Model.LtiRequest.UserId)</small></dd>
+        <dt class="col-sm-3">Line item</dt>
+        <dd class="col-sm-9">@(Model.LineItem?.Label ?? Model.LtiRequest.AssignmentGradeServices?.LineItemUrl)</dd>
+    </dl>
+
+    <h5>What the tool recorded</h5>
+    @if (Model.Results.Count == 0)
+    {
+        <p>No submission yet for this user.</p>
+    }
+    else
+    {
+        <table class="table table-sm w-auto">
+            <thead><tr><th>Score</th><th>Comment</th></tr></thead>
+            <tbody>
+            @foreach (var r in Model.Results)
+            {
+                <tr><td>@r.ResultScore / @r.ResultMaximum</td><td>@r.Comment</td></tr>
+            }
+            </tbody>
+        </table>
+    }
+}

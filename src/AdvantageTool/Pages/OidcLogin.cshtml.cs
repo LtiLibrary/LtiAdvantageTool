@@ -1,4 +1,5 @@
 using AdvantageTool.Data;
+using AdvantageTool.Services;
 using IdentityModel;
 using IdentityModel.Client;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +10,6 @@ namespace AdvantageTool.Pages;
 [IgnoreAntiforgeryToken]
 public class OidcLoginModel(
     ApplicationDbContext context,
-    StateDbContext state,
     ILogger<OidcLoginModel> logger) : PageModel
 {
     [BindProperty(Name = "iss", SupportsGet = true)] public string? Issuer { get; set; }
@@ -31,10 +31,22 @@ public class OidcLoginModel(
             return BadRequest();
         }
 
-        var platform = await context.GetPlatformByIssuerAsync(Issuer);
+        // One issuer can have several registrations, so look the registration up by issuer and
+        // client_id. client_id is optional in the login request; without it the issuer must be
+        // unambiguous.
+        Platform? platform;
+        if (!string.IsNullOrWhiteSpace(ClientId))
+        {
+            platform = await context.GetPlatformAsync(Issuer, ClientId);
+        }
+        else
+        {
+            var candidates = await context.GetPlatformsByIssuerAsync(Issuer);
+            platform = candidates.Count == 1 ? candidates[0] : null;
+        }
         if (platform is null)
         {
-            logger.LogError("Unknown issuer {Issuer}.", Issuer);
+            logger.LogError("No single registration for issuer {Issuer} and client id {ClientId}.", Issuer, ClientId);
             return BadRequest();
         }
 
@@ -46,7 +58,7 @@ public class OidcLoginModel(
 
         var nonce = CryptoRandom.CreateUniqueId();
         var stateValue = CryptoRandom.CreateUniqueId();
-        state.AddState(nonce, stateValue);
+        LtiStateCookie.Set(Response, stateValue, nonce);
 
         var url = new RequestUrl(platform.AuthorizeUrl).CreateAuthorizeUrl(
             clientId: platform.ClientId,
